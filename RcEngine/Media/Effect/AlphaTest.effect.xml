@@ -1,0 +1,77 @@
+<Effect name="AlphaTestModelEffect">
+
+  <!-- Effect parameter which has Semantic -->
+  <AutoBinding name="World" semantic="WorldMatrix" type="float4x4"/>
+  <AutoBinding name="ViewProj" semantic="ViewProjectionMatrix" type="float4x4"/>
+  <AutoBinding name="DiffuseMap" semantic="DiffuseMaterialMap" type="texture2d"/>
+  <AutoBinding name="SpecularMap" semantic="SpecularMaterialMap" type="texture2d"/>
+  <AutoBinding name="NormalMap" semantic="NormalMaterialMap" type="texture2d"/>
+  
+  <AutoBinding name="DiffuseColor" semantic="DiffuseMaterialColor" type="float3"/>
+  <AutoBinding name="SpecularColor" semantic="SpecularMaterialColor" type="float3"/>
+  <AutoBinding name="Shininess" semantic="SpecularMaterialPower" type="float"/>
+
+  <AutoBinding name="LightColor" semantic="LightColor" type="float3"/>
+  <AutoBinding name="LightDir" semantic="LightDirection" type="float4"/>
+
+  <AutoBinding name="CameraOrigin" semantic="CameraPosition" type="float3"/>
+
+  <!-- Effect techniques -->
+  <Technique name="VSM">
+	  <Pass name="p0">
+		  <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+		  <PixelShader file="ShadowMapGen" entry="ShadowMapVSM">
+		    <Macro name="VSM"/>
+		  </PixelShader>
+	  </Pass>
+  </Technique>
+
+  <!-- pission disc PCF-->
+  <Technique name="PCF">
+	  <Pass name="p0">
+      <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+	  </Pass>
+  </Technique>
+  
+  <Technique name="DepthPre">
+    <Pass name="p0">
+      <VertexShader file="Model" entry="ModelVS"/>
+      <State name="ColorWriteMask" index="0" r="false" g="false" b="false" a="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="GBuffer">
+	  <Pass name="p0">
+		  <VertexShader file="Model" entry="ModelVS"/>
+		  <PixelShader file="GBuffer" entry="GBufferPS"/>
+		  <State name="StencilEnable" value="true"/>
+		  <State name="FrontStencilRef" value="1"/>
+		  <State name="FrontStencilFunc" value="Always"/>
+		  <State name="FrontStencilFailOp" value="Keep"/>
+		  <State name="FrontStencilDepthFailOp" value="Keep"/>
+		  <State name="FrontStencilPassOp" value="Replace"/>
+	  </Pass>
+  </Technique>
+
+  <Technique name="DirectionalLighting">
+    <Pass name="p0">
+      <VertexShader file="Model" entry="ModelVS"/>
+      <PixelShader file="ForwardLighting" entry="DirectionalLightingPS"/>
+	  <State name="CullMode" value="None"/>
+	  <!--<State name="FillMode" value="WireFrame"/>-->
+    </Pass>
+  </Technique>
+
+  <Technique name="ForwardShading">
+    <Pass name="p0">
+      <VertexShader file="Model" entry="ModelVS"/>
+      <PixelShader file="ForwardPlus" entry="ForwardShadingPSMain"/>
+      <State name="DepthEnable" value="true"/>
+      <State name="DepthFunc" value="LessEqual"/>
+      <State name="DepthWriteMask" value="false"/>
+    </Pass>
+  </Technique>
+  
+</Effect>
+	
+	

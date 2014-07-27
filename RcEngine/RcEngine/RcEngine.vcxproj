@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\CompileConfig.h" />
+    <ClInclude Include="Core\Environment.h" />
+    <ClInclude Include="Core\Exception.h" />
+    <ClInclude Include="Core\IModule.h" />
+    <ClInclude Include="Core\Loger.h" />
+    <ClInclude Include="Core\ModuleManager.h" />
+    <ClInclude Include="Core\Prerequisites.h" />
+    <ClInclude Include="Core\Profiler.h" />
+    <ClInclude Include="Core\Singleton.h" />
+    <ClInclude Include="Core\StringHash.h" />
+    <ClInclude Include="Core\Timer.h" />
+    <ClInclude Include="Core\Utility.h" />
+    <ClInclude Include="Core\Variant.h" />
+    <ClInclude Include="Core\XMLDom.h" />
+    <ClInclude Include="Graphics\Animation.h" />
+    <ClInclude Include="Graphics\AnimationClip.h" />
+    <ClInclude Include="Graphics\AnimationController.h" />
+    <ClInclude Include="Graphics\AnimationState.h" />
+    <ClInclude Include="Graphics\Camera.h" />
+    <ClInclude Include="Graphics\CameraController1.h" />
+    <ClInclude Include="Graphics\CascadedShadowMap.h" />
+    <ClInclude Include="Graphics\DebugDrawManager.h" />
+    <ClInclude Include="Graphics\Effect.h" />
+    <ClInclude Include="Graphics\EffectParameter.h" />
+    <ClInclude Include="Graphics\Geometry.h" />
+    <ClInclude Include="Graphics\GraphicsCommon.h" />
+    <ClInclude Include="Graphics\GraphicsResource.h" />
+    <ClInclude Include="Graphics\GraphicsScriptLoader.h" />
+    <ClInclude Include="Graphics\Image.h" />
+    <ClInclude Include="Graphics\Material.h" />
+    <ClInclude Include="Graphics\Mesh.h" />
+    <ClInclude Include="Graphics\PixelFormat.h" />
+    <ClInclude Include="Graphics\Renderable.h" />
+    <ClInclude Include="Graphics\RenderFactory.h" />
+    <ClInclude Include="Graphics\RenderOperation.h" />
+    <ClInclude Include="Graphics\RenderPath.h" />
+    <ClInclude Include="Graphics\RenderQueue.h" />
+    <ClInclude Include="Graphics\RenderState.h" />
+    <ClInclude Include="Graphics\Skeleton.h" />
+    <ClInclude Include="Graphics\Sky.h" />
+    <ClInclude Include="Graphics\SpriteBatch.h" />
+    <ClInclude Include="Graphics\TextureResource.h" />
+    <ClInclude Include="Graphics\VertexDeclaration.h" />
+    <ClInclude Include="Input\InputEvent.h" />
+    <ClInclude Include="Input\InputSystem.h" />
+    <ClInclude Include="IO\FileStream.h" />
+    <ClInclude Include="IO\FileSystem.h" />
+    <ClInclude Include="IO\MemoryStream.h" />
+    <ClInclude Include="IO\PathUtil.h" />
+    <ClInclude Include="IO\Stream.h" />
+    <ClInclude Include="MainApp\Application.h" />
+    <ClInclude Include="MainApp\AppSettings.h" />
+    <ClInclude Include="MainApp\Window.h" />
+    <ClInclude Include="Math\BoundingBox.h" />
+    <ClInclude Include="Math\BoundingSphere.h" />
+    <ClInclude Include="Math\ColorRGBA.h" />
+    <ClInclude Include="Math\Frustum.h" />
+    <ClInclude Include="Math\Math.h" />
+    <ClInclude Include="Math\MathUtil.h" />
+    <ClInclude Include="Math\Matrix.h" />
+    <ClInclude Include="Math\Plane.h" />
+    <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="Math\Ray.h" />
+    <ClInclude Include="Math\Rectangle.h" />
+    <ClInclude Include="Math\Vector.h" />
+    <ClInclude Include="Resource\Resource.h" />
+    <ClInclude Include="Resource\ResourceManager.h" />
+    <ClInclude Include="Scene\Entity.h" />
+    <ClInclude Include="Scene\Light.h" />
+    <ClInclude Include="Scene\Node.h" />
+    <ClInclude Include="Scene\SceneManager.h" />
+    <ClInclude Include="Scene\SceneNode.h" />
+    <ClInclude Include="Scene\SceneObject.h" />
+    <ClInclude Include="Scene\SubEntity.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Environment.cpp" />
+    <ClCompile Include="Core\Exception.cpp" />
+    <ClCompile Include="Core\IModule.cpp" />
+    <ClCompile Include="Core\Loger.cpp" />
+    <ClCompile Include="Core\ModuleManager.cpp" />
+    <ClCompile Include="Core\Profiler.cpp" />
+    <ClCompile Include="Core\StringHash.cpp" />
+    <ClCompile Include="Core\Timer.cpp" />
+    <ClCompile Include="Core\Utility.cpp" />
+    <ClCompile Include="Core\Variant.cpp" />
+    <ClCompile Include="Core\XMLDom.cpp" />
+    <ClCompile Include="Graphics\Animation.cpp" />
+    <ClCompile Include="Graphics\AnimationClip.cpp" />
+    <ClCompile Include="Graphics\AnimationController.cpp" />
+    <ClCompile Include="Graphics\AnimationState.cpp" />
+    <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\CameraController1.cpp" />
+    <ClCompile Include="Graphics\CascadedShadowMap.cpp" />
+    <ClCompile Include="Graphics\DDSImage.cpp" />
+    <ClCompile Include="Graphics\DebugDrawManager.cpp" />
+    <ClCompile Include="Graphics\Effect.cpp" />
+    <ClCompile Include="Graphics\EffectParameter.cpp" />
+    <ClCompile Include="Graphics\ForwardPath.cpp" />
+    <ClCompile Include="Graphics\FrameBuffer.cpp" />
+    <ClCompile Include="Graphics\Geometry.cpp" />
+    <ClCompile Include="Graphics\GraphicsResource.cpp" />
+    <ClCompile Include="Graphics\GraphicsScriptLoader.cpp" />
+    <ClCompile Include="Graphics\Image.cpp" />
+    <ClCompile Include="Graphics\Material.cpp" />
+    <ClCompile Include="Graphics\Mesh.cpp" />
+    <ClCompile Include="Graphics\PixelFormat.cpp" />
+    <ClCompile Include="Graphics\Renderable.cpp" />
+    <ClCompile Include="Graphics\RenderDevice.cpp" />
+    <ClCompile Include="Graphics\RenderFactory.cpp" />
+    <ClCompile Include="Graphics\RenderOperation.cpp" />
+    <ClCompile Include="Graphics\RenderPath.cpp" />
+    <ClCompile Include="Graphics\RenderQueue.cpp" />
+    <ClCompile Include="Graphics\RenderState.cpp" />
+    <ClCompile Include="Graphics\Skeleton.cpp" />
+    <ClCompile Include="Graphics\Sky.cpp" />
+    <ClCompile Include="Graphics\SpriteBatch.cpp" />
+    <ClCompile Include="Graphics\TextureResource.cpp" />
+    <ClCompile Include="Graphics\VertexDeclaration.cpp" />
+    <ClCompile Include="Input\InputSystem.cpp" />
+    <ClCompile Include="IO\FileStream.cpp" />
+    <ClCompile Include="IO\FileSystem.cpp" />
+    <ClCompile Include="IO\MemoryStream.cpp" />
+    <ClCompile Include="IO\PathUtil.cpp" />
+    <ClCompile Include="IO\Stream.cpp" />
+    <ClCompile Include="MainApp\Application.cpp" />
+    <ClCompile Include="MainApp\Window.cpp" />
+    <ClCompile Include="MainApp\Window_Android.cpp" />
+    <ClCompile Include="MainApp\Window_Win32.cpp" />
+    <ClCompile Include="Math\ColorRGBA.cpp" />
+    <ClCompile Include="Resource\Resource.cpp" />
+    <ClCompile Include="Resource\ResourceManage.cpp" />
+    <ClCompile Include="Scene\Entity.cpp" />
+    <ClCompile Include="Scene\Light.cpp" />
+    <ClCompile Include="Scene\Node.cpp" />
+    <ClCompile Include="Scene\SceneManager.cpp" />
+    <ClCompile Include="Scene\SceneNode.cpp" />
+    <ClCompile Include="Scene\SceneObject.cpp" />
+    <ClCompile Include="Scene\SubEntity.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Media\Effect\GLSL\BezierCurve.glsl" />
+    <None Include="..\Media\Effect\GLSL\DebugView.glsl" />
+    <None Include="..\Media\Effect\GLSL\DeferredLighting.glsl" />
+    <None Include="..\Media\Effect\GLSL\DeferredUtil.glsl" />
+    <None Include="..\Media\Effect\GLSL\ForwardLighting.glsl" />
+    <None Include="..\Media\Effect\GLSL\ForwardPlus.glsl" />
+    <None Include="..\Media\Effect\GLSL\FSQuad.glsl" />
+    <None Include="..\Media\Effect\GLSL\FullscreenTriangle.glsl" />
+    <None Include="..\Media\Effect\GLSL\GBuffer.glsl" />
+    <None Include="..\Media\Effect\GLSL\LightingUtil.glsl" />
+    <None Include="..\Media\Effect\GLSL\ModelMaterialFactory.glsl" />
+    <None Include="..\Media\Effect\GLSL\ModelVertexFactory.glsl" />
+    <None Include="..\Media\Effect\GLSL\Model.glsl" />
+    <None Include="..\Media\Effect\GLSL\ShadowMapGen.glsl" />
+    <None Include="..\Media\Effect\GLSL\Tessellation.glsl" />
+    <None Include="..\Media\Effect\GLSL\TessQuad.glsl" />
+    <None Include="..\Media\Effect\GLSL\TessTeapot.glsl" />
+    <None Include="..\Media\Effect\GLSL\TiledDeferredShading.glsl" />
+    <None Include="..\Media\Effect\GLSL\ToneMap.glsl" />
+    <None Include="Math\BoundingBox.inl" />
+    <None Include="Math\BoundingSphere.inl" />
+    <None Include="Math\ColorRGBA.inl" />
+    <None Include="Math\Frustum.inl" />
+    <None Include="Math\Math.inl" />
+    <None Include="Math\MathUtil.inl" />
+    <None Include="Math\Matrix.inl" />
+    <None Include="Math\Plane.inl" />
+    <None Include="Math\Quaternion.inl" />
+    <None Include="Math\Rectangle.inl" />
+    <None Include="Math\Vector.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Media\Effect\HLSL\DebugView.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeferredLighting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeferredUtil.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ForwardLighting.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ForwardPlus.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\FSQuad.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\FullscreenTriangle.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\GBuffer.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\LightingUtil.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ModelMaterialFactory.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\Model.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ModelVertexFactory.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\PSSM.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\RenderCascadeScene.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ShadowMapGen.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\TiledDeferredShading.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ToneMap.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\Media\Effect\AlphaTest.effect.xml" />
+    <Xml Include="..\Media\Effect\Compute.effect.xml" />
+    <Xml Include="..\Media\Effect\DebugView.effect.xml" />
+    <Xml Include="..\Media\Effect\DeferredLighting.effect.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="..\Media\Effect\Tessellation.effect.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="..\Media\Effect\TiledLightCull.effect.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="..\Media\Effect\FSQuad.effect.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="..\Media\Effect\HDRToneMap.effect.xml" />
+    <Xml Include="..\Media\Effect\Model.effect.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="..\Media\Effect\TiledDeferredShading.effect.xml" />
+    <Xml Include="..\Media\Material\Model.material.xml" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8C5FC295-3DCE-4113-83C6-884D4F46DEF2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>RcEngine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_d</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;BUILD_DLL;RcWindows;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./;../3rdParty;../3rdParty/gli-0.5.1.1/external/glm-0.9.5.1;../3rdParty/gli-0.5.1.1</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;BUILD_DLL;RcWindows;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./;../3rdParty;../3rdParty/gli-0.5.1.1/external/glm-0.9.5.1;../3rdParty/gli-0.5.1.1</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

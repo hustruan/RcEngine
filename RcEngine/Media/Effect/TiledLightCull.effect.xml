@@ -1,0 +1,9 @@
+<Effect name="ForwardPlus">
+
+  <Technique name="TiledLightCull">
+    <Pass name="p0">
+      <ComputeShader file="ForwardPlus" entry="LightCullCSMain"/>
+    </Pass>
+  </Technique>
+
+</Effect>

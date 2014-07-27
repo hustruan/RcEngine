@@ -1,0 +1,25 @@
+<Effect name="Debug">
+
+  <Technique name="DebugShape">
+    <Pass name="p0">
+      <VertexShader file="DebugView" entry="VSMain"/>
+      <PixelShader file="DebugView" entry="PSMain"/>
+      <State name="DepthEnable" value="true"/>
+      <State name="DepthWriteMask" value="false"/>
+      <State name="FillMode" value="WireFrame"/>
+      <State name="CullMode" value="None"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="DebugShapeDepthDisable">
+    <Pass name="p0">
+      <VertexShader file="DebugView" entry="VSMain"/>
+      <PixelShader file="DebugView" entry="PSMain"/>
+      <State name="DepthEnable" value="false"/>
+      <State name="DepthWriteMask" value="false"/>
+      <State name="FillMode" value="WireFrame"/>
+      <State name="CullMode" value="None"/>
+    </Pass>
+  </Technique>
+
+</Effect>

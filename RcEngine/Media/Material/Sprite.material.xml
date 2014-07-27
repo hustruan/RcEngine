@@ -1,0 +1,12 @@
+<Material name="Sprite">
+	<Sampler name="LinearSampler">
+		<State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+		<State name="AddressU" value="Wrap"/>
+		<State name="AddressV" value="Wrap"/>
+	</Sampler>
+	
+	<Parameter type="texture2d" name="SpriteTexture" semantic="DiffuseMaterialMap" stage="PixelShader" sampler="LinearSampler" texUnit="0"/>
+	
+	<Effect name="Sprite.effect.xml"/>
+	<Queue name="Overlay"/>
+</Material>

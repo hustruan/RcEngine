@@ -1,0 +1,7 @@
+<Material name="WireFrame">
+	<Parameter type="float4x4" name="World" semantic="WorldMatrix" />
+	<Parameter type="float4x4" name="ViewProj" semantic="ViewProjectionMatrix" />
+	<Effect name="WireFrame" file="WireFrame.effect.xml">
+		<Technique name="WireFrame" />
+	</Effect>
+</Material>

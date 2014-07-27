@@ -1,0 +1,8 @@
+<Material name="Tanget">
+
+	<Parameter type="float4x4" name="WorldViewProj" semantic="WorldViewProjection" />
+	<Effect name="TangentFrame.effect.xml">
+		<Flag name="_NormalMap"/>
+	</Effect>
+	
+</Material>

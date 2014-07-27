@@ -1,0 +1,13 @@
+<Effect name="HDRToneMap">
+
+  <!-- Effect techniques -->
+  <Technique name="ToneMap">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="ToneMap" entry="ToneMapPSMain"/>
+      <State name="DepthEnable" value="false"/>
+      <State name="DepthWriteMask" value="false"/>
+    </Pass>
+  </Technique>
+
+</Effect>

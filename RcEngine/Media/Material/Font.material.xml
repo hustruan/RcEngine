@@ -1,0 +1,12 @@
+<Material name="Font">
+	<Sampler name="LinearSampler">
+		<State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+		<State name="AddressU" value="Clamp"/>
+		<State name="AddressV" value="Clamp"/>
+	</Sampler>
+	
+	<Parameter type="texture2d" name="SpriteTexture" semantic="DiffuseMaterialMap" stage="PixelShader" sampler="LinearSampler" texUnit="0"/>
+	
+	<Effect name="Font.effect.xml"/>
+	<Queue name="Overlay"/>
+</Material>

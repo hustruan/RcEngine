@@ -1,0 +1,46 @@
+<Material name="DeferredPipeline">
+
+	<Sampler name="PointSampler">
+		<State name="Filter" value="Min_Mag_Mip_Point"/>
+		<State name="AddressU" value="Clamp"/>
+		<State name="AddressV" value="Clamp"/>
+	</Sampler>
+	
+	<Sampler name="ShadowSampler">
+		<State name="Filter" value="Min_Mag_Mip_Linear"/>
+		<State name="AddressU" value="Clamp"/>
+		<State name="AddressV" value="Clamp"/>
+		<State name="AddressW" value="Border"/>
+		<State name="MaxAnisotropy" value="1"/>
+		<State name="MaxLOD" value="0"/>
+		<State name="MinLOD" value="0"/>
+		<State name="MipLODBias" value="0"/>
+	</Sampler>
+	
+	<Sampler name="PCFSampler">
+		<State name="Filter" value="Min_Mag_Mip_Point"/>
+		<State name="AddressU" value="Border"/>
+		<State name="AddressV" value="Border"/>
+		<State name="BorderColor" r="1.0" g="1.0" b="1.0" a="1.0"/>
+		<State name="ComparisonFunc" value="Less"/>
+	</Sampler>
+	
+	
+	<Parameter type="float4x4" name="WorldView" semantic="WorldViewMatrix"/>
+	<Parameter type="float4x4" name="Projection" semantic="ProjectionMatrix"/>
+	<Parameter type="float4x4" name="InvProj" semantic="ProjectionMatrixInverse"/>
+	<Parameter type="float4x4" name="InvView" semantic="ViewMatrixInverse"/>
+	<Parameter type="float4" name="LightPosVS" semantic="LightPosition"/>
+	<Parameter type="float4" name="LightDirVS" semantic="LightDirection"/>
+	<Parameter type="float3" name="LightColor" semantic="LightColor"/>
+	<Parameter type="float3" name="LightFalloff" semantic="LightFalloff"/>
+	
+	<Parameter type="texture2d" name="GBuffer0" stage="PixelShader" sampler="PointSampler" texUnit="0"/>
+	<Parameter type="texture2d" name="DepthBuffer" stage="PixelShader" sampler="PointSampler" texUnit="1"/>
+	<Parameter type="texture2d" name="GBuffer1" stage="PixelShader" sampler="PointSampler" texUnit="2"/>
+	<Parameter type="texture2d" name="LightAccumulateBuffer" stage="PixelShader" sampler="PointSampler" texUnit="3"/>
+	<Parameter type="texture2d" name="CascadeShadowTex" stage="PixelShader" sampler="ShadowSampler" texUnit="4"/>
+	<Parameter type="texture2d" name="ShadowTex" stage="PixelShader" sampler="PCFSampler" texUnit="4"/>
+	
+	<Effect name="DeferredLighting.effect.xml"/>
+</Material>

@@ -2,6 +2,8 @@
 *.slo
 *.lo
 *.o
+*.obj
+*.tlog
 
 # Compiled Dynamic libraries
 *.so
@@ -11,3 +13,18 @@
 *.lai
 *.la
 *.a
+
+# Visual Studio files
+*.opensdf
+*.sdf
+
+# Debug 
+*/Debug/*
+*/*/Debug/*
+*/*/*/Debug/*
+
+# Release 
+*/Release/*
+*/*/Release/*
+*/*/*/Release/*
+

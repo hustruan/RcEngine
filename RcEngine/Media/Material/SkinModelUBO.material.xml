@@ -1,0 +1,16 @@
+<Material name="pants">
+	<Sampler name="LinearSampler">
+		<State name="Filter" value="Min_Mag_Mip_Linear"/>
+		<State name="AddressU" value="Wrap"/>
+		<State name="AddressV" value="Wrap"/>
+	</Sampler>
+	
+	<Parameter type="float4x4" name="World" semantic="WorldMatrix" />
+	<Parameter type="float4x4" name="ViewProj" semantic="ViewProjectionMatrix" />
+	<Parameter type="texture2d" name="DiffuseMap" semantic="DiffuseMaterialMap" stage="PixelShader" sampler="LinearSampler" texUnit="0" value="pants.dds"/>
+	<Effect name="ModelUBO.effect.xml">
+		<Flag name="_Skinning"/>
+	</Effect>
+	<Queue name="Opaque"/>
+
+</Material>

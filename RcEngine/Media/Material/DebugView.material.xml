@@ -1,0 +1,12 @@
+<Material name="Debug">
+
+	<Sampler name="PointSampler">
+		<State name="Filter" value="Min_Mag_Mip_Point"/>
+		<State name="AddressU" value="Clamp"/>
+		<State name="AddressV" value="Clamp"/>
+	</Sampler>
+	
+	<Parameter name="InputTex" sampler="PointSampler" stage="PixelShader" texUnit="0" type="texture2d"/>	
+	<Effect name="DebugView.effect.xml"/>
+	
+</Material>

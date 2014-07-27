@@ -1,0 +1,13 @@
+<Material name="Test">
+
+  <Parameter semantic="DiffuseMaterialMap" type="texture2d" value="sponza_fabric_diff.dds"/>
+  <Parameter semantic="SpecularMaterialMap" type="texture2d" value="sponza_fabric_spec.dds"/>
+  <Parameter semantic="SpecularMaterialPower" type="float" value="2"/>
+  
+  <Effect name="Model.effect.xml">
+    <Flag name="_DiffuseMap"/>
+    <Flag name="_SpecularMap"/>
+  </Effect>
+  
+  <Queue name="Opaque"/>
+</Material>

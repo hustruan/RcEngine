@@ -1,0 +1,27 @@
+<Effect name="DeferredLightingEffect">
+
+  <Technique name="Tile">
+    <Pass name="p0">
+      <ComputeShader file="TiledDeferredShading" entry="TiledDeferrdCSMain"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="Shading">
+    <Pass name="p0">
+      <VertexShader file="DeferredLighting" entry="DirectionalVSMain"/>
+      <PixelShader file="DeferredLighting" entry="DeferredShadingPSMain"/>
+      <State name="DepthEnable" value="false"/>
+      <State name="DepthWriteMask" value="false"/>
+
+      <!-- Only compute lighting in non-background region -->
+      <State name="StencilEnable" value="true"/>
+      <State name="FrontStencilFunc" value="NotEqual"/>
+      <State name="FrontStencilFailOp" value="Keep"/>
+      <State name="FrontStencilDepthFailOp" value="Keep"/>
+      <State name="FrontStencilPassOp" value="Keep"/>
+      <State name="FrontStencilRef" value="0"/>
+    </Pass>
+  </Technique>
+  
+</Effect> 
+  

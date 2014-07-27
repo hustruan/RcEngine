@@ -1,0 +1,39 @@
+<Effect name="Tessellation">
+
+  <!--<Technique name="BezierCurve">
+    <Pass name="p0">
+      <VertexShader file="BezierCurve" entry="BezierVS"/>
+	  <TessControlShader file="BezierCurve" entry="BezierTCS"/>
+	  <TessEvalShader file="BezierCurve" entry="BezierTES"/>
+      <PixelShader file="BezierCurve" entry="BezierePS"/>
+    </Pass>
+  </Technique>-->
+
+    <Technique name="TessQuad">
+      <Pass name="p0">
+        <VertexShader file="TessQuad" entry="PassThroughVS"/>
+        <TessControlShader file="TessQuad" entry="TCSQuad"/>
+        <TessEvalShader file="TessQuad" entry="TESQuad"/>
+        <PixelShader file="TessQuad" entry="PSQuad"/>
+        <State name="FillMode" value="WireFrame"/>
+      </Pass>
+    </Technique>
+
+  <Technique name="TessTeapot">
+    <Pass name="p0">
+      <VertexShader file="TessTeapot" entry="PassThroughVS"/>
+      <TessControlShader file="TessTeapot" entry="TCSTeapot"/>
+      <TessEvalShader file="TessTeapot" entry="TESTeapot"/>
+      <PixelShader file="TessTeapot" entry="PSTeapot"/>
+      
+    </Pass>
+  </Technique>
+
+  <!--<Technique name="TeapotPoints">
+    <Pass name="p0">
+      <VertexShader file="TessTeapot" entry="PassThroughVSPoint"/>
+      <PixelShader file="TessTeapot" entry="PSTeapotPoint"/>
+    </Pass>
+  </Technique>-->
+
+</Effect>

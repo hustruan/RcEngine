@@ -1,0 +1,32 @@
+<Application Title = "Direct3D11 Demo">
+	<Graphics Left="100" Top="100" Width="1024" Height="768" ColorForamt="R8G8B8A8" DepthStencilFormat="Depth24Stencil8" FullScreen="0">
+		<Sample Count="1" Quality="0"/>
+		<SyncInterval Interval="0"/>
+	</Graphics>
+	
+	<RenderSystem System="Direct3D11"/>
+	
+	<Resource>
+		<Group Name="General">
+			<Path Name="../Media/Effect"/>
+			<Path Name="../Media/Material"/>
+			<Path Name="../Media/Mesh"/>
+			<Path Name="../Media/Pipiline"/>
+			<Path Name="../Media/Texture"/>
+			<Path Name="../Media/Font"/>
+			<Path Name="../Media/GuiSkin"/>
+		</Group>
+		
+		<Group Name="Custom">
+			<Path Name="../Media/Mesh"/>
+			<Path Name="../Media/Mesh/Sponza"/>
+			<Path Name="../Media/Mesh/Dude"/>
+			<Path Name="../Media/Mesh/Dwarf"/>
+			<Path Name="../Media/Mesh/Tiny"/>
+			<Path Name="../Media/Mesh/Dance"/>
+			<Path Name="../Media/Mesh/Shapes"/>
+		</Group>	
+	</Resource>
+	
+</Application>
+
