@@ -3,15 +3,15 @@
 
 #include <Graphics/Animation.h>
 #include <Graphics/AnimationState.h>
+#include <Scene/SceneNode.h>
+#include <Scene/Entity.h>
 #include <Math/Vector.h>
 
 using namespace RcEngine;
 
-
 class CharacterController
 {
 public:
-
 	enum CharacterState
 	{
 		Idle,
@@ -21,24 +21,31 @@ public:
 		Jumping,
 	};
 
-
 public:
 	CharacterController(void);
 	~CharacterController(void);
 
+	inline bool IsMovingBackwards() const		{ return mMovingBack; }
 	inline bool IsJumping() const				{ return mJumping; }
 	inline bool HasJumpReachedApex() const		{ return mJumpingReachedApex; }
 
-	void SetupAnimation();
+	inline float GetLockCameraTimer() const		{ return mLockCameraTimer; }
 
-	
+	inline const float4x4& GetCharacterTransform() const	{ return mCharacterEntity->GetWorldTransform(); }
+	inline float3 GetCharacterPosition() const				{ return mCharacterSceneNode->GetWorldPosition(); }
+	inline const BoundingBoxf& GetCharacterBound() const	{ return mCharacterEntity->GetWorldBoundingBox(); }
 
 protected:
-	bool IsGrounded() const;
+	
+	void SetupAnimation();
 
+	bool IsGrounded() const;
 	void UpdateSmoothedMovementDirection();
 
 private:
+
+	Entity* mCharacterEntity;
+	SceneNode* mCharacterSceneNode;
 
 	CharacterState mCharacterState;
 
@@ -75,6 +82,8 @@ private:
 	// Are we jumping? (Initiated with jump button and not grounded yet)
 	bool mJumping;
 	bool mJumpingReachedApex;
+
+	float mLockCameraTimer;
 };
 
 

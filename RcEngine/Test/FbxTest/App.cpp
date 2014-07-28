@@ -137,30 +137,30 @@ protected:
 		//	mDudeSceneNode = dudeSceneNode;
 		//}
 
-		//SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Arthas");
-		//{
-		//	Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Arthas/Arthas.mesh",  "Custom");
-		//	Entity* swoardEntity = sceneMan->CreateEntity("swoard", "./Arthas/Sword.mesh",  "Custom");
-		//	BoneSceneNode* weaponNode = arthasEntity->CreateBoneSceneNode("Weapon", "wepson");
-		//	weaponNode->SetPosition(float3(4.2, -7.8, 0));
-		//	weaponNode->AttachObject(swoardEntity);
+		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Arthas");
+		{
+			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Arthas/Arthas.mesh",  "Custom");
+			Entity* swoardEntity = sceneMan->CreateEntity("swoard", "./Arthas/Sword.mesh",  "Custom");
+			BoneSceneNode* weaponNode = arthasEntity->CreateBoneSceneNode("Weapon", "wepson");
+			weaponNode->SetPosition(float3(4.2, -7.8, 0));
+			weaponNode->AttachObject(swoardEntity);
 
-		//	AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
+			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
 
-		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Walk.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Random.anim", "Custom"));
-		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Standby.anim", "Custom"));
-		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Casting.anim", "Custom"));
-		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/FightingStandby.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Walk.anim", "Custom"));
+			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Random.anim", "Custom"));
+			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Standby.anim", "Custom"));
+			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Casting.anim", "Custom"));
+			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/FightingStandby.anim", "Custom"));
 
-		//	AnimationState* takeClip = animPlayer->GetClip("Random");
-		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-		//	takeClip->Play();
+			AnimationState* takeClip = animPlayer->GetClip("Walk");
+			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+			takeClip->Play();
 
-		//	arthasSceneNode->SetScale(float3(4, 4, 4));
-		//	arthasSceneNode->SetPosition(float3(-100, 0, 0));
-		//	arthasSceneNode->AttachObject(arthasEntity);
-		//}
+			arthasSceneNode->SetScale(float3(2, 2, 2));
+			arthasSceneNode->SetPosition(float3(0, 18, 0));
+			arthasSceneNode->AttachObject(arthasEntity);
+		}
 
 		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
 		{
@@ -169,36 +169,38 @@ protected:
 			citySceneNode->AttachObject(arthasEntity);
 		}
 
-		String modelName = "./LOL/blitzcrank/blitzcrank.mesh";
-		//String modelName = "./LOL/Ahri/ahri.mesh";
-		SceneNode* blitzcrankSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("blitzcrank");
-		{
-			Entity* blitzcrankEntity = sceneMan->CreateEntity("blitzcrank", modelName,  "Custom");	
-			blitzcrankSceneNode->AttachObject(blitzcrankEntity);
+		//String modelName = "./LOL/blitzcrank/blitzcrank.mesh";
+		////String modelName = "./LOL/Ahri/ahri.mesh";
+		//SceneNode* blitzcrankSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("blitzcrank");
+		//{
+		//	Entity* blitzcrankEntity = sceneMan->CreateEntity("blitzcrank", modelName,  "Custom");	
+		//	blitzcrankSceneNode->AttachObject(blitzcrankEntity);
 
-			AnimationPlayer* animPlayer = blitzcrankEntity->GetAnimationPlayer();
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/dance.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/run.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/laugh.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle1.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle2.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle3.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack1.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack2.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack3.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/death.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/windup.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/taunt.anim", "Custom"));
+		//	AnimationPlayer* animPlayer = blitzcrankEntity->GetAnimationPlayer();
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/dance.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/run.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/laugh.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle1.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle2.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle3.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack1.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack2.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack3.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/death.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/windup.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/taunt.anim", "Custom"));
+		//	
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/Take 001.anim", "Custom"));
 
-			AnimationState* takeClip = animPlayer->GetClip("run");
-			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-			takeClip->Play();
+		//	AnimationState* takeClip = animPlayer->GetClip("Take 001");
+		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	//takeClip->Play();
 
-			//blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
-			//blitzcrankSceneNode->SetPosition(float3(0, 50, 0));
+		//	//blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
+		//	//blitzcrankSceneNode->SetPosition(float3(0, 50, 0));
 
-			mDudeEntity = blitzcrankEntity;
-		}
+		//	mDudeEntity = blitzcrankEntity;
+		//}
 	}
 	
 
@@ -260,7 +262,7 @@ protected:
 		//auto bbox = mDudeSceneNode->GetWorldBoundingBox();
 		//DebugDrawManager::GetSingleton().DrawBoundingBox(bbox, ColorRGBA::Red);
 
-		shared_ptr<Skeleton> skeleton = mDudeEntity->GetSkeleton();
+	//	shared_ptr<Skeleton> skeleton = mDudeEntity->GetSkeleton();
 		//DebugDrawManager::GetSingleton().DrawSkeleton(mDudeEntity->GetWorldTransform(), skeleton, ColorRGBA::Red);
 
 		/*static bool sb = false;

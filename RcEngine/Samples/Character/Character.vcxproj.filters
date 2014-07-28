@@ -18,7 +18,10 @@
     <ClInclude Include="CharacterController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdPersonCameraController.h">
+    <ClInclude Include="ThirdPersonCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -26,7 +29,10 @@
     <ClCompile Include="CharacterController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdPersonCameraController.cpp">
+    <ClCompile Include="ThirdPersonCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

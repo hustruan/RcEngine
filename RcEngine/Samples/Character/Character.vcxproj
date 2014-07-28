@@ -77,15 +77,19 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>RcEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Release</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CharacterApp.h" />
     <ClInclude Include="CharacterController.h" />
-    <ClInclude Include="ThirdPersonCameraController.h" />
+    <ClInclude Include="ThirdPersonCamera.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CharacterApp.cpp" />
     <ClCompile Include="CharacterController.cpp" />
-    <ClCompile Include="ThirdPersonCameraController.cpp" />
+    <ClCompile Include="ThirdPersonCamera.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

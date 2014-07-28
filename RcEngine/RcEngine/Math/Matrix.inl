@@ -662,7 +662,7 @@ inline Matrix4<Real> operator* (Real scalar, const Matrix4<Real>& mat)
 //----------------------------------------------------------------------------
 template<typename Real>
 inline Matrix4<Real> 
-	MatrixInverse(const Matrix4<Real>& mat)
+MatrixInverse(const Matrix4<Real>& mat)
 {
 	Real v0 = mat.M31 * mat.M42 - mat.M32 * mat.M41;
 	Real v1 = mat.M31 * mat.M43 - mat.M33 * mat.M41;

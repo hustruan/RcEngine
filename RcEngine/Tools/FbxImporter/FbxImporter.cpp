@@ -601,33 +601,37 @@ void FbxProcesser::BuildSkeleton()
 
 		const vector<FbxNode*>& meshBones = kv.second.BoneNodes;
 		// 可能是绑定到骨骼上的武器
-		if (kv.second.BoneNodes.size() == 1)
-			mFBXMeshSkeletonMap.erase(kv.first);
-	
-		shared_ptr<Skeleton> meshSkeleton( new Skeleton() );
-
-		for (FbxNode* boneNodeFBX : meshBones)
+		if (kv.second.BoneNodes.size() <= 1)
 		{
-			Bone* newBone;
-
-			auto it = std::find(meshBones.begin(), meshBones.end(), boneNodeFBX->GetParent());	
-			if (it == meshBones.end())
-			{
-				newBone = meshSkeleton->AddBone(boneNodeFBX->GetName(), nullptr);
-			}
-			else
-			{
-				uint32_t parentIndex = std::distance(meshBones.begin(), it);
-				Bone* parentBone = meshSkeleton->GetBone(parentIndex);
-				assert(parentBone);
-				
-				newBone = meshSkeleton->AddBone(boneNodeFBX->GetName(), parentBone);
-			}
-
-			ComputeBoneLocalPose(boneNodeFBX, newBone);
+			mFBXMeshSkeletonMap.erase(kv.first);
 		}
+		else
+		{
+			shared_ptr<Skeleton> meshSkeleton( new Skeleton() );
 
-		kv.second.Skeleton = meshSkeleton;
+			for (FbxNode* boneNodeFBX : meshBones)
+			{
+				Bone* newBone;
+
+				auto it = std::find(meshBones.begin(), meshBones.end(), boneNodeFBX->GetParent());	
+				if (it == meshBones.end())
+				{
+					newBone = meshSkeleton->AddBone(boneNodeFBX->GetName(), nullptr);
+				}
+				else
+				{
+					uint32_t parentIndex = std::distance(meshBones.begin(), it);
+					Bone* parentBone = meshSkeleton->GetBone(parentIndex);
+					assert(parentBone);
+
+					newBone = meshSkeleton->AddBone(boneNodeFBX->GetName(), parentBone);
+				}
+
+				ComputeBoneLocalPose(boneNodeFBX, newBone);
+			}
+
+			kv.second.Skeleton = meshSkeleton;
+		}
 	}
 }
 
@@ -705,6 +709,8 @@ void FbxProcesser::ComputeSkeletonBindPose( FbxNode* pMeshNode )
 
 	if( HasSkin(pMesh) )
 	{
+		ExportLog::LogMsg(0, "Compute skeleton bind pose for Mesh: %s", pMesh->GetName());
+
 		FbxAMatrix lReferenceGlobalInitPosition;
 		FbxAMatrix lClusterGlobalInitPosition;
 
@@ -713,6 +719,8 @@ void FbxProcesser::ComputeSkeletonBindPose( FbxNode* pMeshNode )
 
 		lReferenceGeometry = GetGeometry(pMesh->GetNode());
 		lGlobalPosition = pMesh->GetNode()->EvaluateGlobalTransform();
+
+		uint32_t numReferencedBones = 0;
 
 		for( int i = 0; i < pMesh->GetDeformerCount(); ++i )
 		{
@@ -746,7 +754,7 @@ void FbxProcesser::ComputeSkeletonBindPose( FbxNode* pMeshNode )
 					// Find which skeleton this mesh is skin to
 					if (mFBXBoneNodes.find(pLinkNode) == mFBXBoneNodes.end())
 					{
-						ExportLog::LogWarning("Export Animation Error: Bone %s not exits!\n", pLinkNode->GetName());
+						ExportLog::LogWarning("Export Animation Error: Bone %s not exits!", pLinkNode->GetName());
 						assert(false);
 						continue;
 					}
@@ -769,12 +777,13 @@ void FbxProcesser::ComputeSkeletonBindPose( FbxNode* pMeshNode )
 
 					// BindPose, Matrix(Joint->Global)
 					FbxAMatrix lBindPose = lGlobalPosition * lReferenceGlobalInitPosition.Inverse() * lClusterGlobalInitPosition;
-	
 					mBoneBindPose[pLinkNode] = lBindPose;
-					
+
+					ExportLog::LogMsg(0, "\tCompute Bone: %s", pLinkNode->GetName());
+
 					// Make sure all parents exit in front of this bone in vector
 					std::stack<FbxNode*> nodeStack;
-					
+
 					// Mark bone and all parent as referenced
 					while(mFBXBoneNodes.count(pLinkNode))
 					{
@@ -792,8 +801,17 @@ void FbxProcesser::ComputeSkeletonBindPose( FbxNode* pMeshNode )
 						if (std::find(meshBoneNodes.begin(), meshBoneNodes.end(), pLinkNode) == meshBoneNodes.end())
 							meshBoneNodes.push_back(pLinkNode);
 					}
+
+					if (pFBXCluster->GetControlPointIndicesCount() > 0)
+						numReferencedBones++;
 				} 
 			}
+		}
+
+		// exclude mesh which attach to weapon bone node
+		if (numReferencedBones == 1)
+		{
+			mFBXMeshSkeletonMap[pMesh].BoneNodes.clear();
 		}
 	}
 }
@@ -1129,6 +1147,7 @@ shared_ptr<Skeleton> FbxProcesser::ProcessBoneWeights( FbxMesh* pMesh, std::vect
 				if( !pLinkNode )
 					continue;
 				
+				String name = pLinkNode->GetName();
 				Bone* skeletonBone = meshSkeleton->GetBone(pLinkNode->GetName());
 				assert(skeletonBone);
 
@@ -1172,6 +1191,8 @@ void FbxProcesser::ProcessAnimation( const String& clipName, FbxNode* pNode, dou
 				FbxAMatrix matAbsoluteTransform = GetGlobalPosition(pNode, takeTime);	
 				FbxAMatrix matParentAbsoluteTransform = GetGlobalPosition(pNode->GetParent(), takeTime);
 				FbxAMatrix matLocalTrasform = matParentAbsoluteTransform.Inverse() * matAbsoluteTransform;
+
+				//FbxAMatrix matLocalTrasform = pNode->EvaluateLocalTransform(takeTime);
 
 				AnimationClipData::KeyFrame keyframe;
 
@@ -1300,7 +1321,7 @@ void FbxProcesser::CollectAnimations( )
 	{
 		FbxAnimStack* lAnimStack = mFBXScene->GetSrcObject<FbxAnimStack>(i);
 		
-		int nbAnimLayers = lAnimStack->GetMemberCount<FbxAnimLayer>();
+		int numAnimLayers = lAnimStack->GetMemberCount<FbxAnimLayer>();
 
 		FbxString takeName = lAnimStack->GetName();
 
@@ -2242,7 +2263,7 @@ int main()
 	FbxProcesser fbxProcesser;
 	fbxProcesser.Initialize();
 
-	if (fbxProcesser.LoadScene("../../Media/Mesh/AvatarAnimPack/run.fbx"))
+	if (fbxProcesser.LoadScene("../../Media/Mesh/Beta/Beta.FBX"))
 	{
 		fbxProcesser.mSceneName = "Ahri";
 		fbxProcesser.mAnimationName = "Dance";

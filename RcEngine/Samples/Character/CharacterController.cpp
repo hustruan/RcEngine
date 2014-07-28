@@ -43,7 +43,6 @@ void CharacterController::UpdateSmoothedMovementDirection()
 
 	// Target direction relative to the camera
 	float3 targetDirection = keybordDirection.X() * right + keybordDirection.Z() * forward;
-
 }
 
 bool CharacterController::IsGrounded() const
