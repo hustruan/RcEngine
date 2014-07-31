@@ -195,7 +195,8 @@ MeshPart::MeshPart(Mesh& mesh)
 	  mIndexCount(0),
 	  mPrimitiveCount(0),
 	  mIndexStart(0), 
-	  mVertexStart(0)
+	  mVertexStart(0),
+	  mVertexCount(0)
 {
 
 }

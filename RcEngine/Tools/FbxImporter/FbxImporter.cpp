@@ -13,6 +13,7 @@
 
 #include "ExportLog.h"
 
+
 using namespace std;
 
 #ifdef IOS_REF
@@ -1894,6 +1895,7 @@ void FbxProcesser::BuildAndSaveBinary( )
 
 			// write material name
 			stream.WriteString(meshPart->MaterialName + ".material.xml");
+			ExportLog::LogMsg(0, "\tMaterial: %s", meshPart->MaterialName.c_str());
 
 			// write sub mesh bounding sphere
 			stream.Write(&meshPart->Bound.Min, sizeof(float3));
@@ -2243,6 +2245,65 @@ void FbxProcesser::RunCommand( const vector<String>& arguments )
 {
 
 }
+
+void FbxProcesser::BuildAndSaveOBJ()
+{
+	String fileName = "Sinbad";
+	for (size_t mi = 0; mi < mSceneMeshes.size(); ++mi)
+	{
+		MeshData& mesh  = *(mSceneMeshes[mi]);
+
+		// Write vertex and index buffer
+		for (size_t i = 0; i < mesh.Vertices.size(); ++i)
+		{
+			ofstream fout(fileName + std::to_string(i) + ".obj");
+
+			for (const Vertex& vertex : mesh.Vertices[i])
+			{
+				uint32_t vertexFlag = vertex.Flags;
+
+				if (vertexFlag & Vertex::ePosition)
+				{
+					fout << "v " << vertex.Position[0] << " " << vertex.Position[1] << " " << vertex.Position[2] << endl;
+				}
+
+				if (vertexFlag & Vertex::eNormal)
+				{
+					fout << "vn " << vertex.Normal[0] << " " << vertex.Normal[1] << " " << vertex.Normal[2] << endl;
+				}
+
+				if (vertexFlag & Vertex::eTexcoord0)
+				{
+					fout << "vt " << vertex.Tex0[0] << " " << vertex.Tex0[1] << endl;
+				}
+			}
+
+			g_ExportSettings.SwapWindOrder = false;
+			if (g_ExportSettings.SwapWindOrder)
+			{
+				for (size_t j = 0; j < mesh.Indices[i].size() / 3; ++j)
+				{
+					int a = mesh.Indices[i][3*j+0] +1;
+					int b = mesh.Indices[i][3*j+2] +1;
+					int c = mesh.Indices[i][3*j+1] +1;
+					fout << "f " << a << '/' << a << '/' << a << " " << b << '/' << b << '/' << b << " " << c << '/' << c << '/' << c << endl;
+				}
+			}
+			else
+			{
+				for (size_t j = 0; j < mesh.Indices[i].size() / 3; ++j)
+				{
+					int a = mesh.Indices[i][3*j+0]+1;
+					int b = mesh.Indices[i][3*j+1]+1;
+					int c = mesh.Indices[i][3*j+2]+1;
+
+					fout << "f " << a << '/' << a << '/' << a << " " << b << '/' << b << '/' << b << " " << c << '/' << c << '/' << c << endl;
+				}
+			}
+		}
+	}
+}
+
 int main()
 {
 	ExportLog::AddListener( &g_ConsoleOutListener );
@@ -2254,26 +2315,33 @@ int main()
 	ExportLog::SetLogLevel( 1 );
 	ExportLog::EnableLogging( TRUE );
 
-	//g_ExportSettings.ExportSkeleton = false;
+	g_ExportSettings.ExportSkeleton = true;
 	//g_ExportSettings.MergeScene = true;
-	g_ExportSettings.MergeWithSameMaterial = true;
-	g_ExportSettings.MergeScene = true;
-	//g_ExportSettings.SwapWindOrder = false;
+	//g_ExportSettings.MergeWithSameMaterial = true;
+	//g_ExportSettings.MergeScene = true;
+	g_ExportSettings.SwapWindOrder = true;
 
 	FbxProcesser fbxProcesser;
-	fbxProcesser.Initialize();
 
-	if (fbxProcesser.LoadScene("../../Media/Mesh/Beta/Beta.FBX"))
-	{
-		fbxProcesser.mSceneName = "Ahri";
-		fbxProcesser.mAnimationName = "Dance";
+	fbxProcesser.LoadOgre("E:/GitHub/RcEngine/RcEngine/Tools/FbxImporter/Sinbad/Sinbad.mesh");
+	fbxProcesser.BuildAndSaveBinary();
+	//fbxProcesser.BuildAndSaveOBJ();
+	fbxProcesser.BuildAndSaveMaterial();
 
-		fbxProcesser.ProcessScene();
-		//fbxProcesser.BuildAndSaveXML();
- 		fbxProcesser.BuildAndSaveBinary();
-		fbxProcesser.BuildAndSaveMaterial();
-		fbxProcesser.ExportMaterial();
-	}
+
+	//fbxProcesser.Initialize();
+
+	//if (fbxProcesser.LoadScene("../../Media/Mesh/Sinbad/Sinbad.fbx"))
+	//{
+	//	fbxProcesser.mSceneName = "Ahri";
+	//	fbxProcesser.mAnimationName = "Dance";
+
+	//	fbxProcesser.ProcessScene();
+	//	//fbxProcesser.BuildAndSaveXML();
+ //		fbxProcesser.BuildAndSaveBinary();
+	//	fbxProcesser.BuildAndSaveMaterial();
+	//	fbxProcesser.ExportMaterial();
+	//}
 
 	return 0;
 }

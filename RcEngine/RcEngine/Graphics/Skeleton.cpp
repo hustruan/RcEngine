@@ -56,15 +56,16 @@ Bone* Skeleton::GetBone( uint32_t index ) const
 shared_ptr<Skeleton> Skeleton::LoadFrom( Stream& source, uint32_t numBones )
 {
 	shared_ptr<Skeleton> skeleton = std::make_shared<Skeleton>();
-	skeleton->mBones.resize(numBones);
 
+	unordered_map<Bone*, int32_t> boneParentsMap;
+
+	skeleton->mBones.resize(numBones);
 	for (uint32_t i = 0; i < numBones; ++i)
 	{
 		String boneName = source.ReadString();
 		int32_t parentBoneIdx = source.ReadInt();
 
-		Bone* parent = (parentBoneIdx == -1) ? nullptr : skeleton->mBones[parentBoneIdx];
-		Bone* bone = new Bone(boneName, i, parent);
+		Bone* bone = new Bone(boneName, i, nullptr);
 
 		float3 bindPos;
 		source.Read(&bindPos,sizeof(float3));
@@ -78,10 +79,21 @@ shared_ptr<Skeleton> Skeleton::LoadFrom( Stream& source, uint32_t numBones )
 		source.Read(&bindScale,sizeof(float3));
 		bone->SetScale(bindScale);
 
-		bone->CalculateBindPose();
-
-		skeleton->mBones[i] = bone;	
+		boneParentsMap[bone] = parentBoneIdx;
+		skeleton->mBones[i] = bone;
 	}
+
+	for (uint32_t i = 0; i < numBones; ++i)
+	{
+		Bone* bone = skeleton->mBones[i];
+		int32_t parentIndex = boneParentsMap[bone];
+
+		if (parentIndex != -1)
+			skeleton->mBones[parentIndex]->AttachChild(bone);
+	}
+
+	for (uint32_t i = 0; i < numBones; ++i)
+		skeleton->mBones[i]->CalculateBindPose();
 
 	return skeleton;
 }
@@ -91,17 +103,25 @@ shared_ptr<Skeleton> Skeleton::Clone()
 	shared_ptr<Skeleton> skeleton = std::make_shared<Skeleton>();
 
 	skeleton->mBones.resize(mBones.size());
-	for (size_t iBone = 0; iBone < mBones.size(); ++iBone)
+	for (size_t i = 0; i < mBones.size(); ++i)
 	{
-		Bone* parentBoneOld = static_cast<Bone*>(mBones[iBone]->GetParent());
+		Bone* newBone =  new Bone( mBones[i]->GetName(), i, nullptr);
+		newBone->SetPosition(mBones[i]->GetPosition());
+		newBone->SetRotation(mBones[i]->GetRotation());
+		newBone->SetScale(mBones[i]->GetScale());
+		newBone->mOffsetMatrix = mBones[i]->mOffsetMatrix;
 
-		Bone* parentBoneNew = parentBoneOld ? skeleton->mBones[parentBoneOld->GetBoneIndex()] : nullptr;
-		Bone* newBone =  new Bone( mBones[iBone]->GetName(), iBone, parentBoneNew);
-		newBone->SetPosition(mBones[iBone]->GetPosition());
-		newBone->SetRotation(mBones[iBone]->GetRotation());
-		newBone->SetScale(mBones[iBone]->GetScale());
-		newBone->CalculateBindPose();
-		skeleton->mBones[iBone] = newBone;
+		skeleton->mBones[i] = newBone;
+	}
+
+	for (size_t i = 0; i < mBones.size(); ++i)
+	{
+		Bone* parentBone = (static_cast<Bone*>(mBones[i]->GetParent()));
+		if (parentBone)
+		{
+			uint32_t parentIndex =  parentBone->GetBoneIndex();
+			skeleton->mBones[parentIndex]->AttachChild(skeleton->mBones[i]);
+		}
 	}
 
 	return skeleton;

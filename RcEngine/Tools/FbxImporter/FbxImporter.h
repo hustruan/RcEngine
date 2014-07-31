@@ -7,6 +7,7 @@
 #include <Graphics/VertexDeclaration.h>
 #include <Math/MathUtil.h>
 #include <Math/ColorRGBA.h>
+#include <IO/FileStream.h>
 
 using namespace RcEngine;
 
@@ -28,11 +29,13 @@ struct ExportSettings
 	{}
 };
 
+extern ExportSettings g_ExportSettings;
+
 // Coordinate System Transformer, Right-Handed -> Left Handed.
 class FBXTransformer
 {
 public:
-	FBXTransformer() {}
+	FBXTransformer() : mMaxConversion(false) {}
 
 	void Initialize( FbxScene* pScene );
 
@@ -111,6 +114,8 @@ struct Vertex
 
 	uint32_t Flags;
 	size_t Index;	// keep track index in vertices
+
+	Vertex() : Flags(0) {}
 };
 
 // Mesh Part Structure
@@ -191,9 +196,12 @@ public:
 	void BuildAndSaveXML();
 	void BuildAndSaveBinary();	
 	void BuildAndSaveMaterial();
+	void BuildAndSaveOBJ();
 
 	void ExportMaterial();
 
+	void LoadOgre(const char* filename);
+	
 private:
 	void ProcessMesh(FbxNode* pNode);
 	void ProcessAnimation(const String& clipName, FbxNode* pNode, double fFrameRate, double fStart, double fStop);
@@ -214,6 +222,14 @@ private:
 	 * Merge mesh part vertices into one big VertexBuffer if VertexFormat are same.
 	 */
 	void MergeMeshParts();
+
+	
+private:
+	void ImportOgreMesh(FileStream& stream, shared_ptr<MeshData> pMesh);
+	void ReadSubMesh(FileStream& stream, shared_ptr<MeshData>& pMesh);
+	void ReadSkeleton(FileStream& stream, shared_ptr<MeshData>& pMesh);
+	void ReadAnimation(FileStream& stream, shared_ptr<Skeleton>& pMesh);
+	void ReadAnimationTrack(FileStream& stream, AnimationClipData& clipData, shared_ptr<Skeleton>& pSkel);
 
 public:
 	FbxManager* mFBXSdkManager;
@@ -248,5 +264,3 @@ public:
 private:
 	FBXTransformer mFBXTransformer;
 };
-
-

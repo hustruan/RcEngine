@@ -86,6 +86,7 @@
   <ItemGroup>
     <ClCompile Include="ExportLog.cpp" />
     <ClCompile Include="FbxImporter.cpp" />
+    <ClCompile Include="OgreImporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExportLog.h" />

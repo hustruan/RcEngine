@@ -1190,63 +1190,62 @@ aiMatrix4x4 GetBoneOffset(OutModel& model, aiString name)
 
 void AssimpProcesser::BuildSkeleton( OutModel& outModel )
 {
-	// Build skeleton if necessary
-	if (outModel.Bones.size() && outModel.RootBone)
-	{
-		shared_ptr<Skeleton> skeleton(new Skeleton);
-		vector<Bone*>& bones = skeleton->GetBonesModified();
+	//// Build skeleton if necessary
+	//if (outModel.Bones.size() && outModel.RootBone)
+	//{
+	//	shared_ptr<Skeleton> skeleton(new Skeleton);
 
-		for (size_t i = 0; i < outModel.Bones.size(); ++i)
-		{
-			aiNode* boneNode = outModel.Bones[i];
-			String boneName(boneNode->mName.C_Str());
+	//	for (size_t i = 0; i < outModel.Bones.size(); ++i)
+	//	{
+	//		aiNode* boneNode = outModel.Bones[i];
+	//		String boneName(boneNode->mName.C_Str());
 
-			Bone* bone = new Bone(boneName, i);
+	//		Bone* bone = new Bone(boneName, i);
 
-			aiMatrix4x4 transform = boneNode->mTransformation;
+	//		aiMatrix4x4 transform = boneNode->mTransformation;
 
-			// Make the root bone transform relative to the model's root node, if it is not already
-			// This will put the mesh in model coordinate system.
-			if (boneNode == outModel.RootBone)
-				transform = GetDerivedTransform(boneNode, outModel.RootNode);
+	//		// Make the root bone transform relative to the model's root node, if it is not already
+	//		// This will put the mesh in model coordinate system.
+	//		if (boneNode == outModel.RootBone)
+	//			transform = GetDerivedTransform(boneNode, outModel.RootNode);
 
-			aiVector3D scale, position;
-			aiQuaternion rot;
-			transform.Decompose(scale, rot, position);
+	//		aiVector3D scale, position;
+	//		aiQuaternion rot;
+	//		transform.Decompose(scale, rot, position);
 
-			Quaternionf quat = FromAIQuaternion(rot);
-			float yaw, roll, pitch;
-			//QuaternionToRotationYawPitchRoll(yaw, pitch, roll, quat);
+	//		Quaternionf quat = FromAIQuaternion(rot);
+	//		float yaw, roll, pitch;
+	//		//QuaternionToRotationYawPitchRoll(yaw, pitch, roll, quat);
 
-			bone->SetPosition( FromAIVector(position) );
-			bone->SetRotation( FromAIQuaternion(rot) );
-			bone->SetScale( FromAIVector(scale) );
+	//		bone->SetPosition( FromAIVector(position) );
+	//		bone->SetRotation( FromAIQuaternion(rot) );
+	//		bone->SetScale( FromAIVector(scale) );
 
-			// Get offset information if exists
-			aiMatrix4x4 offsetMatrix = GetOffsetMatrix(outModel, boneName);
-			bones.push_back(bone);
-		}
+	//		// Get offset information if exists
+	//		aiMatrix4x4 offsetMatrix = GetOffsetMatrix(outModel, boneName);
+	//		bones.push_back(bone);
+	//	}
 
-		// Set the bone hierarchy
-		for (size_t i = 1; i < outModel.Bones.size(); ++i)
-		{
-			String parentName(outModel.Bones[i]->mParent->mName.C_Str());
+	//	// Set the bone hierarchy
+	//	for (size_t i = 1; i < outModel.Bones.size(); ++i)
+	//	{
+	//		String parentName(outModel.Bones[i]->mParent->mName.C_Str());
 
-			for (size_t j = 0; j < bones.size(); ++j)
-			{
-				if (bones[j]->GetName() == parentName)
-				{
-					//std::cout << bones[i]->GetName() << "   Parent:" << parentName << std::endl;
-					bones[j]->AttachChild( bones[i] );
-					break;
-				}
-			}
-		}
+	//		for (size_t j = 0; j < bones.size(); ++j)
+	//		{
+	//			if (bones[j]->GetName() == parentName)
+	//			{
+	//				//std::cout << bones[i]->GetName() << "   Parent:" << parentName << std::endl;
+	//				bones[j]->AttachChild( bones[i] );
+	//				break;
+	//			}
+	//		}
+	//	}
 
-		outModel.Skeleton = skeleton;
-	}
+	//	outModel.Skeleton = skeleton;
+	//}
 
-	//ValidateOffsetMatrix(outModel);
+	////ValidateOffsetMatrix(outModel);
 }
 
 void AssimpProcesser::BuildAndSaveAnimations( OutModel& model )

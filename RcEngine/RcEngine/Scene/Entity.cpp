@@ -184,17 +184,26 @@ void Entity::OnUpdateRenderQueue(RenderQueue* renderQueue, const Camera& camera,
 
 void Entity::UpdateAnimation()
 {
-	for (auto& kv : mAnimationPlayer->GetAllClip())
+	if (mAnimationPlayer)
 	{
-		AnimationState* animState = kv.second;
-		animState->Apply();
+		for (auto& kv : mAnimationPlayer->GetAllClip())
+		{
+			AnimationState* animState = kv.second;
+			animState->Apply();
+		}
+
+		// Note: the model's world transform will be baked in the skin matrices
+		for (uint32_t i = 0; i < mSkeleton->GetNumBones(); ++i)
+		{
+			Bone* bone = mSkeleton->GetBone(i);
+			auto world = bone->GetWorldTransform();
+			mSkinMatrices[i] = bone->GetOffsetMatrix() * bone->GetWorldTransform();
+		}
 	}
-	
-	// Note: the model's world transform will be baked in the skin matrices
-	for (uint32_t i = 0; i < mSkeleton->GetNumBones(); ++i)
+	else
 	{
-		Bone* bone = mSkeleton->GetBone(i);
-		mSkinMatrices[i] = bone->GetOffsetMatrix() * bone->GetWorldTransform();
+		for (uint32_t i = 0; i < mSkeleton->GetNumBones(); ++i)
+			mSkinMatrices[i].MakeIdentity();
 	}
 }
 
