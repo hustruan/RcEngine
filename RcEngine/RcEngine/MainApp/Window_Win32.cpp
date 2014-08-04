@@ -414,7 +414,7 @@ LRESULT Window::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 		{
 			InputEvent e;
 			e.MouseWheel.type = InputEventType::MouseWheel;
-			e.MouseWheel.wheel = GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA;
+			e.MouseWheel.wheel = GET_WHEEL_DELTA_WPARAM(wParam)/* / WHEEL_DELTA*/;
 			e.MouseWheel.x = GET_X_LPARAM(lParam); 
 			e.MouseWheel.y = GET_Y_LPARAM(lParam); 
 			mInputSystem->FireEvent(e);
@@ -467,8 +467,11 @@ LRESULT Window::WndProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 		{
 			InputEvent e;
 			e.Key.type = InputEventType::KeyDown;
-			MakeKeyEvent(wParam, lParam, e);
-			mInputSystem->FireEvent(e);
+			if ( (lParam & (1 << 30)) == 0 )
+			{
+				MakeKeyEvent(wParam, lParam, e);
+				mInputSystem->FireEvent(e);
+			}
 
 			//printf("wParam = %d WM_KEYDOWN at clock:%d\n", wParam, clock()); 
 		}

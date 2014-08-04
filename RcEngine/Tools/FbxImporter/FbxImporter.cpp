@@ -2323,25 +2323,25 @@ int main()
 
 	FbxProcesser fbxProcesser;
 
-	fbxProcesser.LoadOgre("E:/GitHub/RcEngine/RcEngine/Tools/FbxImporter/Sinbad/Sinbad.mesh");
-	fbxProcesser.BuildAndSaveBinary();
-	//fbxProcesser.BuildAndSaveOBJ();
-	fbxProcesser.BuildAndSaveMaterial();
+	//fbxProcesser.LoadOgre("E:/GitHub/RcEngine/RcEngine/Tools/FbxImporter/Sinbad/Sword.mesh");
+	//fbxProcesser.BuildAndSaveBinary();
+	////fbxProcesser.BuildAndSaveOBJ();
+	//fbxProcesser.BuildAndSaveMaterial();
 
 
-	//fbxProcesser.Initialize();
+	fbxProcesser.Initialize();
 
-	//if (fbxProcesser.LoadScene("../../Media/Mesh/Sinbad/Sinbad.fbx"))
-	//{
-	//	fbxProcesser.mSceneName = "Ahri";
-	//	fbxProcesser.mAnimationName = "Dance";
+	if (fbxProcesser.LoadScene("../../Media/Mesh/Sinbad/Arena.fbx"))
+	{
+		fbxProcesser.mSceneName = "Ahri";
+		fbxProcesser.mAnimationName = "Dance";
 
-	//	fbxProcesser.ProcessScene();
-	//	//fbxProcesser.BuildAndSaveXML();
- //		fbxProcesser.BuildAndSaveBinary();
-	//	fbxProcesser.BuildAndSaveMaterial();
-	//	fbxProcesser.ExportMaterial();
-	//}
+		fbxProcesser.ProcessScene();
+		//fbxProcesser.BuildAndSaveXML();
+ 		fbxProcesser.BuildAndSaveBinary();
+		fbxProcesser.BuildAndSaveMaterial();
+		fbxProcesser.ExportMaterial();
+	}
 
 	return 0;
 }

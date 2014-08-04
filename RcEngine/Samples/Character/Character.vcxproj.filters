@@ -15,24 +15,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CharacterController.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThirdPersonCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CharacterApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SinbadCharacterController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CharacterController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThirdPersonCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CharacterApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SinbadCharacterController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

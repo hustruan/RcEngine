@@ -89,39 +89,6 @@ protected:
 		sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 	}
 
-	void ExportOBJ(size_t j, shared_ptr<GraphicsBuffer> vb, shared_ptr<GraphicsBuffer> ib)
-	{
-		String fileName = "Sinbad";
-		std::ofstream fout(fileName + std::to_string(j) + ".obj");
-
-		uint8_t* pVB = static_cast<uint8_t*>(vb->Map(0, MAP_ALL_BUFFER, RMA_Read_Only)); 
-		size_t vertexCount = vb->GetBufferSize() / 64;
-		for (size_t i = 0; i < vertexCount; ++i)
-		{
-			float* pPos = (float* )pVB;
-			float* pNormal = (float* )pVB + 44;
-			float* pTex = (float* )pVB + 56;
-
-			fout << "v " << pPos[0] << " " << pPos[1] << " " << pPos[2] << std::endl;
-			fout << "vn " << pNormal[0] << " " << pNormal[1] << " " << pNormal[2] << std::endl;
-			fout << "vt " << pTex[0] << " " << pTex[1] << std::endl;
-
-			pVB += 64;
-		}
-		vb->UnMap();
-		
-		uint16_t* pIB = static_cast<uint16_t*>(ib->Map(0, MAP_ALL_BUFFER, RMA_Read_Only));
-		size_t indexCount = ib->GetBufferSize() / sizeof(uint16_t);
-		for (size_t i = 0; i < indexCount / 3; ++i)
-		{
-			int a = pIB[i*3+0]+1;
-			int b = pIB[i*3+1]+1;
-			int c = pIB[i*3+2]+1;
-			fout << "f " << a << '/' << a << '/' << a << " " << b << '/' << b << '/' << b << " " << c << '/' << c << '/' << c << std::endl;
-		}
-		ib->UnMap();
-	}
-
 	void LoadDudeEntity()
 	{
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
@@ -196,39 +163,66 @@ protected:
 		//	arthasSceneNode->AttachObject(arthasEntity);
 		//}
 
-		/*SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
+		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
 		{
 			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./AncientCity/AncientCity.mesh",  "Custom");	
 			citySceneNode->SetScale(float3(10, 10, 10));
 			citySceneNode->AttachObject(arthasEntity);
-		}*/
+		}
 
 		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
 		{
 			Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
-			auto sinbadMesh = arthasEntity->GetMesh();
-			
-			//Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
-			//Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
 
-			//BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("Weapon", "SheathL");
-			//BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("Weapon", "SheathR");
-			//sword1Node->AttachObject(sword1);
-			//sword2Node->AttachObject(sword2);
+			
+			Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+			Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+
+			BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
+			BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
+			sword1Node->AttachObject(sword1);
+			sword2Node->AttachObject(sword2);
 
 			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
 
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Sinbad/Dance.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Sinbad/RunBase.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Sinbad/RunTop.anim", "Custom"));
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Sinbad/JumpLoop.anim", "Custom"));
+			const String AnimClips[] = { 
+				"./Sinbad/Dance.anim", 
+			    "./Sinbad/DrawSwords.anim",
+				"./Sinbad/JumpStart.anim",
+				"./Sinbad/JumpLoop.anim",
+				"./Sinbad/JumpEnd.anim",
+				"./Sinbad/HandsClosed.anim",
+				"./Sinbad/HandsRelaxed.anim",
+				"./Sinbad/IdleBase.anim",
+				"./Sinbad/IdleTop.anim",
+				"./Sinbad/RunBase.anim",
+				"./Sinbad/RunTop.anim",
+				"./Sinbad/SliceHorizontal.anim",
+				"./Sinbad/SliceVertical.anim",
+			};
 
-			AnimationState* takeClip = animPlayer->GetClip("RunTop");
+			for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
+			{
+				AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
+				animState->WrapMode = AnimationState::Wrap_Loop;
+			}
+			
+			AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
+			SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
+
+			SliceHorizontal->Play();
+			animPlayer->PlayClip("IdleBase");
+
+			/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
 			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
 			takeClip->Play();
 
+			AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
+			runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+			runBaseClip->Play();*/
+
 			arthasSceneNode->SetScale(float3(5, 5, 5));
-			//arthasSceneNode->SetPosition(float3(0, 50, 0));
+			arthasSceneNode->SetPosition(float3(0, 50, 0));
 			arthasSceneNode->AttachObject(arthasEntity);
 
 			mDudeEntity = arthasEntity;

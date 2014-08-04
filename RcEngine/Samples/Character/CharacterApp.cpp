@@ -45,16 +45,13 @@ CharacterApp::~CharacterApp(void)
 void CharacterApp::Initialize()
 {
 	mCamera = std::make_shared<Camera>();
-	mCamera->CreateLookAt(float3(-7.404108, 39.924358, -153.436646), float3(-7.288536, 39.863396, -152.445221), float3(0.007056, 0.998140, 0.060553));
-	mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
+	mCamera->CreateLookAt(float3(3.405924, 22.548273, -31.670168), float3(3.326280, 22.028830, -30.819384), float3(-0.048415, 0.854505, 0.517183));
+	mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 3000.0f );
 
-	auto view = mCamera->GetViewMatrix();
-	auto proj = mCamera->GetProjMatrix();
-
-	mCameraControler = new RcEngine::Test::FPSCameraControler;
+	/*mCameraControler = new RcEngine::Test::FPSCameraControler;
 	mCameraControler->AttachCamera(*mCamera);
 	mCameraControler->SetMoveSpeed(100.0f);
-	mCameraControler->SetMoveInertia(true);
+	mCameraControler->SetMoveInertia(true);*/
 
 	mRenderPath = std::make_shared<ForwardPath>();
 	mRenderPath->OnGraphicsInit(mCamera);
@@ -70,8 +67,6 @@ void CharacterApp::LoadContent()
 	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
 
-	LoadDudeEntity();
-
 	// Set as default camera
 	auto screenFB = Environment::GetSingleton().GetRenderDevice()->GetScreenFrameBuffer();
 	screenFB->SetCamera(mCamera);
@@ -81,44 +76,22 @@ void CharacterApp::LoadContent()
 	mDirLight->SetLightColor(float3(1, 1, 1));
 	mDirLight->SetCastShadow(false);
 	sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
-}
 
-void CharacterApp::LoadDudeEntity()
-{
-	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
-	ResourceManager& resMan = ResourceManager::GetSingleton();
-
-	SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Arthas");
-	{
-		Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Arthas/Arthas.mesh",  "Custom");
-		Entity* swoardEntity = sceneMan->CreateEntity("swoard", "./Arthas/Sword.mesh",  "Custom");
-		BoneSceneNode* weaponNode = arthasEntity->CreateBoneSceneNode("Weapon", "wepson");
-		weaponNode->SetPosition(float3(4.2, -7.8, 0));
-		weaponNode->AttachObject(swoardEntity);
-
-		AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
-
-		animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Walk.anim", "Custom"));
-		//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Random.anim", "Custom"));
-		//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Standby.anim", "Custom"));
-		//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Casting.anim", "Custom"));
-		//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/FightingStandby.anim", "Custom"));
-
-		AnimationState* takeClip = animPlayer->GetClip("Walk");
-		takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-		takeClip->Play();
-
-		arthasSceneNode->SetScale(float3(2, 2, 2));
-		arthasSceneNode->SetPosition(float3(0, 18, 0));
-		arthasSceneNode->AttachObject(arthasEntity);
-	}
 
 	SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
 	{
-		Entity* arthasEntity = sceneMan->CreateEntity("dude", "./AncientCity/AncientCity.mesh",  "Custom");	
+		Entity* cityEntity = sceneMan->CreateEntity("dude", "./AncientCity/AncientCity.mesh",  "Custom");	
 		citySceneNode->SetScale(float3(10, 10, 10));
-		citySceneNode->AttachObject(arthasEntity);
+		citySceneNode->AttachObject(cityEntity);
 	}
+
+	//Entity* arena = sceneMan->CreateEntity("Arena", "./Sinbad/Floor.mesh",  "Custom");
+	//sceneMan->GetRootSceneNode()->AttachObject(arena);
+
+	mSinbadController = new SinbadCharacterController(mCamera);
+	mThirdPersonCamera = new ThirdPersonCamera(mSinbadController, mCamera);
+
+	mCamera->CreateLookAt(float3(3.405924, 22.548273, -31.670168), float3(3.326280, 22.028830, -30.819384), float3(-0.048415, 0.854505, 0.517183));
 }
 
 void CharacterApp::CalculateFrameRate()
@@ -139,9 +112,13 @@ void CharacterApp::CalculateFrameRate()
 void CharacterApp::Update( float deltaTime )
 {
 	CalculateFrameRate();
-	mCameraControler->Update(deltaTime);
+	mSinbadController->Update(deltaTime);
+	mThirdPersonCamera->Update(deltaTime);
 
-	if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
+	//mCameraControler->Update(deltaTime);
+
+
+	if ( InputSystem::GetSingleton().KeyPress(KC_P) )
 	{
 		auto target = mCamera->GetLookAt();
 		auto eye = mCamera->GetPosition();
