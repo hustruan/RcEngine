@@ -222,9 +222,9 @@ protected:
 	float3 mScale;
 	Quaternionf mRotation;
 	
-	mutable float3 mDerivedPosition;
-	mutable float3 mDerivedScale;
-	mutable Quaternionf mDerivedRotation;
+	//mutable float3 mDerivedPosition;
+	//mutable float3 mDerivedScale;
+	//mutable Quaternionf mDerivedRotation;
 
 	mutable float4x4 mWorldTransform;
 

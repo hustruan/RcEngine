@@ -14,9 +14,9 @@ public:
 
 	const float3& GetPosition() const				{ return mPosition; }
 	const float3& GetLookAt() const					{ return mLookAt; }
-	const float3& GetUp() const						{ return mUpVec; }
-	const float3& GetView() const					{ return mViewVec; }
-	float3 GetRight() const							{ return Normalize(Cross(mUpVec, mViewVec)); }
+	const float3& GetUp() const						{ return mUp; }
+	const float3& GetForward() const				{ return mForward; }
+	float3 GetRight() const							{ return Normalize(Cross(mUp, mForward)); }
 	float  GetFov() const							{ return mFieldOfView; }
 	float  GetAspect() const						{ return mAspect; }
 	float  GetNearPlane() const						{ return mNearPlane; }
@@ -41,8 +41,8 @@ public_internal:
 private:
 	float3 mPosition;
 	float3 mLookAt;
-	float3 mUpVec;
-	float3 mViewVec;
+	float3 mUp;
+	float3 mForward;
 
 	float mFieldOfView;
 	float mAspect;

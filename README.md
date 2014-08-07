@@ -1,4 +1,4 @@
 RcEngine
 ========
 
-RcEngine is a graphics engine implemented in C++,  inspired by KlayGE. 
+RcEngine is a graphics engine implemented in C++,  inspired by OGRE and KlayGE. 

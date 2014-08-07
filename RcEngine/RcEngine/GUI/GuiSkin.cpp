@@ -1,10 +1,11 @@
 #include <GUI/GuiSkin.h>
 #include <IO/FileSystem.h>
-#include <Graphics/Texture.h>
+#include <Graphics/GraphicsResource.h>
+#include <Graphics/TextureResource.h>
 #include <Graphics/Font.h>
 #include <Graphics/SpriteBatch.h>
 #include <Resource/ResourceManager.h>
-#include <Core/Context.h>
+#include <Core/Environment.h>
 #include <Core/XMLDom.h>
 #include <Core/Exception.h>
 
@@ -93,7 +94,7 @@ ColorRGBA ReadColor(const String& str)
 {
 	ColorRGBA color;
 	if ( sscanf(str.c_str(), "%f %f %f %f", &color[0], &color[1], &color[2], &color[3]) != 4 )
-		ENGINE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Input is not ColorRGBA", "ReadColor");
+		ENGINE_EXCEPT(Exception::ERR_INVALID_PARAMS, "Input is not ColorRGBA", "ReadColor");
 
 	return color;
 }
@@ -120,10 +121,11 @@ GuiSkin::~GuiSkin()
 void GuiSkin::LoadImpl()
 {
 	FileSystem& fileSystem = FileSystem::GetSingleton();
-	RenderFactory& factory = Context::GetSingleton().GetRenderFactory();
 	ResourceManager& resMan = ResourceManager::GetSingleton();
 	GuiSkinDefs& skinDefs = GuiSkinDefs::GetInstance();
 
+	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
+	
 	String mName = "xWinForm.skin.xml";
 	String mGroup = "General";
 
@@ -138,8 +140,7 @@ void GuiSkin::LoadImpl()
 	String textureFile = root->AttributeString("texture", "");
 	if (fileSystem.Exits(textureFile))
 	{
-		mSkinTexAtlas = std::static_pointer_cast<TextureResource>(
-			resMan.GetResourceByName(RT_Texture, textureFile, "General"))->GetTexture();
+		mSkinTexAtlas = resMan.GetResourceByName<TextureResource>(RT_Texture, textureFile, "General")->GetTexture();
 	}
 
 

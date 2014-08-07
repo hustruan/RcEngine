@@ -35,6 +35,7 @@
     <ClInclude Include="Graphics\DebugDrawManager.h" />
     <ClInclude Include="Graphics\Effect.h" />
     <ClInclude Include="Graphics\EffectParameter.h" />
+    <ClInclude Include="Graphics\Font.h" />
     <ClInclude Include="Graphics\Geometry.h" />
     <ClInclude Include="Graphics\GraphicsCommon.h" />
     <ClInclude Include="Graphics\GraphicsResource.h" />
@@ -54,6 +55,23 @@
     <ClInclude Include="Graphics\SpriteBatch.h" />
     <ClInclude Include="Graphics\TextureResource.h" />
     <ClInclude Include="Graphics\VertexDeclaration.h" />
+    <ClInclude Include="GUI\Button.h" />
+    <ClInclude Include="GUI\CheckBox.h" />
+    <ClInclude Include="GUI\ComboBox.h" />
+    <ClInclude Include="GUI\Console.h" />
+    <ClInclude Include="GUI\Cursor.h" />
+    <ClInclude Include="GUI\GuiSkin.h" />
+    <ClInclude Include="GUI\Label.h" />
+    <ClInclude Include="GUI\LineEdit.h" />
+    <ClInclude Include="GUI\ListBox.h" />
+    <ClInclude Include="GUI\Menu.h" />
+    <ClInclude Include="GUI\RadioButton.h" />
+    <ClInclude Include="GUI\ScrollBar.h" />
+    <ClInclude Include="GUI\Slider.h" />
+    <ClInclude Include="GUI\TextEdit.h" />
+    <ClInclude Include="GUI\UIElement.h" />
+    <ClInclude Include="GUI\UIManager.h" />
+    <ClInclude Include="GUI\UIWindow.h" />
     <ClInclude Include="Input\InputEvent.h" />
     <ClInclude Include="Input\InputSystem.h" />
     <ClInclude Include="IO\FileStream.h" />
@@ -109,6 +127,7 @@
     <ClCompile Include="Graphics\DebugDrawManager.cpp" />
     <ClCompile Include="Graphics\Effect.cpp" />
     <ClCompile Include="Graphics\EffectParameter.cpp" />
+    <ClCompile Include="Graphics\Font.cpp" />
     <ClCompile Include="Graphics\ForwardPath.cpp" />
     <ClCompile Include="Graphics\FrameBuffer.cpp" />
     <ClCompile Include="Graphics\Geometry.cpp" />
@@ -130,6 +149,23 @@
     <ClCompile Include="Graphics\SpriteBatch.cpp" />
     <ClCompile Include="Graphics\TextureResource.cpp" />
     <ClCompile Include="Graphics\VertexDeclaration.cpp" />
+    <ClCompile Include="GUI\Button.cpp" />
+    <ClCompile Include="GUI\CheckBox.cpp" />
+    <ClCompile Include="GUI\ComboBox.cpp" />
+    <ClCompile Include="GUI\Console.cpp" />
+    <ClCompile Include="GUI\Cursor.cpp" />
+    <ClCompile Include="GUI\GuiSkin.cpp" />
+    <ClCompile Include="GUI\Label.cpp" />
+    <ClCompile Include="GUI\LineEdit.cpp" />
+    <ClCompile Include="GUI\ListBox.cpp" />
+    <ClCompile Include="GUI\Menu.cpp" />
+    <ClCompile Include="GUI\RadioButton.cpp" />
+    <ClCompile Include="GUI\ScrollBar.cpp" />
+    <ClCompile Include="GUI\Slider.cpp" />
+    <ClCompile Include="GUI\TextEdit.cpp" />
+    <ClCompile Include="GUI\UIElement.cpp" />
+    <ClCompile Include="GUI\UIManager.cpp" />
+    <ClCompile Include="GUI\UIWindow.cpp" />
     <ClCompile Include="Input\InputSystem.cpp" />
     <ClCompile Include="IO\FileStream.cpp" />
     <ClCompile Include="IO\FileSystem.cpp" />
@@ -244,6 +280,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\Sprite.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\TiledDeferredShading.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -260,6 +299,7 @@
     <Xml Include="..\Media\Effect\DeferredLighting.effect.xml">
       <SubType>Designer</SubType>
     </Xml>
+    <Xml Include="..\Media\Effect\Sprite.effect.xml" />
     <Xml Include="..\Media\Effect\Tessellation.effect.xml">
       <SubType>Designer</SubType>
     </Xml>

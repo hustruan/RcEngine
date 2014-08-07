@@ -15,13 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
+    <ClInclude Include="LightAnimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPathApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h">
+    <ClCompile Include="RenderPathApp.cpp">
       <Filter>Source Files</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="LightAnimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

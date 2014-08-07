@@ -201,13 +201,15 @@ public:
 	/**
 	 * Mouse
 	 */
-	int32_t GetMouseMoveX() const					{ return mMouseMove.X(); }
-	int32_t GetMouseMoveY() const					{ return mMouseMove.Y(); }
-	const Vector<int32_t, 2>& GetMouseMove() const  { return mMouseMove; }
+	inline int32_t GetMouseMoveX() const					{ return mMouseMove.X(); }
+	inline int32_t GetMouseMoveY() const					{ return mMouseMove.Y(); }
+	inline const Vector<int32_t, 2>& GetMouseMove() const   { return mMouseMove; }
 
-	int32_t GetMousePosX() const					{ return mMousePos.X(); }
-	int32_t GetMousePoxY() const					{ return mMousePos.Y(); }
-	const Vector<int32_t, 2>& GetMousePos() const   { return mMousePos; }
+	inline int32_t GetMousePosX() const						{ return mMousePos.X(); }
+	inline int32_t GetMousePoxY() const						{ return mMousePos.Y(); }
+	inline const Vector<int32_t, 2>& GetMousePos() const    { return mMousePos; }
+
+	inline int32_t GetMouseMoveWheel() const				{ return mMouseMoveWheel; }
 
 	bool MouseButtonDown(MouseCode button) const;
 	bool MouseButtonPress(MouseCode button) const;
@@ -265,9 +267,16 @@ private:
 	void DispatchRanges(float dt) const;
 
 private:
+
+	bool mInitialMouseFoucus;
+
 	Vector<int32_t, 2>  mMousePos;
 	Vector<int32_t, 2>  mLastMousePos;
 	Vector<int32_t, 2>  mMouseMove;
+
+	int32_t mMouseWheel;
+	int32_t mLastMouseWheel;
+	int32_t mMouseMoveWheel;
 
 	std::vector<bool>     mKeyState;
 	std::vector<int32_t>  mJustPressed;

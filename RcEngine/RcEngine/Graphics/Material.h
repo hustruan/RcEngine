@@ -48,7 +48,7 @@ public:
 	// Apply shader parameter before rendering, called by renderable
 	void ApplyMaterial(const float4x4& world = float4x4::Identity());
 
-	//shared_ptr<Resource> Clone();
+	shared_ptr<Resource> Clone();
 
 protected:
 

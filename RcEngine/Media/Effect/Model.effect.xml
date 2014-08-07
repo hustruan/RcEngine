@@ -64,7 +64,7 @@
     <Pass name="p0">
       <VertexShader file="Model" entry="ModelVS"/>
       <PixelShader file="ForwardLighting" entry="DirectionalLightingPS"/>
-	    <!--<State name="FillMode" value="WireFrame"/>-->
+      <!--<State name="FillMode" value="WireFrame"/>-->
     </Pass>
   </Technique>
 

@@ -30,9 +30,9 @@ public:
 	};
 
 	// Animation event callback at specified time pos between [0, length]. 
-	typedef fastdelegate::FastDelegate<void(AnimationState*, float)> AnimatonNotify;
-	typedef fastdelegate::FastDelegate<void(AnimationState*)> AnimatonBeginNotify;
-	typedef fastdelegate::FastDelegate<void(AnimationState*)> AnimatonEndNotify;
+	typedef fastdelegate::FastDelegate2<AnimationState*, float> AnimatonNotify;
+	typedef fastdelegate::FastDelegate1<AnimationState*> AnimatonBeginNotify;
+	typedef fastdelegate::FastDelegate1<AnimationState*> AnimatonEndNotify;
 
 public:
 	AnimationState(AnimationPlayer& animation, const shared_ptr<AnimationClip> clip);
@@ -51,9 +51,6 @@ public:
 	 */
 	bool Update(float delta);
 
-	void SetAnimationWrapMode( AnimationWrapMode wrapMode );
-	AnimationWrapMode GetAnimationWrapMode() const { return WrapMode; }
-
 	void SetEnable( bool enabled );
 	bool IsEnabled() const { return mEnable; } 
 
@@ -61,6 +58,7 @@ public:
 	 * Current animation time position.
 	 */
 	void SetTime( float time );
+	void AdvanceTime( float deltaTime );
 	float GetTime() const { return mTime; }
 
 	/**
@@ -96,13 +94,7 @@ public:
 private:
 	void OnBegin();
 	void OnEnd();
-	
-	/**
-	 * Advance the animation by delta time.
-	 */
-	void AdvanceTime( float delta );
-
-	
+		
 private:
 
 	AnimationPlayer& mAnimation;
@@ -122,10 +114,12 @@ private:
 	AnimationState* mFadeToClipState;
 	
 	// Ordered collection of listeners on the clip.
-	std::list<std::pair<float, AnimatonNotify>> mAnimNotifies;
+	typedef std::pair<float, AnimatonNotify> AnimatonNotifyPoint;
+	std::list<AnimatonNotifyPoint> mAnimNotifies;
 	
 	// Iterator that points to the next listener event to be triggered.
-	std::list<std::pair<float, AnimatonNotify>>::iterator mAninNofityIter;
+	std::list<AnimatonNotifyPoint>::iterator mAnimNofityIter;
+	std::list<AnimatonNotifyPoint>::reverse_iterator mAnimNofityRIter;
 		 
 public:
 

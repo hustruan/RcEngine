@@ -2,6 +2,8 @@
 #include <MainApp/Application.h>
 #include <Graphics/RenderPath.h>
 #include <Graphics/CameraController1.h>
+#include "SinbadCharacterController.h"
+#include "ThirdPersonCamera.h"
 
 using namespace RcEngine;
 
@@ -13,7 +15,6 @@ public:
 
 	void Initialize();
 	void LoadContent();
-	void LoadDudeEntity();
 	void UnloadContent()
 	{
 
@@ -28,6 +29,10 @@ protected:
 	shared_ptr<RenderPath> mRenderPath;
 	shared_ptr<Camera> mCamera;
 	Test::FPSCameraControler* mCameraControler;
+
+
+	SinbadCharacterController* mSinbadController;
+	ThirdPersonCamera* mThirdPersonCamera;
 
 	int mFramePerSecond;
 };

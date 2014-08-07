@@ -5,6 +5,7 @@
 #include <Graphics/Effect.h>
 #include <Graphics/FrameBuffer.h>
 #include <Graphics/GraphicsResource.h>
+#include <Graphics/VertexDeclaration.h>
 #include <Graphics/RenderFactory.h>
 #include <Graphics/RenderQueue.h>
 #include <Graphics/Font.h>
@@ -246,26 +247,30 @@ void SpriteBatch::Flush()
 Sprite::Sprite()
 	: mDirty(true)
 {
-	//RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
+	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
 
-	//// create index buffer 
-	//mIndexBuffer = factory->CreateIndexBuffer(BU_Dynamic, EAH_CPU_Write | EAH_GPU_Read, NULL);
+	// bind vertex stream
+	VertexElement elements[3] = 
+	{
+		VertexElement(0, VEF_Float3, VEU_Position, 0),
+		VertexElement(sizeof(float3), VEF_Float2, VEU_TextureCoordinate, 0),
+		VertexElement(sizeof(float3) + sizeof(float2), VEF_Float4, VEU_Color, 0)
+	};
+	
+	uint32_t vertexSize = sizeof(float3) + sizeof(float2) + sizeof(float3);
+	uint32_t indexSize = sizeof(uint16_t);
 
-	//// create vertex buffer
-	//mVertexBuffer = factory.CreateVertexBuffer(BU_Dynamic, EAH_CPU_Write | EAH_GPU_Read, NULL);
+	// create index buffer 
+	mIndexBuffer = factory->CreateIndexBuffer(vertexSize * 20, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
 
-	//// bind vertex stream
-	//VertexElement elements[3] = 
-	//{
-	//	VertexElement(0, VEF_Float3, VEU_Position, 0),
-	//	VertexElement(sizeof(float3), VEF_Float2, VEU_TextureCoordinate, 0),
-	//	VertexElement(sizeof(float3) + sizeof(float2), VEF_Float4, VEU_Color, 0)
-	//};
+	// create vertex buffer
+	mVertexBuffer = factory->CreateVertexBuffer(indexSize * 20, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Index, NULL);
 
-	//mRenderOperation = std::make_shared<RenderOperation>();
-	//mRenderOperation->PrimitiveType = PT_Triangle_List;
-	//mRenderOperation->BindVertexStream(mVertexBuffer, factory.CreateVertexDeclaration(elements, 3));
-	//mRenderOperation->BindIndexStream(mIndexBuffer, IBT_Bit16);
+	mRenderOperation = std::make_shared<RenderOperation>();
+	mRenderOperation->PrimitiveType = PT_Triangle_List;
+	mRenderOperation->BindVertexStream(0, mVertexBuffer);
+	mRenderOperation->BindIndexStream(mIndexBuffer, IBT_Bit16);
+	mRenderOperation->VertexDecl = factory->CreateVertexDeclaration(elements, 3);
 }
 
 Sprite::~Sprite()
@@ -277,29 +282,8 @@ void Sprite::OnRenderBegin()
 {
 	Renderable::OnRenderBegin();
 
-	auto frameBuffer = Environment::GetSingleton().GetRenderDevice()->GetCurrentFrameBuffer();
-	auto w = frameBuffer->GetWidth();
-	auto h = frameBuffer->GetHeight();
-	mWindowSizeParam->SetValue(float2(float(frameBuffer->GetWidth()), float(frameBuffer->GetHeight())));
-}
-
-//void Sprite::OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& cam, RenderOrder order )
-//{
-//	UpdateGeometryBuffers();
-//
-//	RenderQueueItem item;
-//	item.Renderable = this;
-//	item.Type = SOT_Sprite;
-//
-//	// ignore render order, only handle state change order
-//	item.SortKey = (float)mSpriteMaterial->GetEffect()->GetResourceHandle();
-//
-//	renderQueue->AddToQueue(item, RenderQueue::BucketOverlay);
-//}
-
-void Sprite::SetProjectionMatrix( const float4x4& mat )
-{
-	mSpriteMaterial->GetEffect()->GetParameterByName("ProjMat")->SetValue(mat);
+	Window* mainWindow = Application::msApp->GetMainWindow();
+	mWindowSizeParam->SetValue(float2(1.0f / mainWindow->GetWidth(), 1.0f / mainWindow->GetHeight()));
 }
 
 void Sprite::UpdateGeometryBuffers()
@@ -352,14 +336,13 @@ vector<uint16_t>& Sprite::GetIndices()
 	return mInidces;
 }
 
-
 void Sprite::SetSpriteContent( const shared_ptr<Texture>& tex, const shared_ptr<Material>& mat )
 {
 	mSpriteTexture = tex;
 	mSpriteMaterial = mat;
 
 	mSpriteMaterial->SetTexture("SpriteTexture", mSpriteTexture->GetShaderResourceView());
-	mWindowSizeParam = mSpriteMaterial->GetEffect()->GetParameterByName("WindowSize");
+	mWindowSizeParam = mSpriteMaterial->GetEffect()->GetParameterByName("InvWindowSize");
 }
 
 }

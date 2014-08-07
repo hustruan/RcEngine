@@ -1,5 +1,4 @@
 #include <Graphics/RenderPath.h>
-#include <Graphics/Renderer.h>
 #include <Graphics/RenderDevice.h>
 #include <Graphics/GraphicsResource.h>
 #include <Graphics/VertexDeclaration.h>
@@ -284,7 +283,6 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	const uint32_t windowWidth = appWindow->GetWidth();
 	const uint32_t windowHeight = appWindow->GetHeight();
 
-	RenderFactory* factory = mDevice->GetRenderFactory();
 	ResourceManager& resMan = ResourceManager::GetSingleton();
 
 	// Load deferred lighting effect
@@ -297,9 +295,20 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mSpotLightTech = mDeferredEffect->GetTechniqueByName("SpotLighting");
 	mShadingTech = mDeferredEffect->GetTechniqueByName("Shading");
 
-	// Init GBuffer
-	mGBufferFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
-	mGBufferFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
+	CreateBuffers(windowWidth, windowHeight);
+	
+	// Build light volume
+	BuildSpotLightShape(mSpotLightShape);
+	BuildPointLightShape(mPointLightShape);
+
+	mGBufferFB->SetCamera(camera);
+	mLightAccumulateFB->SetCamera(camera);
+	mHDRFB->SetCamera(camera);
+}
+
+void DeferredPath::CreateBuffers( uint32_t windowWidth, uint32_t windowHeight )
+{
+	RenderFactory* factory = mDevice->GetRenderFactory();
 
 #ifdef _DEBUG
 	uint32_t acessHint = EAH_GPU_Write | EAH_GPU_Read;
@@ -309,6 +318,19 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 
 	uint32_t rtCreateFlag = TexCreate_ShaderResource | TexCreate_RenderTarget;
 	uint32_t dsCreateFlag = TexCreate_ShaderResource | TexCreate_DepthStencilTarget;
+
+	// Init GBuffer
+	if (!mGBufferFB)
+	{
+		mGBufferFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
+	}
+	else
+	{
+		mDevice->BindFrameBuffer(mGBufferFB);
+		mGBufferFB->DetachAll();
+		mGBufferFB->Resize(windowWidth, windowHeight);
+	}
+	mGBufferFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
 
 	mGBuffer[0] = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA16F, 1, 1, 1, 0, acessHint, rtCreateFlag, NULL);
 	mGBuffer[1] = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA8_UNORM, 1, 1, 1, 0, acessHint, rtCreateFlag, NULL);
@@ -323,10 +345,19 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mGBufferFB->AttachRTV(ATT_Color1, mGBufferRTV[1]);
 
 	// Init light buffer
-	mLightAccumulateFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
+	if (!mLightAccumulateFB)
+	{
+		mLightAccumulateFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
+	}
+	else
+	{
+		mDevice->BindFrameBuffer(mLightAccumulateFB);
+		mLightAccumulateFB->DetachAll();
+		mLightAccumulateFB->Resize(windowWidth, windowHeight);
+	}
 	mLightAccumulateFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
 
-	mLightAccumulateBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA32F, 1, 1, 1, 0, acessHint, rtCreateFlag, NULL);
+	mLightAccumulateBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA16F, 1, 1, 1, 0, acessHint, rtCreateFlag, NULL);
 	mDepthStencilBufferLight = factory->CreateTexture2D(windowWidth, windowHeight, PF_D24S8, 1, 1, 1, 0, acessHint, dsCreateFlag, NULL);
 
 	mLightAccumulateRTV = factory->CreateRenderTargetView2D(mLightAccumulateBuffer, 0, 0);
@@ -336,10 +367,19 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mLightAccumulateFB->AttachRTV(ATT_Color0, mLightAccumulateRTV);
 
 	// HDR buffer
-	mHDRFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
+	if (!mHDRFB)
+	{
+		mHDRFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
+	}
+	else
+	{
+		mDevice->BindFrameBuffer(mHDRFB);
+		mHDRFB->DetachAll();
+		mHDRFB->Resize(windowWidth, windowHeight);
+	}
 	mHDRFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
 
-	mHDRBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA32F, 1, 1, 1, 0, acessHint, rtCreateFlag, NULL);
+	mHDRBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA16F, 1, 1, 1, 0, acessHint, rtCreateFlag, NULL);
 	mHDRBufferRTV = factory->CreateRenderTargetView2D(mHDRBuffer, 0, 0);
 	mHDRFB->AttachRTV(ATT_Color0, mHDRBufferRTV);
 
@@ -347,15 +387,6 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mDepthStencilViewReadOnly = factory->CreateDepthStencilView(mDepthStencilBuffer, 0, 0, dsvReadOnly);
 	mHDRFB->AttachRTV(ATT_DepthStencil, mDepthStencilViewReadOnly);
 
-	// Init shadow manager
-	//mShadowMan = new CascadedShadowMap(mDevice);
-
-	mGBufferFB->SetCamera(camera);
-
-	// Build light volume
-	BuildSpotLightShape(mSpotLightShape);
-	BuildPointLightShape(mPointLightShape);
-	
 	// bind shader input
 	mDeferredEffect->GetParameterByName("GBuffer0")->SetValue(mGBuffer[0]->GetShaderResourceView());
 	mDeferredEffect->GetParameterByName("GBuffer1")->SetValue(mGBuffer[1]->GetShaderResourceView());
@@ -365,60 +396,10 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mToneMapEffect->GetParameterByName("HDRBuffer")->SetValue(mHDRBuffer->GetShaderResourceView());	
 }
 
+
 void DeferredPath::OnWindowResize( uint32_t windowWidth, uint32_t windowHeight )
 {
-	RenderFactory* factory = mDevice->GetRenderFactory();
-
-	mDevice->BindFrameBuffer(mGBufferFB);
-	mGBufferFB->DetachAll();
-	mGBufferFB->Resize(windowWidth, windowHeight);
-	mGBufferFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
-
-#ifdef _DEBUG
-	uint32_t acessHint = EAH_GPU_Write | EAH_GPU_Read | EAH_CPU_Read;
-#else
-	uint32_t acessHint = EAH_GPU_Write | EAH_GPU_Read;
-#endif
-	uint32_t createFlags = TexCreate_ShaderResource | TexCreate_RenderTarget;
-
-	mGBuffer[0] = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA32F, 1, 1, 0, 0, acessHint, createFlags, NULL);
-	mGBuffer[1] = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA8_UNORM, 1, 1, 0, 0, acessHint, createFlags, NULL);
-	mDepthStencilBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_D24S8, 1, 1, 0, 0, acessHint, createFlags, NULL);
-
-	mGBufferRTV[0] = factory->CreateRenderTargetView2D(mGBuffer[0], 0, 0);
-	mGBufferRTV[1] = factory->CreateRenderTargetView2D(mGBuffer[1], 0, 0);
-	mDepthStencilView = factory->CreateDepthStencilView(mDepthStencilBuffer, 0, 0);
-
-	mGBufferFB->AttachRTV(ATT_DepthStencil, mDepthStencilView);
-	mGBufferFB->AttachRTV(ATT_Color0, mGBufferRTV[0]);
-	mGBufferFB->AttachRTV(ATT_Color1, mGBufferRTV[1]);
-
-	mDevice->BindFrameBuffer(mLightAccumulateFB);
-	mLightAccumulateFB->DetachAll();
-	mLightAccumulateFB->Resize(windowWidth, windowHeight);
-	mLightAccumulateFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
-
-	mLightAccumulateBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA16F, 1, 1, 0, 0, acessHint, createFlags, NULL);
-	mDepthStencilBufferLight = factory->CreateTexture2D(windowWidth, windowHeight, PF_D24S8, 1, 1, 0, 0, acessHint, createFlags, NULL);
-	mLightAccumulateRTV = factory->CreateRenderTargetView2D(mLightAccumulateBuffer, 0, 0);
-	mDepthStencilBufferLightView = factory->CreateDepthStencilView(mDepthStencilBufferLight, 0, 0);
-
-	mLightAccumulateFB->AttachRTV(ATT_DepthStencil, mDepthStencilBufferLightView);
-	mLightAccumulateFB->AttachRTV(ATT_Color0, mLightAccumulateRTV);
-
-	mDevice->BindFrameBuffer(mHDRFB);
-	mHDRFB->DetachAll();
-	mHDRFB->Resize(windowWidth, windowHeight);
-	mHDRFB->SetViewport(Viewport(0.0f, 0.f, float(windowWidth), float(windowHeight)));
-
-	// HDR buffer
-	mHDRBuffer = factory->CreateTexture2D(windowWidth, windowHeight, PF_RGBA32F, 1, 1, 0, 0, acessHint, createFlags, NULL);
-	mHDRBufferRTV = factory->CreateRenderTargetView2D(mHDRBuffer, 0, 0);
-	mHDRFB = factory->CreateFrameBuffer(windowWidth, windowHeight);
-
-	mDepthStencilViewReadOnly = factory->CreateDepthStencilView(mDepthStencilBuffer, 0, 0);
-	mHDRFB->AttachRTV(ATT_DepthStencil, mDepthStencilViewReadOnly);
-	mHDRFB->AttachRTV(ATT_Color0, mHDRBufferRTV);
+	CreateBuffers(windowWidth, windowHeight);
 }
 
 void DeferredPath::RenderScene()
@@ -479,8 +460,7 @@ void DeferredPath::GenereateGBuffer()
 	mGBufferFB->Clear(CF_Color | CF_Depth | CF_Stencil, ColorRGBA(0, 0, 0, 0), 1.0f, 0);
 
 	// Todo: update render queue with render bucket filter
-	shared_ptr<Camera> camera = mGBufferFB->GetCamera();
-	mSceneMan->UpdateRenderQueue(*camera, RO_None);   
+	mSceneMan->UpdateRenderQueue(*mCamera, RO_None);   
 
 	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
@@ -489,11 +469,11 @@ void DeferredPath::GenereateGBuffer()
 		renderItem.Renderable->Render();
 	}
 
-	//if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
-	//{
-	//	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer0.pfm", mGBuffer[0]);
-	//	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer1.tga", mGBuffer[1]);
-	//}
+	if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
+	{
+		mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer0.pfm", mGBuffer[0]);
+		mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer1.tga", mGBuffer[1]);
+	}
 }
 
 void DeferredPath::ComputeSSAO()
@@ -554,7 +534,18 @@ void DeferredPath::DeferredLighting()
 		}
 	}
 
-	//mDevice->GetRenderFactory()->SaveLinearDepthTextureToFile("E:/depth.pfm", mDepthStencilBufferLight, proj.M33, proj.M43);
+	/*if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
+	{
+	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer0.pfm", mGBuffer[0]);
+	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer1.tga", mGBuffer[1]);
+	mDevice->GetRenderFactory()->SaveTextureToFile("E:/LightAccu.pfm", mLightAccumulateBuffer);
+	}*/
+
+	if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
+	{
+		mDevice->GetRenderFactory()->SaveLinearDepthTextureToFile("E:/depth.pfm", mDepthStencilBufferLight, proj.M33, proj.M43);
+		mDevice->GetRenderFactory()->SaveTextureToFile("E:/LightAccu.pfm", mLightAccumulateBuffer);
+	}
 }
 
 void DeferredPath::DeferredShading()
@@ -585,8 +576,6 @@ void DeferredPath::PostProcess()
 
 	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("ToneMap");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
-
-	screenFB->SwapBuffers();
 }
 
 void DeferredPath::DrawDirectionalLightShape( Light* light )

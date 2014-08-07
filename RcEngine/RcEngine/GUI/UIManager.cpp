@@ -10,11 +10,9 @@
 #include <Input/InputSystem.h>
 #include <Input/InputEvent.h>
 #include <Resource/ResourceManager.h>
-#include <Core/Context.h>
+#include <Core/Environment.h>
 
 namespace RcEngine {
-
-SINGLETON_DECL(UIManager)
 
 UIManager::UIManager()
 	: mDragElement(nullptr), mFocusElement(nullptr), mRootElement(nullptr), mMainWindow(nullptr),
@@ -36,7 +34,7 @@ void UIManager::OnGraphicsInitialize()
 	if (!mInitialize)
 	{
 		//Keep track of main window
-		mMainWindow = Context::GetSingleton().GetApplication().GetMainWindow();
+		mMainWindow = Application::msApp->GetMainWindow();
 
 		mRootElement = new UIElement();
 		mRootElement->SetName("UIRoot");

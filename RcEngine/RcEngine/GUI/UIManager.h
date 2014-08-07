@@ -10,13 +10,12 @@ namespace RcEngine {
 class UIElement;
 class Cursor;
 class GuiSkin;
+class Window;
 union InputEvent;
 
 class _ApiExport UIManager : public Singleton<UIManager>
 {
 public:
-	SINGLETON_DECL_HEADER(UIManager);
-
 	enum UIEvent
 	{
 		KeyUpDown,

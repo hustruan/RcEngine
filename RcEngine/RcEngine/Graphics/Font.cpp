@@ -1,8 +1,9 @@
 #include <Graphics/Font.h>
-#include <Graphics/Texture.h>
+#include <Graphics/GraphicsResource.h>
+#include <Graphics/TextureResource.h>
 #include <Graphics/RenderFactory.h>
 #include <Graphics/SpriteBatch.h>
-#include <Core/Context.h>
+#include <Core/Environment.h>
 #include <Core/Exception.h>
 #include <Core/Utility.h>
 #include <IO/FileSystem.h>
@@ -10,6 +11,7 @@
 #include <GUI/GuiSkin.h>
 #include <Math/Rectangle.h>
 #include <Resource/ResourceManager.h>
+#include <fstream>
 
 namespace {
 
@@ -224,11 +226,10 @@ Font::~Font()
 void Font::LoadImpl()
 {
 	FileSystem& fileSystem = FileSystem::GetSingleton();
-	RenderFactory& factory = Context::GetSingleton().GetRenderFactory();
 	ResourceManager& resMan = ResourceManager::GetSingleton();
 
 	// font texture
-	shared_ptr<TextureResource> fontTexture = std::static_pointer_cast<TextureResource>(resMan.GetResourceByName(RT_Texture, mResourceName + ".sdff.png", mGroup));
+	shared_ptr<TextureResource> fontTexture = resMan.GetResourceByName<TextureResource>(RT_Texture, mResourceName + ".sdff.dds", mGroup);
 	fontTexture->Load();
 	mFontTexture = fontTexture->GetTexture();
 

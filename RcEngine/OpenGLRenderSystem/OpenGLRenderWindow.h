@@ -15,7 +15,7 @@ public:
 	void ToggleFullscreen(bool fs);
 	bool Fullscreen() const;
 	void SwapBuffers();
-
+	
 private:
 	bool mFullscreen;
 	std::string mDescription;

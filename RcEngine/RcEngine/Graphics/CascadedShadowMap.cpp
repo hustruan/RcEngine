@@ -53,7 +53,7 @@ void FrustumPlaneExtraction(const Camera& camera, float camZ, float3 corner[4])
 	float height = camZ * tanf(camera.GetFov() * 0.5f);
 	float width = height * camera.GetAspect();
 
-	float3 center = camera.GetPosition() + camera.GetView() * camZ;
+	float3 center = camera.GetPosition() + camera.GetForward() * camZ;
 	float3 right = camera.GetRight();
 	float3 up = camera.GetUp();
 
@@ -434,7 +434,7 @@ void CascadedShadowMap::UpdateShadowMatrix( const Camera& camera, const Light& l
 
 	const Frustumf& camFrustum = camera.GetFrustum();
 	const float3& camPos = camera.GetPosition();
-	const float3& camDir = camera.GetView();
+	const float3& camDir = camera.GetForward();
 	const float3& camUp = camera.GetUp();
 
 	const uint32_t numSplits= light.GetShadowCascades();

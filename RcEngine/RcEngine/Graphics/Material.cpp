@@ -54,38 +54,29 @@ Material::~Material(void)
 	
 }
 
-//shared_ptr<Resource> Material::Clone()
-//{
-//	printf("Clone material: %s\n", mMaterialName.c_str());
-//
-//	shared_ptr<Material> retVal = std::make_shared<Material>(mCreator, mResourceHandle, mResourceName, mGroup);
-//
-//	retVal->mMaterialName = mMaterialName;
-//	
-//	retVal->mAmbient = mEmissive;
-//	retVal->mDiffuse = mDiffuse;
-//	retVal->mSpecular = mSpecular;
-//	retVal->mEmissive = mEmissive;
-//	retVal->mPower = mPower;
-//
-//	retVal->mEffect = std::static_pointer_cast<Effect>(mEffect/*->Clone()*/);
-//	retVal->mTextures = mTextures;
-//
-//	/*for (MaterialParameter* param : mCachedEffectParams)
-//	{
-//		MaterialParameter* paramCloned = new MaterialParameter;
-//		paramCloned->EffectParam = retVal->mEffect->GetParameterByName(param->Name);
-//		paramCloned->Usage = param->Usage;
-//		paramCloned->IsSemantic = param->IsSemantic;
-//		paramCloned->Name = param->Name;
-//		paramCloned->Type = param->Type;
-//		retVal->mCachedEffectParams.push_back(paramCloned);
-//	}*/
-//
-//	retVal->SetLoadState(Resource::Loaded);
-//
-//	return retVal;
-//}
+shared_ptr<Resource> Material::Clone()
+{
+	printf("Clone material: %s\n", mMaterialName.c_str());
+
+	shared_ptr<Material> retVal = std::make_shared<Material>(mCreator, mResourceHandle, mResourceName, mGroup);
+
+	retVal->mMaterialName = mMaterialName;
+	
+	retVal->mAmbient = mEmissive;
+	retVal->mDiffuse = mDiffuse;
+	retVal->mSpecular = mSpecular;
+	retVal->mEmissive = mEmissive;
+	retVal->mPower = mPower;
+
+	retVal->mEffect = mEffect;
+	retVal->mMaterialTextureCopys = mMaterialTextureCopys;
+	retVal->mTextureSRVs = mTextureSRVs;
+	retVal->mAutoBindings = mAutoBindings;
+
+	retVal->SetLoadState(Resource::Loaded);
+
+	return retVal;
+}
 
 void Material::SetTexture( const String& name, const shared_ptr<ShaderResourceView>& textureSRV )
 {

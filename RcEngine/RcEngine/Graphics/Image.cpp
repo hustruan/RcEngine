@@ -112,8 +112,8 @@ bool Image::CopyImageFromTexture( const shared_ptr<Texture>& texture )
 			uint8_t* pSrcBits = pImageData;
 			uint8_t* ppEndBits = pSrcBits + totalSize;
 
-			uint32_t rowPitch;
-			void* pLevelData;
+			uint32_t rowPitch, rowPitchPad;
+			uint8_t* pLevelData;
 
 			for (uint32_t layer = 0; layer < mLayers; ++layer)
 			{
@@ -121,16 +121,22 @@ bool Image::CopyImageFromTexture( const shared_ptr<Texture>& texture )
 				{
 					uint32_t levelWidth = (std::max)(1U, mWidth>>level) ;
 					uint32_t levelHeight = (std::max)(1U, mHeight>>level);
-	
-					pLevelData = texture->Map2D(layer, level, RMA_Read_Only, rowPitch);
-					memcpy(pSrcBits, pLevelData, levelHeight * rowPitch);
-					texture->Unmap2D(layer, level);
-
+					
+					rowPitch = levelWidth * PixelFormatUtils::GetNumElemBytes(mFormat);
+					pLevelData = (uint8_t*)texture->Map2D(layer, level, RMA_Read_Only, rowPitchPad);
+					
 					SurfaceInfo surface = { pSrcBits, rowPitch, 0 };
 					mSurfaces.push_back(surface);
 
-					// Advance 
-					pSrcBits += levelHeight * rowPitch; 
+					for (uint32_t i = 0; i < levelHeight; ++i)
+					{
+						memcpy(pSrcBits, pLevelData, rowPitch);
+
+						pSrcBits += rowPitch;
+						pLevelData += rowPitchPad;
+					}
+
+					texture->Unmap2D(layer, level);
 				}
 			}
 

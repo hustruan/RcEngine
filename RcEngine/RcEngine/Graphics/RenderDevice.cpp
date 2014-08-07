@@ -8,7 +8,7 @@
 namespace RcEngine {
 
 RenderDevice::RenderDevice(  )
-	: mRHFactory(nullptr),
+	: mRenderFactory(nullptr),
 	  mCurrentFrontStencilRef(0),
 	  mCurrentBackStencilRef(0),
 	  mCurrentBlendFactor(ColorRGBA::Black),
@@ -21,7 +21,7 @@ RenderDevice::RenderDevice(  )
 
 RenderDevice::~RenderDevice( void )
 {
-	SAFE_DELETE(mRHFactory);
+	SAFE_DELETE(mRenderFactory);
 }
 
 void RenderDevice::BindFrameBuffer( const shared_ptr<FrameBuffer>& fb )

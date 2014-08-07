@@ -28,11 +28,6 @@ AnimationState::~AnimationState()
 
 }
 
-void AnimationState::SetAnimationWrapMode( AnimationWrapMode wrapMode )
-{
-	WrapMode = wrapMode;
-}
-
 void AnimationState::SetEnable( bool enabled )
 {
 	mEnable = enabled;
@@ -111,42 +106,29 @@ void AnimationState::Apply()
 	}
 }
 
-void AnimationState::AdvanceTime( float delta )
+void AnimationState::AdvanceTime( float deltaTime )
+{
+	SetTime(mTime + deltaTime);
+}
+
+void AnimationState::SetTime( float timePos )
 {
 	float length = mClip->GetDuration();
-	
-	if (delta == 0 || length == 0)
-		return;
 
-	float timePos = GetTime() + delta;
 	if (WrapMode == Wrap_Loop)
 	{
 		// wrap
 		timePos = fmod(timePos, length);
-		if(timePos < 0)
+		if(timePos < 0.0f)
 			timePos += length;    
 	}
 	else
 	{
-		if (timePos > length)
+		if (timePos > length || timePos < 0.0f)
 			SetClipStateBit(Clip_Is_End_Bit);
 	}
 
-	SetTime(timePos);
-}
-
-void AnimationState::SetTime( float time )
-{
-	// Clamp
-	time = Clamp(time, 0.0f, mClip->GetDuration());
-
-	if (mTime != time)
-	{
-		mTime = time;
-
-		//if (mEnable)
-		//	mAnimation.mParentMesh.MarkAnimationDirty();
-	}
+	mTime = Clamp(timePos, 0.0f, length);
 }
 
 void AnimationState::SetFadeLength( float fadeLength )
@@ -164,6 +146,7 @@ bool AnimationState::Update( float delta )
 
 	if (IsClipStateBitSet(Clip_Is_End_Bit))
 	{
+		printf("%s End\n", mClip->GetClipName().c_str());
 		OnEnd();
 		// Return false so the AnimationClip is removed from the running clips on the AnimationController.
 		return false;
@@ -177,7 +160,7 @@ bool AnimationState::Update( float delta )
 	else
 	{
 		// advance time
-		AdvanceTime(delta * PlayBackSpeed);
+		AdvanceTime(delta);
 	}
 
 	// Notify any listeners of Animation events.
@@ -185,18 +168,18 @@ bool AnimationState::Update( float delta )
 	{
 		if (PlayBackSpeed >= 0.0f)
 		{
-			while (mAninNofityIter != mAnimNotifies.end() && mTime >= mAninNofityIter->first)
+			while (mAnimNofityIter != mAnimNotifies.end() && mTime >= mAnimNofityIter->first)
 			{
-				(mAninNofityIter->second)(this, mTime);
-				++mAninNofityIter;
+				(mAnimNofityIter->second)(this, mTime);
+				++mAnimNofityIter;
 			}
 		}
 		else
 		{
-			while (mAninNofityIter != mAnimNotifies.begin() && mTime <= mAninNofityIter->first)
+			while (mAnimNofityRIter != mAnimNotifies.rbegin() && mTime <= mAnimNofityIter->first)
 			{
-				(mAninNofityIter->second)(this, mTime);
-				--mAninNofityIter;
+				(mAnimNofityRIter->second)(this, mTime);
+				++mAnimNofityRIter;
 			}
 		}
 	}
@@ -247,7 +230,6 @@ bool AnimationState::Update( float delta )
 
 	return true;
 }
-
 
 bool AnimationState::IsClipStateBitSet( uint8_t bits ) const
 {
@@ -308,7 +290,17 @@ void AnimationState::Play()
 	else
 	{
 		SetClipStateBit(Clip_Is_Playing_Bit);
-		mTime = 0;
+		
+		if (PlayBackSpeed > 0.0f)
+		{
+			mTime = 0;
+			mAnimNofityIter = mAnimNotifies.begin();
+		}
+		else
+		{
+			mTime = GetDuration();
+			mAnimNofityRIter = mAnimNotifies.rbegin();
+		}
 
 		// add to controller
 		mAnimation.mController->Schedule(this);
@@ -345,8 +337,7 @@ void AnimationState::CrossFade( AnimationState* fadeClipState, float fadeLength 
 	if (fadeClipState == this)
 		return;
 
-	if (!fadeClipState->IsClipStateBitSet(Clip_Is_Fading_Bit) &&
-		!IsClipStateBitSet(Clip_Is_Fading_Bit))
+	if (!fadeClipState->IsClipStateBitSet(Clip_Is_Fading_Bit) && !IsClipStateBitSet(Clip_Is_Fading_Bit))
 	{
 		// if the given clip is not fading, do fading	
 		fadeClipState->BlendWeight = 0.0f;
@@ -370,32 +361,10 @@ void AnimationState::CrossFade( AnimationState* fadeClipState, float fadeLength 
 
 void AnimationState::AddNotify( const AnimatonNotify& notify, float fireTime )
 {
-	if (mAnimNotifies.empty())
-	{
-		mAnimNotifies.push_back(std::make_pair(fireTime, notify));
+	auto it = mAnimNotifies.begin();
+	while (it != mAnimNotifies.end() && it->first > fireTime) ++it;
 
-		if (IsClipStateBitSet(Clip_Is_Playing_Bit))
-			mAninNofityIter = mAnimNotifies.begin();
-	}
-	else
-	{
-		for (auto iter = mAnimNotifies.begin(); iter != mAnimNotifies.end(); ++iter)
-		{
-			if (iter->first > fireTime)
-			{
-				iter = mAnimNotifies.insert(iter, std::make_pair(fireTime, notify));
-
-				//// If playing, update the iterator if we need to.
-				//// otherwise, it will just be set the next time the clip gets played.
-				//if (IsClipStateBitSet(Clip_Is_Playing_Bit))
-				//{
-				//	mAninNofityIter = mAnimNotifies.begin();
-				//}
-				break;
-			}
-		}
-	}
-
+	mAnimNotifies.insert(it, std::make_pair(fireTime, notify));
 }
 
 

@@ -31,6 +31,7 @@ FPSCameraControler::FPSCameraControler()
 	  mRotateSpeed(0.001f),
 	  mMoveInertia(false),
 	  mTotalInertiaTime(0.25f),
+	  mInertiaTime(0.0f),
 	  mFramesToSmoothMouseData(2.0f)
 {
 
@@ -156,7 +157,7 @@ void FPSCameraControler::Update( float deltaTime )
 	else
 	{
 		 vWorldUp = mAttachedCamera->GetUp();
-		 vWorldAhead = mAttachedCamera->GetView();
+		 vWorldAhead = mAttachedCamera->GetForward();
 	}
 	
 	float3 newCameraPos = mAttachedCamera->GetPosition() + Transform(deltaMove, mCameraRot);

@@ -13,16 +13,13 @@
 
 #include "ExportLog.h"
 
+
 using namespace std;
 
 #ifdef IOS_REF
 #undef  IOS_REF
 #define IOS_REF (*(mFBXSdkManager->GetIOSettings()))
 #endif
-
-ConsoleOutListener g_ConsoleOutListener;
-DebugSpewListener  g_DebugSpewListener;
-ExportSettings     g_ExportSettings;
 
 #define MAXBONES_PER_VERTEX 4
 
@@ -1894,6 +1891,7 @@ void FbxProcesser::BuildAndSaveBinary( )
 
 			// write material name
 			stream.WriteString(meshPart->MaterialName + ".material.xml");
+			ExportLog::LogMsg(0, "\tMaterial: %s", meshPart->MaterialName.c_str());
 
 			// write sub mesh bounding sphere
 			stream.Write(&meshPart->Bound.Min, sizeof(float3));
@@ -2181,26 +2179,26 @@ void FbxProcesser::BuildAndSaveMaterial()
 			rootNode->AppendNode(paramNode);
 		}
 
-		if (mMaterials[i].Textures.count("NormalMap"))
-		{
-			paramNode = materialXML.AllocateNode(XML_Node_Element, "Parameter");
-			paramNode->AppendAttribute(materialXML.AllocateAttributeString("name", "NormalMap"));
-			paramNode->AppendAttribute(materialXML.AllocateAttributeString("sampler", "LinearSampler"));
-			paramNode->AppendAttribute(materialXML.AllocateAttributeString("semantic", "NormalMaterialMap"));
-			paramNode->AppendAttribute(materialXML.AllocateAttributeString("stage", "PixelShader"));
-			paramNode->AppendAttribute(materialXML.AllocateAttributeUInt("texUnit", texUnit++));
-			paramNode->AppendAttribute(materialXML.AllocateAttributeString("type", "texture2d"));
+		//if (mMaterials[i].Textures.count("Bump"))
+		//{
+		//	paramNode = materialXML.AllocateNode(XML_Node_Element, "Parameter");
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeString("name", "NormalMap"));
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeString("sampler", "LinearSampler"));
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeString("semantic", "NormalMaterialMap"));
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeString("stage", "PixelShader"));
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeUInt("texUnit", texUnit++));
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeString("type", "texture2d"));
 
-			String filename = PathUtil::GetFileName(mMaterials[i].Textures["NormalMap"]) + ".dds";
-			paramNode->AppendAttribute(materialXML.AllocateAttributeString("value", filename));
+		//	String filename = PathUtil::GetFileName(mMaterials[i].Textures["Bump"]) + ".dds";
+		//	paramNode->AppendAttribute(materialXML.AllocateAttributeString("value", filename));
 
-			rootNode->AppendNode(paramNode);
+		//	rootNode->AppendNode(paramNode);
 
-			// Add effect flag
-			XMLNodePtr flagNode = materialXML.AllocateNode(XML_Node_Element, "Flag");
-			flagNode->AppendAttribute(materialXML.AllocateAttributeString("name", "_NormalMap"));
-			effectNode->AppendNode(flagNode);
-		}
+		//	// Add effect flag
+		//	XMLNodePtr flagNode = materialXML.AllocateNode(XML_Node_Element, "Flag");
+		//	flagNode->AppendAttribute(materialXML.AllocateAttributeString("name", "_NormalMap"));
+		//	effectNode->AppendNode(flagNode);
+		//}
 
 		if (mMaterials[i].Textures.count("TransparentColor"))
 		{
@@ -2243,38 +2241,62 @@ void FbxProcesser::RunCommand( const vector<String>& arguments )
 {
 
 }
-int main()
+
+void FbxProcesser::BuildAndSaveOBJ()
 {
-	ExportLog::AddListener( &g_ConsoleOutListener );
-#if _MSC_VER >= 1500
-	if( IsDebuggerPresent() )
-		ExportLog::AddListener( &g_DebugSpewListener );
-#endif
-
-	ExportLog::SetLogLevel( 1 );
-	ExportLog::EnableLogging( TRUE );
-
-	//g_ExportSettings.ExportSkeleton = false;
-	//g_ExportSettings.MergeScene = true;
-	g_ExportSettings.MergeWithSameMaterial = true;
-	g_ExportSettings.MergeScene = true;
-	//g_ExportSettings.SwapWindOrder = false;
-
-	FbxProcesser fbxProcesser;
-	fbxProcesser.Initialize();
-
-	if (fbxProcesser.LoadScene("../../Media/Mesh/Beta/Beta.FBX"))
+	String fileName = "Sinbad";
+	for (size_t mi = 0; mi < mSceneMeshes.size(); ++mi)
 	{
-		fbxProcesser.mSceneName = "Ahri";
-		fbxProcesser.mAnimationName = "Dance";
+		MeshData& mesh  = *(mSceneMeshes[mi]);
 
-		fbxProcesser.ProcessScene();
-		//fbxProcesser.BuildAndSaveXML();
- 		fbxProcesser.BuildAndSaveBinary();
-		fbxProcesser.BuildAndSaveMaterial();
-		fbxProcesser.ExportMaterial();
+		// Write vertex and index buffer
+		for (size_t i = 0; i < mesh.Vertices.size(); ++i)
+		{
+			ofstream fout(fileName + std::to_string(i) + ".obj");
+
+			for (const Vertex& vertex : mesh.Vertices[i])
+			{
+				uint32_t vertexFlag = vertex.Flags;
+
+				if (vertexFlag & Vertex::ePosition)
+				{
+					fout << "v " << vertex.Position[0] << " " << vertex.Position[1] << " " << vertex.Position[2] << endl;
+				}
+
+				if (vertexFlag & Vertex::eNormal)
+				{
+					fout << "vn " << vertex.Normal[0] << " " << vertex.Normal[1] << " " << vertex.Normal[2] << endl;
+				}
+
+				if (vertexFlag & Vertex::eTexcoord0)
+				{
+					fout << "vt " << vertex.Tex0[0] << " " << vertex.Tex0[1] << endl;
+				}
+			}
+
+			g_ExportSettings.SwapWindOrder = false;
+			if (g_ExportSettings.SwapWindOrder)
+			{
+				for (size_t j = 0; j < mesh.Indices[i].size() / 3; ++j)
+				{
+					int a = mesh.Indices[i][3*j+0] +1;
+					int b = mesh.Indices[i][3*j+2] +1;
+					int c = mesh.Indices[i][3*j+1] +1;
+					fout << "f " << a << '/' << a << '/' << a << " " << b << '/' << b << '/' << b << " " << c << '/' << c << '/' << c << endl;
+				}
+			}
+			else
+			{
+				for (size_t j = 0; j < mesh.Indices[i].size() / 3; ++j)
+				{
+					int a = mesh.Indices[i][3*j+0]+1;
+					int b = mesh.Indices[i][3*j+1]+1;
+					int c = mesh.Indices[i][3*j+2]+1;
+
+					fout << "f " << a << '/' << a << '/' << a << " " << b << '/' << b << '/' << b << " " << c << '/' << c << '/' << c << endl;
+				}
+			}
+		}
 	}
-
-	return 0;
 }
 

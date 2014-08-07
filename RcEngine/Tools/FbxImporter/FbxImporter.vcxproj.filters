@@ -21,6 +21,12 @@
     <ClCompile Include="FbxImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OgreImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExportLog.h">

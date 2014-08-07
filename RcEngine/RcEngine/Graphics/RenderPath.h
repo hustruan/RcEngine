@@ -78,6 +78,9 @@ public:
 	CascadedShadowMap* GetShadowManager() const  { return mShadowMan; }
 
 protected:
+
+	void CreateBuffers(uint32_t width, uint32_t height);
+
 	void GenereateGBuffer();
 	void ComputeSSAO();
 	void DeferredLighting(); // Lighting pass

@@ -5,11 +5,10 @@ float4x4 InvViewProj;
 
 cbuffer PerLight{
 
-float4 LightPos;		// w dimension is spot light inner cone cos angle
-float4 LightDir;		// w dimension is spot light outer cone cos angle
-float3 LightColor;
-float3 LightFalloff; 
-
+	float4 LightPos;		// w dimension is spot light inner cone cos angle
+	float4 LightDir;		// w dimension is spot light outer cone cos angle
+	float3 LightColor;
+	float3 LightFalloff; 
 };
 
 float3 CameraOrigin;
@@ -49,14 +48,13 @@ float3 ReconstructWorldPosition(in int3 texelPos, in float4 clipPos)
 //---------------------------------------------------------------
 // Directional light
 void DirectionalVSMain(uint iVertexID        : SV_VertexID,
-					   out float3 oViewRay   : TEXCOORD0,
-					   out float4 oPosCS	 : SV_POSITION)
+					   out float4 oPosCS    : TEXCOORD0,
+					   out float4 oPosCSD3D : SV_POSITION) 
 {
 	float2 grid = float2((iVertexID << 1) & 2, iVertexID & 2);
 	float2 ndcXY = grid * float2(2.0, -2.0) + float2(-1.0, 1.0);
 
-	oPosCS = float4(ndcXY, 0.0, 1.0);
-	oViewRay = mul( float4(ndcXY, 1.0, 0.0), InvViewProj ).xyz;
+	oPosCSD3D = oPosCS = float4(ndcXY, 0.0, 1.0);
 }
 
 //-----------------------------------------------------------------
@@ -72,13 +70,13 @@ void LightVolumeVSMain(in float3 iPos       : POSITION,
 //---------------------------------------------------------------------
 // Deferred Directional Light
 void DirectionalPSMain(
-	in float3 iViewRay	  : TEXCOORD0,
+	in float4 iPosCS	  : TEXCOORD0,
 	in float4 iFragCoord  : SV_POSITION,
 	out float4 oFragColor : SV_Target0 )
 {
 	int3 sampleIndex = int3(iFragCoord.xy, 0);
 
-	float3 viewRay = normalize(iViewRay);
+	float3 worldPosition = ReconstructWorldPosition(sampleIndex, iPosCS);
 
 	// Decode normal and shininess from GBuffer
 	float3 N;
@@ -92,7 +90,7 @@ void DirectionalPSMain(
 	float nDotl = dot(L, N);
 	if (nDotl > 0.0)
 	{
-		float3 V = -viewRay;
+		float3 V = normalize(CameraOrigin - worldPosition);
 		float3 H = normalize(V + L);
 		
 		float3 diffuse = LightColor * nDotl;

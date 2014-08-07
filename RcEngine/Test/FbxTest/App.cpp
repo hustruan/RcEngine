@@ -3,12 +3,13 @@
 #include <Graphics/FrameBuffer.h>
 #include <Graphics/RenderDevice.h>
 #include <Graphics/RenderFactory.h>
+#include <Graphics/GraphicsResource.h>
 #include <Graphics/VertexDeclaration.h>
 #include <Graphics/TextureResource.h>
 #include <Graphics/GraphicsResource.h>
 #include <Graphics/RenderOperation.h>
 #include <Graphics/Material.h>
-#include <Graphics/Effect.h>
+#include <Graphics/Mesh.h>
 #include <Graphics/Effect.h>
 #include <Graphics/EffectParameter.h>
 #include <Graphics/Camera.h>
@@ -137,30 +138,30 @@ protected:
 		//	mDudeSceneNode = dudeSceneNode;
 		//}
 
-		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Arthas");
-		{
-			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Arthas/Arthas.mesh",  "Custom");
-			Entity* swoardEntity = sceneMan->CreateEntity("swoard", "./Arthas/Sword.mesh",  "Custom");
-			BoneSceneNode* weaponNode = arthasEntity->CreateBoneSceneNode("Weapon", "wepson");
-			weaponNode->SetPosition(float3(4.2, -7.8, 0));
-			weaponNode->AttachObject(swoardEntity);
+		//SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Arthas");
+		//{
+		//	Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Arthas/Arthas.mesh",  "Custom");
+		//	Entity* swoardEntity = sceneMan->CreateEntity("swoard", "./Arthas/Sword.mesh",  "Custom");
+		//	BoneSceneNode* weaponNode = arthasEntity->CreateBoneSceneNode("Weapon", "wepson");
+		//	weaponNode->SetPosition(float3(4.2, -7.8, 0));
+		//	weaponNode->AttachObject(swoardEntity);
 
-			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
+		//	AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
 
-			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Walk.anim", "Custom"));
-			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Random.anim", "Custom"));
-			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Standby.anim", "Custom"));
-			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Casting.anim", "Custom"));
-			//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/FightingStandby.anim", "Custom"));
+		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Walk.anim", "Custom"));
+		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Random.anim", "Custom"));
+		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Standby.anim", "Custom"));
+		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/Casting.anim", "Custom"));
+		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/FightingStandby.anim", "Custom"));
 
-			AnimationState* takeClip = animPlayer->GetClip("Walk");
-			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-			takeClip->Play();
+		//	AnimationState* takeClip = animPlayer->GetClip("Walk");
+		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	takeClip->Play();
 
-			arthasSceneNode->SetScale(float3(2, 2, 2));
-			arthasSceneNode->SetPosition(float3(0, 18, 0));
-			arthasSceneNode->AttachObject(arthasEntity);
-		}
+		//	arthasSceneNode->SetScale(float3(2, 2, 2));
+		//	arthasSceneNode->SetPosition(float3(0, 18, 0));
+		//	arthasSceneNode->AttachObject(arthasEntity);
+		//}
 
 		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
 		{
@@ -168,6 +169,65 @@ protected:
 			citySceneNode->SetScale(float3(10, 10, 10));
 			citySceneNode->AttachObject(arthasEntity);
 		}
+
+		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
+		{
+			Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
+
+			
+			Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+			Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+
+			BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
+			BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
+			sword1Node->AttachObject(sword1);
+			sword2Node->AttachObject(sword2);
+
+			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
+
+			const String AnimClips[] = { 
+				"./Sinbad/Dance.anim", 
+			    "./Sinbad/DrawSwords.anim",
+				"./Sinbad/JumpStart.anim",
+				"./Sinbad/JumpLoop.anim",
+				"./Sinbad/JumpEnd.anim",
+				"./Sinbad/HandsClosed.anim",
+				"./Sinbad/HandsRelaxed.anim",
+				"./Sinbad/IdleBase.anim",
+				"./Sinbad/IdleTop.anim",
+				"./Sinbad/RunBase.anim",
+				"./Sinbad/RunTop.anim",
+				"./Sinbad/SliceHorizontal.anim",
+				"./Sinbad/SliceVertical.anim",
+			};
+
+			for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
+			{
+				AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
+				animState->WrapMode = AnimationState::Wrap_Loop;
+			}
+			
+			AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
+			SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
+
+			SliceHorizontal->Play();
+			animPlayer->PlayClip("IdleBase");
+
+			/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
+			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+			takeClip->Play();
+
+			AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
+			runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+			runBaseClip->Play();*/
+
+			arthasSceneNode->SetScale(float3(5, 5, 5));
+			arthasSceneNode->SetPosition(float3(0, 50, 0));
+			arthasSceneNode->AttachObject(arthasEntity);
+
+			mDudeEntity = arthasEntity;
+		}
+
 
 		//String modelName = "./LOL/blitzcrank/blitzcrank.mesh";
 		////String modelName = "./LOL/Ahri/ahri.mesh";
@@ -194,9 +254,9 @@ protected:
 
 		//	AnimationState* takeClip = animPlayer->GetClip("Take 001");
 		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-		//	//takeClip->Play();
+		//	takeClip->Play();
 
-		//	//blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
+		//	blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
 		//	//blitzcrankSceneNode->SetPosition(float3(0, 50, 0));
 
 		//	mDudeEntity = blitzcrankEntity;
@@ -262,11 +322,10 @@ protected:
 		//auto bbox = mDudeSceneNode->GetWorldBoundingBox();
 		//DebugDrawManager::GetSingleton().DrawBoundingBox(bbox, ColorRGBA::Red);
 
-	//	shared_ptr<Skeleton> skeleton = mDudeEntity->GetSkeleton();
+		//shared_ptr<Skeleton> skeleton = mDudeEntity->GetSkeleton();
 		//DebugDrawManager::GetSingleton().DrawSkeleton(mDudeEntity->GetWorldTransform(), skeleton, ColorRGBA::Red);
 
-		/*static bool sb = false;
-		for (size_t i = 0; i < skeleton->GetNumBones(); ++i)
+		/*for (size_t i = 0; i < skeleton->GetNumBones(); ++i)
 		{
 			Bone* bone = skeleton->GetBone(i);
 
@@ -274,14 +333,9 @@ protected:
 			center = Transform(center, mDudeEntity->GetWorldTransform());
 
 			ColorRGBA color = ColorRGBA::Red;
-			if (bone->GetName().find("L_") != String::npos)
-				color = ColorRGBA::Green;
-			else if (bone->GetName().find("R_") != String::npos)
-				color = ColorRGBA::Blue;
+			DebugDrawManager::GetSingleton().DrawSphere(center, 0.5, color, true);
+		}*/
 
-			DebugDrawManager::GetSingleton().DrawSphere(center, 1.0, color, true);
-		}
-*/
 
 		//for (size_t i = 0; i < mDudeCollisionSpheres.size(); ++i)
 		//{
@@ -293,14 +347,6 @@ protected:
 
 		//	DebugDrawManager::GetSingleton().DrawSphere(center, mDudeCollisionSpheres[i].Radius * 0.5, ColorRGBA::Red);
 		//}
-
-
-		/*Bone* bone = skeleton->GetBone("L_forearm");
-		DebugDrawManager::GetSingleton().DrawSphere(bone->GetWorldPosition(), 0.5, ColorRGBA::Red);
-
-		bone = skeleton->GetBone("R_forearm");
-		DebugDrawManager::GetSingleton().DrawSphere(bone->GetWorldPosition(), 0.5, ColorRGBA::Blue);*/
-		
 
 		screenFB->SwapBuffers();
 	}

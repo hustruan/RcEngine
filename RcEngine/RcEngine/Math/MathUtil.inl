@@ -816,3 +816,51 @@ Real NearestDistToAABB( const Vector<Real, 3>& pos, const Vector<Real, 3>& mins,
 
 	return nearestVec.Length();
 }
+
+//////////////////////////////////////////////////////////////////////////
+template <typename Real>
+Quaternion<Real> RotateTowards( const Vector<Real, 3>& currentDirection, const Vector<Real, 3>& targetDirection, const Vector<Real, 3>& fallbackAxis = Vector<Real, 3>::Zero() )
+{
+	static_assert(std::is_floating_point<float>::value, "Only Valid For Float Point Vector!");
+
+	Vector<Real, 3> src = Normalize(currentDirection);
+	Vector<Real, 3> dest = Normalize(targetDirection);
+
+	Real d = Dot(src, dest);
+	if (d >= Real(1.0))
+		return Quaternion<Real>::Identity();
+
+	Quaternion<Real> q;
+
+	if (d < ( Math<Real>::ZERO_TOLERANCE - 1))
+	{
+		if (fallbackAxis != Vector<Real, 3>::Zero())
+		{
+			// Rotate 180 degrees about the fallback axis
+			q = QuaternionFromRotationAxis(fallbackAxis, Math<Real>::PI);
+		}
+		else
+		{
+			// Generate an axis
+			Vector<Real, 3> axis = Cross( Vector<Real, 3>(1, 0, 0), src );
+			if ( LengthSquared(axis) < Math<Real>::ZERO_TOLERANCE * Math<Real>::ZERO_TOLERANCE)
+				axis = Cross( Vector<Real, 3>(0, 1, 0), src );
+
+			q = QuaternionFromRotationAxis(Normalize(axis), Math<Real>::PI);
+		}
+	}
+	else
+	{
+		Vector<Real, 3> c = Cross(src, dest);
+
+		Real s = sqrt( (1+d)*2 );
+		Real invs = 1 / s;
+
+		q.X() = c.X() * invs;
+		q.Y() = c.Y() * invs;
+		q.Z() = c.Z() * invs;
+		q.W() = s * Real(0.5);
+	}
+
+	return q;
+}

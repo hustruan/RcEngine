@@ -267,6 +267,60 @@
     <ClInclude Include="Graphics\Geometry.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\Button.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\CheckBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\ComboBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Console.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Cursor.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\GuiSkin.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Label.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\LineEdit.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\ListBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Menu.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\RadioButton.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\ScrollBar.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\Slider.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\TextEdit.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\UIElement.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\UIManager.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\UIWindow.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Font.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Exception.cpp">
@@ -458,6 +512,60 @@
     <ClCompile Include="Graphics\Geometry.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Button.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\CheckBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\ComboBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Console.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Cursor.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\GuiSkin.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Label.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\LineEdit.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\ListBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Menu.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\RadioButton.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\ScrollBar.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Slider.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\TextEdit.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\UIElement.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\UIManager.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\UIWindow.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Font.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\BoundingBox.inl">
@@ -603,6 +711,9 @@
     <FxCompile Include="..\Media\Effect\HLSL\ForwardPlus.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\Sprite.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -636,6 +747,9 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\Tessellation.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\Sprite.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

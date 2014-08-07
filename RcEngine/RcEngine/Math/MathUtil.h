@@ -169,6 +169,17 @@ template <typename Real>
 inline void 
 QuaternionToYawPitchRoll(Real& yaw, Real& pitch, Real& roll, const Quaternion<Real>& quat);
 
+/**
+ * Returns the shortest arc Quaternion Rotation needed to rotate the currentDirection to
+ * be the same as the targetDirection.
+ * This method is based on Stan Melax's article in Game Programming Gems, and  
+ * the code was referenced from OgreVector3.h of the Ogre library
+ * 
+ * fallbackAxis, The Axis to rotate around if a 180 degree rotation is required.
+ */
+template <typename Real>
+Quaternion<Real> RotateTowards( const Vector<Real, 3>& currentDirection, const Vector<Real, 3>& targetDirection, const Vector<Real, 3>& fallbackAxis);
+
 
 /**
  * Create a new bounding box form a bounding sphere

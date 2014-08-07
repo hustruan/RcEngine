@@ -5,6 +5,8 @@
 #include <Graphics/TextureResource.h>
 #include <Graphics/AnimationClip.h>
 #include <Graphics/Mesh.h>
+#include <Graphics/RenderDevice.h>
+#include <Graphics/Font.h>
 #include <Resource/ResourceManager.h>
 #include <Core/Environment.h>
 #include <Core/ModuleManager.h>
@@ -15,6 +17,7 @@
 #include <IO/FileStream.h>
 #include <Input/InputSystem.h>
 #include <Scene/SceneManager.h>
+#include <GUI/UIManager.h>
 
 // C++ 11 thread
 #include <thread>
@@ -36,12 +39,11 @@ Application::Application( const String& config )
 	FileSystem::Initialize();
 	ResourceManager::Initialize();
 	ProfilerManager::Initialize();
-	
+	UIManager::Initialize();
+
 	// Init System Clock
 	SystemClock::InitClock();
-
-	//UIManager::Initialize();
-
+	
 	// todo add sub scene manager
 	new SceneManager;
 
@@ -52,7 +54,7 @@ Application::Application( const String& config )
 	resMan.RegisterType(RT_Animation, "Animation",AnimationClip::FactoryFunc);
 	resMan.RegisterType(RT_Texture, "Texture", TextureResource::FactoryFunc);
 	//resMan.RegisterType(RT_Pipeline, "Pipeline", Pipeline::FactoryFunc);
-	//resMan.RegisterType(RT_Font, "Font", Font::FactoryFunc);
+	resMan.RegisterType(RT_Font, "Font", Font::FactoryFunc);
 
 	LoadConfiguration();
 
@@ -114,7 +116,7 @@ void Application::Tick()
 	sceneMan->UpdateSceneGraph(deltaTime);
 
 	// Update UI
-	//UIManager::GetSingleton().Update(deltaTime);
+	UIManager::GetSingleton().Update(deltaTime);
 
 	// render
 	Render();
@@ -129,7 +131,7 @@ void Application::ProcessEventQueue()
 	{
 		bool eventConsumed = false;
 
-		//eventConsumed = UIManager::GetSingleton().OnEvent(event);
+		eventConsumed = UIManager::GetSingleton().OnEvent(event);
 		
 		if (!eventConsumed)
 		{
@@ -199,8 +201,11 @@ void Application::Window_UserResized()
 
 	if (mAppSettings.Width != width || mAppSettings.Height != height)
 	{
-		//Environment::GetSingleton().GetRHDevice()->Resize(width, height);	
-		//UIManager::GetSingleton().OnWindowResize(width, height);
+		mAppSettings.Width = width;
+		mAppSettings.Height = height;
+
+		Environment::GetSingleton().GetRenderDevice()->OnWindowResize(width, height);
+		UIManager::GetSingleton().OnWindowResize(width, height);
 
 		WindowResize(width, height);
 	}	
@@ -227,8 +232,7 @@ void Application::Create()
 	LoadAllModules();
 
 	// UI Graphics initailize
-	//UIManager::GetSingleton().OnGraphicsInitialize();
-
+	UIManager::GetSingleton().OnGraphicsInitialize();
 
 	// Show main window
 	mMainWindow->ShowWindow();

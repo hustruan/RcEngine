@@ -82,10 +82,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp" />
+    <ClCompile Include="LightAnimation.cpp" />
+    <ClCompile Include="RenderPathApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
+    <ClInclude Include="LightAnimation.h" />
+    <ClInclude Include="RenderPathApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

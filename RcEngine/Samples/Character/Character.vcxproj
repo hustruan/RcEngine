@@ -83,12 +83,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CharacterApp.h" />
-    <ClInclude Include="CharacterController.h" />
+    <ClInclude Include="SinbadCharacterController.h" />
     <ClInclude Include="ThirdPersonCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CharacterApp.cpp" />
-    <ClCompile Include="CharacterController.cpp" />
+    <ClCompile Include="SinbadCharacterController.cpp" />
     <ClCompile Include="ThirdPersonCamera.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

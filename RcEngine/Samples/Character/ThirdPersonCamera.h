@@ -4,42 +4,44 @@
 
 using namespace RcEngine;
 
-class CharacterController;
+class SinbadCharacterController;
 
 class ThirdPersonCamera
 {
 public:
-	ThirdPersonCamera(CharacterController* characterController);
+	ThirdPersonCamera(SinbadCharacterController* characterController, shared_ptr<Camera> camera);
 	~ThirdPersonCamera(void);
+	
+	void Update(float deltaTime);
 
 protected:
-	void Apply();
-	void SetUpRotation(const float3& centerPos, const float3& headPos);
 
+	void UpdateInput(float deltaTime);
+
+	void HandleRoatate( uint32_t action, int32_t value, float dt);
 
 private:
-	Camera* mCamera;
+	shared_ptr<Camera> mCamera;
 
-	CharacterController* mController;
+	SinbadCharacterController* mController;
 	
 	float3 mCenterOffset;
 	float3 mHeadOffset;
 
 	// the height we want the camera to be above the target
-	float mHeight;
+	float mCameraHeight;
 
 	float mTargetHeight;
-
 
 	// The distance in the x-z plane to the target
 	float mDistance;
 
-
 	float mHeightVelocity;
 	float mAngleVelocity;
 
-	float mLockCameraTimeout;
+	float2 mMouseDelta;
 
-	bool mSnap;
+	float mCameraYawAngle;
+	float mCameraPitchAngle;
 };
 

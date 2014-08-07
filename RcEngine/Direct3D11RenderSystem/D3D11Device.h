@@ -16,6 +16,7 @@ public:
 	~D3D11Device();
 
 	void CreateRenderWindow();
+	void OnWindowResize(uint32_t width, uint32_t height);
 	void ToggleFullscreen(bool fs);
 	void AdjustProjectionMatrix(float4x4& pOut);
 	void SetSamplerState(ShaderType stage, uint32_t unit, const shared_ptr<SamplerState>& state);

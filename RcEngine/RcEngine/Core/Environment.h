@@ -16,10 +16,10 @@ public:
 	Environment();
 	~Environment();
 	
-	inline Application*  GetApplication() const			{ assert(mApplication); return mApplication; }
-	inline RenderDevice*     GetRenderDevice() const			{ assert(mRenderDevice); return mRenderDevice; }
-	inline RenderFactory*    GetRenderFactory() const			{ assert(mRenderFactory); return mRenderFactory; }
-	inline SceneManager* GetSceneManager() const		{ assert(mRenderFactory); return mSceneManager; }
+	inline Application*		 GetApplication() const			{ assert(mApplication); return mApplication; }
+	inline RenderDevice*     GetRenderDevice() const		{ assert(mRenderDevice); return mRenderDevice; }
+	inline RenderFactory*    GetRenderFactory() const		{ assert(mRenderFactory); return mRenderFactory; }
+	inline SceneManager*	 GetSceneManager() const		{ assert(mRenderFactory); return mSceneManager; }
 
 private:
 

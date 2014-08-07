@@ -1,0 +1,15 @@
+<Effect name="Sprite">
+
+  <Technique name="SpriteTech">
+    <Pass name="p0">
+      <VertexShader file="Sprite" entry="SpriteVS"/>
+      <PixelShader file="Sprite" entry="SpritePS"/>
+      <State name="BlendEnable" value="true"/>
+      <State name="SrcBlend" value="SrcAlpha"/>
+      <State name="DestBlend" value="InvSrcAlpha"/>
+      <State name="DepthFunc" value="LessEqual"/>
+      <State name="CullMode" value="None"/>
+    </Pass>
+  </Technique>
+
+</Effect>

@@ -8,7 +8,11 @@ namespace RcEngine{
 InputSystem::InputSystem()
 	: mMouseMove(0, 0), 
 	  mMousePos(0, 0),
-	  mKeyState(MS_Button7, false) // All for Key + Mouse + Joysticks
+	  mKeyState(MS_Button7, false), // All for Key + Mouse + Joysticks,
+	  mInitialMouseFoucus(false),
+	  mMouseMoveWheel(0),
+	  mMouseWheel(0),
+	  mLastMouseWheel(0)
 {
 }
 
@@ -19,6 +23,7 @@ InputSystem::~InputSystem()
 void InputSystem::ClearStates()
 {
 	mMouseMove = mLastMousePos = mMousePos = Vector<int32_t, 2>(0, 0);
+	mMouseMoveWheel = mMouseWheel = mLastMouseWheel = 0;
 	std::fill(mKeyState.begin(), mKeyState.end(), false);
 	mJustPressed.clear();
 	mjustReleased.clear();
@@ -62,6 +67,14 @@ void InputSystem::FireEvent( const InputEvent& event )
 		}
 		break;
 
+	case InputEventType::MouseWheel:
+		{
+			//mMousePos.X() = event.MouseWheel.x;
+			//mMousePos.Y() = event.MouseWheel.y;
+			mMouseWheel += event.MouseWheel.wheel;
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -89,21 +102,19 @@ void InputSystem::BeginEvents()
 
 void InputSystem::EndEvents()
 {
-	Window* mainWindow = Environment::GetSingleton().GetApplication()->GetMainWindow();
-
-	mMouseMove = mMousePos - mLastMousePos;
-
-	if (!mainWindow->IsMouseVisible())
-	{
-		mLastMousePos.X() = mainWindow->GetWidth() / 2;
-		mLastMousePos.Y() =  mainWindow->GetHeight() / 2;
-
-		mainWindow->ForceMouseToCenter();
-	}
-	else
+	if (!mInitialMouseFoucus)
 	{
 		mLastMousePos = mMousePos;
+		mInitialMouseFoucus = true;
 	}
+
+	// Update Mouse Move
+	mMouseMove = mMousePos - mLastMousePos;
+	mLastMousePos = mMousePos;
+
+	// Update Wheel Move
+	mMouseMoveWheel = mMouseWheel - mLastMouseWheel;
+	mLastMouseWheel = mMouseWheel;
 }
 
 bool InputSystem::KeyDown( KeyCode key ) const
@@ -207,6 +218,8 @@ void InputSystem::DispatchRanges(float deltaTime) const
 		case MS_YDelta:
 			value = mMouseMove.Y();
 			break;
+		case MS_Z:
+
 		default:
 			assert(false);
 		}
@@ -287,6 +300,10 @@ void InputSystem::Dispatch( float deltaTime )
 void InputSystem::ForceCursorToCenter()
 {
 	Window* mainWindow = Environment::GetSingleton().GetApplication()->GetMainWindow();
+
+	mLastMousePos.X() = mainWindow->GetWidth() / 2;
+	mLastMousePos.Y() =  mainWindow->GetHeight() / 2;
+
 	mainWindow->ForceMouseToCenter();
 }
 

@@ -28,6 +28,8 @@ public:
 	inline GLuint GetCurrentFBO() const { return mCurrentFBO; }
 	void BindFBO(GLuint fbo); 
 
+
+	void OnWindowResize( uint32_t width, uint32_t height );
 	void ToggleFullscreen(bool fs);
 	void AdjustProjectionMatrix(float4x4& pOut);
 
@@ -37,7 +39,6 @@ public:
 	void SetSamplerState(ShaderType stage, uint32_t unit, const shared_ptr<SamplerState>& state);
 	void SetViewports(const std::vector<Viewport>& viewports);
 	void DispatchCompute(const EffectTechnique* technique, uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCounZ);
-
 
 protected:
 

@@ -27,7 +27,7 @@ OpenGLDevice::OpenGLDevice()
 	gOpenGLDevice = this;
 	mBlitFBO[0] = mBlitFBO[1] = 0; 
 
-	mRHFactory = new OpenGLFactory();
+	mRenderFactory = new OpenGLFactory();
 }
 
 OpenGLDevice::~OpenGLDevice(void)
@@ -56,9 +56,9 @@ void OpenGLDevice::CreateRenderWindow()
 	BindFrameBuffer(mScreenFrameBuffer);
 	
 	//Create default render state
-	mCurrentDepthStencilState = mRHFactory->CreateDepthStencilState(DepthStencilStateDesc());
-	mCurrentBlendState = mRHFactory->CreateBlendState(BlendStateDesc());
-	mCurrentRasterizerState = mRHFactory->CreateRasterizerState(RasterizerStateDesc());
+	mCurrentDepthStencilState = mRenderFactory->CreateDepthStencilState(DepthStencilStateDesc());
+	mCurrentBlendState = mRenderFactory->CreateBlendState(BlendStateDesc());
+	mCurrentRasterizerState = mRenderFactory->CreateRasterizerState(RasterizerStateDesc());
 
 	// enable default render state
 	glEnable(GL_DEPTH_TEST);
@@ -91,6 +91,13 @@ void OpenGLDevice::CreateRenderWindow()
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 	OGL_ERROR_CHECK();
+}
+
+void OpenGLDevice::OnWindowResize( uint32_t width, uint32_t height )
+{
+	mScreenFrameBuffer->Resize(width, height);
+	mScreenFrameBuffer->SetViewport(Viewport(0, 0, float(width), float(height)));
+	BindFrameBuffer(mScreenFrameBuffer);
 }
 
 void OpenGLDevice::GetBlitFBO( GLuint& srcFBO, GLuint& dstFBO )

@@ -33,7 +33,7 @@ public:
 	void Pause();
 	void Resume();
 
-private:
+public:
 	State mState;
 
 	// A list of running AnimationClips.

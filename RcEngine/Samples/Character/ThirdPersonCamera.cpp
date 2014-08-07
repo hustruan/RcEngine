@@ -1,19 +1,14 @@
 #include "ThirdPersonCamera.h"
-#include "CharacterController.h"
+#include "SinbadCharacterController.h"
 #include <Math/MathUtil.h>
+#include <Graphics/Camera.h>
+#include <Input/InputSystem.h>
 
-inline float AngleDistance(float a, float b)
-{
-	//a = Mathf.Repeat(a, 360);
-	//b = Mathf.Repeat(b, 360);
-
-	//return Mathf.Abs(b - a);
-	
-	return fabsf(b-1);
-}
-
-ThirdPersonCamera::ThirdPersonCamera( CharacterController* characterController )
-	: mController(characterController)
+ThirdPersonCamera::ThirdPersonCamera( SinbadCharacterController* characterController, shared_ptr<Camera> camera )
+	: mController(characterController),
+	  mCamera(camera),
+	  mDistance(25),
+	  mCameraHeight(2)
 {
 	float3 characterPosition = mController->GetCharacterPosition();
 	const BoundingBoxf& characterBound = mController->GetCharacterBound();
@@ -21,6 +16,11 @@ ThirdPersonCamera::ThirdPersonCamera( CharacterController* characterController )
 	mCenterOffset = characterBound.Center() - characterPosition;	
 	mHeadOffset = mCenterOffset;
 	mHeadOffset.Y() = characterBound.Max.Y() - characterPosition.Y();
+
+	mCameraYawAngle = 0;
+	mCameraPitchAngle = Mathf::ToRadian(45.0f);
+
+	mMouseDelta = float2::Zero();
 }
 
 ThirdPersonCamera::~ThirdPersonCamera(void)
@@ -28,81 +28,54 @@ ThirdPersonCamera::~ThirdPersonCamera(void)
 
 }
 
-void ThirdPersonCamera::Apply()
-{
-	const float4x4& targetTransform = mController->GetCharacterTransform();
 
-	Quaternionf targetOrient;
-	float3 targetPosition, targetScale;
-	MatrixDecompose(targetScale, targetOrient, targetPosition, targetTransform);
+void ThirdPersonCamera::UpdateInput( float deltaTime )
+{
+	InputSystem& inputSys = InputSystem::GetSingleton();
+
+	float2 curMouseDelta(0.0f, 0.0f);
+
+	const float RotateScaler = 0.001f;
+	curMouseDelta.X() = inputSys.GetMouseMoveX() * RotateScaler;
+	curMouseDelta.Y() = inputSys.GetMouseMoveY() * RotateScaler;
+	inputSys.ForceCursorToCenter();
+
+	// Smooth the relative mouse data over a few frames so it isn't 
+	// jerky when moving slowly at low frame rates.
+	float fPercentOfNew = 1.0f / 2.0f;
+	float fPercentOfOld = 1.0f - fPercentOfNew;
+	mMouseDelta = mMouseDelta * fPercentOfOld + curMouseDelta * fPercentOfNew;
+
+	
+	// Zoom 
+	//printf("%d\n", inputSys.GetMouseMoveWheel());
+	//mDistance += mDistance * inputSys.GetMouseMoveWheel() * 0.0005f;
+	//mDistance = Clamp(mDistance, 8.0f, 25.0f);
+}
+
+void ThirdPersonCamera::Update( float deltaTime )
+{
+	UpdateInput(deltaTime);
+
+	float3 targetPosition = mController->GetCharacterPosition();
 
 	float3 targetCenter = targetPosition + mCenterOffset;
 	float3 targetHead = targetPosition + mHeadOffset;
+	
 
-	// Calculate the current & target rotation angles
-	float3 targetEulerAngles;
-	QuaternionToYawPitchRoll(targetEulerAngles.Y(), targetEulerAngles.X(), targetEulerAngles.Z(), targetOrient);
-	float originalTargetAngle = targetEulerAngles.Y();
+	// Update the pitch & yaw angle based on mouse movement
+	mCameraYawAngle += mMouseDelta.X();
+	mCameraPitchAngle += mMouseDelta.Y();
 
-	float4x4 cameraTransform = MatrixInverse(mCamera->GetViewMatrix());
-	float3 currentEulerAngles;
-	RotationMatrixToYawPitchRoll(currentEulerAngles.Y(), currentEulerAngles.X(), currentEulerAngles.Z(), cameraTransform);
-	float currentAngle = targetEulerAngles.Y();
+	mCameraPitchAngle = Clamp(mCameraPitchAngle, Mathf::ToRadian(-5.0f), Mathf::ToRadian(60.0f));
 
-	// Adjust real target angle when camera is locked
-	float targetAngle = originalTargetAngle; 
+	Quaternionf cameraRot = QuaternionFromYawPitchRoll(mCameraYawAngle, mCameraPitchAngle, 0.0f);
+	float3 cameraOrigin = Transform( float3(0, 0, -mDistance), cameraRot );
 
-	if (mSnap)
-	{
+	cameraOrigin += targetCenter;
+	
+	float3 cameraTarget = targetCenter + float3(0, mCameraHeight, 0);
 
-	}
-	else
-	{
-		if (mController->GetLockCameraTimer() < mLockCameraTimeout)
-			targetAngle = currentAngle;
-		
-		// Lock the camera when moving backwards!
-		// * It is really confusing to do 180 degree spins when turning around.
-		if (AngleDistance (currentAngle, targetAngle) > 160 && mController->IsMovingBackwards())
-			targetAngle += Mathf::PI;
-
-		//currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, angleVelocity, angularSmoothLag, angularMaxSpeed);
-	}
-
-
-	// When jumping don't move camera upwards but only down!
-	if (mController->IsJumping())
-	{
-		// We'd be moving the camera upwards, do that only if it's really high
-		float newTargetHeight = targetCenter.Y() + mHeight;
-		if (newTargetHeight < mTargetHeight || newTargetHeight - mTargetHeight > 5)
-			mTargetHeight = targetCenter.Y() + mHeight;
-	}
-	// When walking always update the target height
-	else
-	{
-		mTargetHeight = targetCenter.Y() + mHeight;
-	}
-
-	// Damp the height
-	float currentHeight = cameraTransform.M42;
-//	currentHeight = Mathf.SmoothDamp (currentHeight, mTargetHeight, heightVelocity, heightSmoothLag);
-
-	// Convert the angle into a rotation, by which we then reposition the camera
-	Quaternionf currentRotation = QuaternionFromYawPitchRoll(currentAngle, 0.0f, 0.0f);
-
-	// Set the position of the camera on the x-z plane to: distance meters behind the target
-	float3 newCameraPosition = targetCenter + Transform(float3(0, 0, -1), currentRotation) * mDistance;
-
-	// Set the height of the camera
-	newCameraPosition.Y() = currentHeight;
-
-	// Always look at the target	
-	SetUpRotation(targetCenter, targetHead);
-}
-
-void ThirdPersonCamera::SetUpRotation( const float3& centerPos, const float3& headPos )
-{
-
+	mCamera->CreateLookAt(cameraOrigin, cameraTarget);
 }
 

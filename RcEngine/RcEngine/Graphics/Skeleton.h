@@ -34,6 +34,8 @@ private:
 
 class _ApiExport Bone : public Node
 {
+	friend class Skeleton;
+
 public:
 	Bone(const String& name, uint32_t boneIndex, Bone* parent = 0);
 
