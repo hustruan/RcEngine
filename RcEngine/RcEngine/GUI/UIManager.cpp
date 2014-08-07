@@ -5,12 +5,13 @@
 #include <MainApp/Application.h>
 #include <MainApp/Window.h>
 #include <Graphics/Font.h>
-#include <Graphics/Material.h>
+#include <Graphics/Effect.h>
 #include <Graphics/SpriteBatch.h>
 #include <Input/InputSystem.h>
 #include <Input/InputEvent.h>
 #include <Resource/ResourceManager.h>
 #include <Core/Environment.h>
+#include <Scene/SceneManager.h>
 
 namespace RcEngine {
 
@@ -42,12 +43,12 @@ void UIManager::OnGraphicsInitialize()
 
 		ResourceManager& resMan = ResourceManager::GetSingleton();
 
-		mFont = std::static_pointer_cast<Font>(resMan.GetResourceByName(RT_Font,"Consolas Regular", "General"));
+		mFont = resMan.GetResourceByName<Font>(RT_Font, "Consolas Regular", "General");
+		shared_ptr<Effect> fontEffect = resMan.GetResourceByName<Effect>(RT_Effect, "Font.effect.xml", "General") ;
 
-		mSpriteBatch = std::make_shared<SpriteBatch>();
-
-		mSpriteBatchFont = std::make_shared<SpriteBatch>( 
-			std::static_pointer_cast<Material>(resMan.GetResourceByName(RT_Material, "Font.material.xml", "General")) );
+		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+		mSpriteBatch = sceneMan->CreateSpriteBatch();
+		mSpriteBatchFont = sceneMan->CreateSpriteBatch(fontEffect);
 
 		mInitialize = true;
 	}
@@ -55,9 +56,7 @@ void UIManager::OnGraphicsInitialize()
 
 void UIManager::OnGraphicsFinalize()
 {
-	mSpriteBatch.reset();
 	mFont.reset();
-	mSpriteBatchFont.reset();
 	SAFE_DELETE(mDefaultSkin);
 }
 

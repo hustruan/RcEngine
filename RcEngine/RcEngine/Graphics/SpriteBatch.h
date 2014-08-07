@@ -22,6 +22,8 @@ struct SpriteVertex
 
 class _ApiExport SpriteBatch
 {
+	friend class Sprite;
+
 public:
 	/**
 	 * Default sprite batch, use to render normal 2D sprite
@@ -31,7 +33,7 @@ public:
 	/**
 	 * Sprite batch with specular material
 	 */
-	SpriteBatch(const shared_ptr<Material>& material);
+	SpriteBatch(const shared_ptr<Effect>& effect);
 	~SpriteBatch();
 
 	void Begin();
@@ -74,9 +76,16 @@ public:
 	void Draw(const shared_ptr<Texture>& texture, const float2& position, const ColorRGBA& color, float layerDepth = 0.0f);
 	void Draw(const shared_ptr<Texture>& texture, const float2& position, const IntRect* sourceRectangle, const ColorRGBA& color, float layerDepth = 0.0f);
 
+
+public_internal:
+	void OnUpdateRenderQueue(RenderQueue& renderQueue);
+
 private:
 	uint32_t mSortMode;
-	shared_ptr<Material> mSpriteMaterial;
+	shared_ptr<Effect> mEffect;
+	EffectParameter* mSpriteTexParam;
+
+	float2 mInvWindowSize;
 
 	// SpriteEntity is keep track by SceneManager, So SceneManager will delete it when destroy
 	std::map<shared_ptr<Texture>, Sprite*> mBatches;
@@ -87,47 +96,46 @@ private:
  */
 class Sprite : public Renderable
 {
-public:
-	Sprite();
-	~Sprite();
+	friend class SpriteBatch;
 
-	const shared_ptr<Material>& GetMaterial() const { return mSpriteMaterial; }
+public:
+	Sprite(SpriteBatch& batch, shared_ptr<Texture> texture);
+	~Sprite();
 
 	// no world transform
 	uint32_t GetWorldTransformsCount() const { return 0; }
 
 	void GetWorldTransforms(float4x4* xform) const { }
-
 	const shared_ptr<RenderOperation>& GetRenderOperation() const { return mRenderOperation; }
+	
+	const shared_ptr<Material>& GetMaterial() const;
+	void OnRenderBegin();
+	void Render();
 
-	bool Empty() const;
+	inline bool Empty() const { return mInidces.empty(); }
+
+	vector<SpriteVertex>& GetVertices();
+	vector<uint16_t>& GetIndices();
 
 	void ClearAll();
 
-	vector<SpriteVertex>& GetVertices();
-
-	vector<uint16_t>& GetIndices();
-
-	void SetProjectionMatrix(const float4x4& mat);
-
-	void OnRenderBegin();
-
+private:
 	void UpdateGeometryBuffers();
-
-public_internal:
-	void SetSpriteContent(const shared_ptr<Texture>& tex, const shared_ptr<Material>& mat);
+	void ResizeGeometryBuffers(size_t numVertex, size_t numIndex);
 
 private:
-	shared_ptr<Texture> mSpriteTexture;
-	shared_ptr<Material> mSpriteMaterial;
-	shared_ptr<RenderOperation> mRenderOperation;
-	vector<SpriteVertex> mVertices;
-	vector<uint16_t> mInidces;
+	SpriteBatch& mBatch;
 
+	shared_ptr<Texture> mSpriteTexture;
+	shared_ptr<RenderOperation> mRenderOperation;
+	
+	shared_ptr<VertexDeclaration> mVertexDecl;
 	shared_ptr<GraphicsBuffer> mVertexBuffer;
 	shared_ptr<GraphicsBuffer> mIndexBuffer;
 
-	EffectParameter* mWindowSizeParam;
+	enum { NumInitSprites = 100 };
+	vector<SpriteVertex> mVertices;
+	vector<uint16_t> mInidces;
 
 	bool mDirty;
 };

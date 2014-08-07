@@ -127,11 +127,6 @@ void D3D11Buffer::UnMap()
 	}
 }
 
-void D3D11Buffer::ResizeBuffer( uint32_t size )
-{
-
-}
-
 }
 
 

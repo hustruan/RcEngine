@@ -13,7 +13,6 @@ public:
 	D3D11Buffer(uint32_t bufferSize, uint32_t accessHint, uint32_t flags, uint32_t structSize, ElementInitData* initData);
 	~D3D11Buffer(void);
 
-	void ResizeBuffer(uint32_t size);
 	void* Map(uint32_t offset, uint32_t length, ResourceMapAccess options);
 	void UnMap();
 

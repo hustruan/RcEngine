@@ -17,6 +17,7 @@
 #include <Resource/ResourceManager.h>
 #include <Math/MathUtil.h>
 #include <Core/Environment.h>
+#include <Core/Exception.h>
 #include <MainApp/Application.h>
 #include <MainApp/Window.h>
 
@@ -53,21 +54,17 @@ static void Rotate(Vector<Real,2>& point, const Vector<Real,2>& origin, Real rot
 
 namespace RcEngine {
 
-
 SpriteBatch::SpriteBatch()
 {
-	mSpriteMaterial = std::static_pointer_cast<Material>(
-		ResourceManager::GetSingleton().GetResourceByName(RT_Material, "Sprite.material.xml", "General"));
-
-	if (!mSpriteMaterial->IsLoaded())
-		mSpriteMaterial->Load();
+	mEffect = ResourceManager::GetSingleton().GetResourceByName<Effect>(RT_Effect, "Sprite.effect.xml", "General");
+	mSpriteTexParam = mEffect->GetParameterByName("SpriteTexture");
 }	
 
-SpriteBatch::SpriteBatch( const shared_ptr<Material>& material )
+SpriteBatch::SpriteBatch( const shared_ptr<Effect>& effect )
 {
-	mSpriteMaterial = material;
-	if (!mSpriteMaterial->IsLoaded())
-		mSpriteMaterial->Load();
+	assert(effect && effect->IsLoaded() == true);
+	mEffect = effect;
+	mSpriteTexParam = mEffect->GetParameterByName("SpriteTexture");
 }
 
 SpriteBatch::~SpriteBatch()
@@ -79,10 +76,7 @@ void SpriteBatch::Begin( )
 {
 	std::map<shared_ptr<Texture>, Sprite*>::iterator it;
 	for (it = mBatches.begin(); it != mBatches.end(); ++it)
-	{
-		Sprite* entity = it->second;
-		entity->ClearAll();
-	}
+		it->second->ClearAll();
 }
 
 void SpriteBatch::End()
@@ -101,17 +95,12 @@ void SpriteBatch::Draw( const shared_ptr<Texture>& texture, const Rectanglef& de
 
 	IntRect srcRect = src ? (*src) : IntRect(0, 0, texWidth, texHeight);
 
-	Sprite* spriteEntity = nullptr;
 	if (mBatches.find(texture) == mBatches.end())
 	{
-		spriteEntity = Environment::GetSingleton().GetSceneManager()->CreateSprite(texture, 
-			std::static_pointer_cast<Material>(mSpriteMaterial->Clone()));	
-		mBatches[texture] = spriteEntity;
+		mBatches[texture] = new Sprite(*this, texture);
 	}
-	else
-	{
-		spriteEntity = static_cast<Sprite* >(mBatches[texture]);
-	}
+
+	Sprite* spriteEntity = mBatches[texture];
 	assert(spriteEntity);
 	
 	float2 topLeft = float2(dest.Left(), dest.Top());
@@ -232,58 +221,54 @@ void SpriteBatch::Draw( const shared_ptr<Texture>& texture, const float2& positi
 
 void SpriteBatch::Flush()
 {
-	std::map<shared_ptr<Texture>, Sprite*>::iterator it;
-	for (it = mBatches.begin(); it != mBatches.end(); ++it)
+	Window* mainWindow = Application::msApp->GetMainWindow();
+	mInvWindowSize = float2(1.0f / mainWindow->GetWidth(), 1.0f / mainWindow->GetHeight());
+	mEffect->GetParameterByName("InvWindowSize")->SetValue(mInvWindowSize);
+
+	for (auto it = mBatches.begin(); it != mBatches.end(); ++it)
+		it->second->UpdateGeometryBuffers();       
+}
+
+void SpriteBatch::OnUpdateRenderQueue( RenderQueue& renderQueue )
+{
+	for (auto it = mBatches.begin(); it != mBatches.end(); ++it)
 	{
-		Sprite* entity = it->second;
-		
-		bool visile = (entity->Empty() == false);		
-		if (visile)
-			entity->UpdateGeometryBuffers();			
+		RenderQueueItem item;
+		item.Renderable = it->second;
+
+		// ignore render order, only handle state change order
+		item.SortKey = (float)mEffect->GetResourceHandle();
+		renderQueue.AddToQueue(item, RenderQueue::BucketOverlay);
 	}
 }
 
 //-----------------------------------------------------------------------------------------------------------------
-Sprite::Sprite()
-	: mDirty(true)
+Sprite::Sprite( SpriteBatch& batch, shared_ptr<Texture> texture )
+	: mBatch(batch),
+	  mSpriteTexture(texture),
+	  mDirty(true)
 {
 	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
 
-	// bind vertex stream
+	ResizeGeometryBuffers(NumInitSprites*4, NumInitSprites*6);
+
 	VertexElement elements[3] = 
 	{
 		VertexElement(0, VEF_Float3, VEU_Position, 0),
 		VertexElement(sizeof(float3), VEF_Float2, VEU_TextureCoordinate, 0),
 		VertexElement(sizeof(float3) + sizeof(float2), VEF_Float4, VEU_Color, 0)
 	};
-	
-	uint32_t vertexSize = sizeof(float3) + sizeof(float2) + sizeof(float3);
-	uint32_t indexSize = sizeof(uint16_t);
-
-	// create index buffer 
-	mIndexBuffer = factory->CreateIndexBuffer(vertexSize * 20, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
-
-	// create vertex buffer
-	mVertexBuffer = factory->CreateVertexBuffer(indexSize * 20, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Index, NULL);
 
 	mRenderOperation = std::make_shared<RenderOperation>();
 	mRenderOperation->PrimitiveType = PT_Triangle_List;
 	mRenderOperation->BindVertexStream(0, mVertexBuffer);
 	mRenderOperation->BindIndexStream(mIndexBuffer, IBT_Bit16);
-	mRenderOperation->VertexDecl = factory->CreateVertexDeclaration(elements, 3);
+	mRenderOperation->VertexDecl = factory->CreateVertexDeclaration(elements, ARRAY_SIZE(elements));
 }
 
 Sprite::~Sprite()
 {
 	
-}
-
-void Sprite::OnRenderBegin()
-{
-	Renderable::OnRenderBegin();
-
-	Window* mainWindow = Application::msApp->GetMainWindow();
-	mWindowSizeParam->SetValue(float2(1.0f / mainWindow->GetWidth(), 1.0f / mainWindow->GetHeight()));
 }
 
 void Sprite::UpdateGeometryBuffers()
@@ -292,36 +277,65 @@ void Sprite::UpdateGeometryBuffers()
 	{
 		if (mVertices.size() && mInidces.size())
 		{
-			uint32_t vbSize = sizeof(SpriteVertex) * mVertices.size();
-			mVertexBuffer->ResizeBuffer(vbSize);
+			ResizeGeometryBuffers(mVertices.size(), mInidces.size());
 
-			uint8_t* vbData = (uint8_t*)mVertexBuffer->Map(0, vbSize, RMA_Write_Discard);
-			memcpy(vbData, (uint8_t*)&mVertices[0], vbSize);
+			uint32_t vbSize = sizeof(SpriteVertex) * mVertices.size();
+			uint32_t ibSize = sizeof(uint16_t) * mInidces.size();
+
+			void* vbData = mVertexBuffer->Map(0, vbSize, RMA_Write_Discard);
+			memcpy(vbData, &mVertices[0], vbSize);
 			mVertexBuffer->UnMap();
 
-			uint32_t ibSize = sizeof(uint16_t) * mInidces.size();
-			mIndexBuffer->ResizeBuffer(ibSize);
-
-			uint8_t* ibData = (uint8_t*)mIndexBuffer->Map(0, ibSize, RMA_Write_Discard);
-			memcpy(ibData, (uint8_t*)&mInidces[0], ibSize);
+			void* ibData = mIndexBuffer->Map(0, ibSize, RMA_Write_Discard);
+			memcpy(ibData, &mInidces[0], ibSize);
 			mIndexBuffer->UnMap();
 
-			mRenderOperation->BindIndexStream(mIndexBuffer, IBT_Bit16);
+			mRenderOperation->IndexStart = 0;
+			mRenderOperation->IndexCount = mInidces.size();
 		}
-
 		mDirty = false;
 	}
 }
 
-bool Sprite::Empty() const
+void Sprite::ResizeGeometryBuffers( size_t numVertex, size_t numIndex )
 {
-	return mInidces.empty();
+	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
+
+	uint32_t vbSize = numVertex * sizeof(SpriteVertex);
+	uint32_t ibSize = numIndex * sizeof(uint16_t);
+
+	if (!mVertexBuffer)
+	{
+		mVertexBuffer = factory->CreateIndexBuffer(vbSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+	}
+	else 
+	{
+		uint32_t currVBSize = mVertexBuffer->GetBufferSize();
+		if (currVBSize < vbSize)
+		{
+			mVertexBuffer = factory->CreateVertexBuffer(vbSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+		}
+	}
+
+	if (!mIndexBuffer)
+	{
+		mIndexBuffer = factory->CreateVertexBuffer(ibSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+	}
+	else 
+	{
+		uint32_t currIBSize = mIndexBuffer->GetBufferSize();
+		if (currIBSize < ibSize)
+		{
+			mIndexBuffer = factory->CreateIndexBuffer(ibSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+		}
+	}
 }
 
 void Sprite::ClearAll()
 {
 	mVertices.resize(0);
 	mInidces.resize(0);
+	mDirty = true;
 }
 
 vector<SpriteVertex>& Sprite::GetVertices()
@@ -336,13 +350,24 @@ vector<uint16_t>& Sprite::GetIndices()
 	return mInidces;
 }
 
-void Sprite::SetSpriteContent( const shared_ptr<Texture>& tex, const shared_ptr<Material>& mat )
+void Sprite::Render()
 {
-	mSpriteTexture = tex;
-	mSpriteMaterial = mat;
+	EffectTechnique* technique = mBatch.mEffect->GetTechniqueByIndex(0);
 
-	mSpriteMaterial->SetTexture("SpriteTexture", mSpriteTexture->GetShaderResourceView());
-	mWindowSizeParam = mSpriteMaterial->GetEffect()->GetParameterByName("InvWindowSize");
+	mBatch.mSpriteTexParam->SetValue(mSpriteTexture->GetShaderResourceView());
+	Environment::GetSingleton().GetRenderDevice()->Draw(technique, *mRenderOperation);
 }
+
+const shared_ptr<Material>& Sprite::GetMaterial() const
+{
+	ENGINE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Shoudn't call this", "Sprite::GetMaterial");
+}
+
+void Sprite::OnRenderBegin()
+{
+	ENGINE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Shoudn't call this", "Sprite::OnRenderBegin");
+}
+
+
 
 }

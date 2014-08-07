@@ -65,7 +65,6 @@ public:
 	inline uint32_t	GetBufferSize() const   { return mBufferSize; }
 	inline uint32_t	GetCreateFlags() const	{ return mCreateFlags; }
 
-	virtual void ResizeBuffer(uint32_t size) = 0;
 	virtual void* Map(uint32_t offset, uint32_t length, ResourceMapAccess mapType) = 0;
 	virtual void UnMap() = 0;
 

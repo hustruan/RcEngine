@@ -39,21 +39,6 @@ OpenGLBuffer::~OpenGLBuffer( )
 		glDeleteBuffers(1, &mBufferOGL);
 }
 
-void OpenGLBuffer::ResizeBuffer( uint32_t size )
-{
-	if (mBufferSize != size)
-	{
-		GLenum bufferUsage = OpenGLMapping::Mapping(mAccessHint);
-	
-		glBindBuffer(mBufferTarget, mBufferOGL);
-		glBufferData(mBufferTarget, static_cast<GLsizeiptr>(size), NULL, bufferUsage);
-		glBindBuffer(mBufferTarget, 0);
-
-		mBufferSize = size;
-		OGL_ERROR_CHECK();
-	}
-}
-
 void* OpenGLBuffer::Map( uint32_t offset, uint32_t length, ResourceMapAccess mapType )
 {
 	void* pMapBuffer = NULL;

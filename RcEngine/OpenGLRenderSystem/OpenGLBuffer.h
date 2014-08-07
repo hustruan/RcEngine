@@ -15,7 +15,6 @@ public:
 	inline GLuint GetBufferOGL() const		{ return mBufferOGL; }
 	inline GLuint GetBufferTarget() const   { return mBufferTarget; }
 
-	virtual void ResizeBuffer(uint32_t size);
 	virtual void* Map(uint32_t offset, uint32_t length, ResourceMapAccess mapType);
 	virtual void UnMap() ;
 

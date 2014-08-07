@@ -2,7 +2,7 @@ float2 InvWindowSize;
 
 void SpriteVS(in float3 iPos	: POSITION,
 			  in float2 iTex	: TEXCOORD0,
-			  in float4 iColor  : TEXCOORD1,
+			  in float4 iColor  : COLOR,
 			  out float2 oTex   : TEXCOORD0,
 			  out float4 oColor : TEXCOORD1,
 			  out float4 oPosCS : SV_POSITION)

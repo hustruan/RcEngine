@@ -299,6 +299,7 @@
     <Xml Include="..\Media\Effect\DeferredLighting.effect.xml">
       <SubType>Designer</SubType>
     </Xml>
+    <Xml Include="..\Media\Effect\Font.effect.xml" />
     <Xml Include="..\Media\Effect\Sprite.effect.xml" />
     <Xml Include="..\Media\Effect\Tessellation.effect.xml">
       <SubType>Designer</SubType>

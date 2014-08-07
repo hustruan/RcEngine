@@ -2,6 +2,8 @@
 #include <Graphics/RenderDevice.h>
 #include <Graphics/FrameBuffer.h>
 #include <Scene/SceneManager.h>
+#include <Resource/ResourceManager.h>
+#include <Graphics/TextureResource.h>
 #include <GUI/UIManager.h>
 #include <GUI/Button.h>
 #include <GUI/CheckBox.h>
@@ -9,7 +11,9 @@
 #include <GUI/LineEdit.h>
 #include <GUI/ListBox.h>
 #include <GUI/UIWindow.h>
+#include <GUI/Slider.h>
 #include <Core/Environment.h>
+#include <Graphics/SpriteBatch.h>
 
 using namespace RcEngine;
 
@@ -26,6 +30,13 @@ protected:
 	void Initialize()
 	{
 		InitGUI();
+
+		//SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+		//mSpriteBatch = sceneMan->CreateSpriteBatch();
+
+		//ResourceManager& resMan =  ResourceManager::GetSingleton();
+		//auto textureRes = resMan.GetResourceByName<TextureResource>(RT_Texture, "./Arthas/Sword_2H_Frostmourne_D_01_Glow.dds", "Custom");
+		//mTexture = textureRes->GetTexture();
 	}
 
 	void InitGUI()
@@ -63,17 +74,16 @@ protected:
 
 		uiY += checkBox->GetSize().Y() + 18;
 
-
-		//mBlendAreaSlider = new Slider(UI_Horizontal);
-		//mBlendAreaSlider->InitGuiStyle(nullptr);
-		//mBlendAreaSlider->SetName("Slider");    
-		//mBlendAreaSlider->SetPosition(int2(20 + mBlendAreaLabel->GetSize().X(), uiY + 5));
-		//mBlendAreaSlider->SetTrackLength(120);
-		//mBlendAreaSlider->SetValue(50);
+		Slider* mBlendAreaSlider = new Slider(UI_Horizontal);
+		mBlendAreaSlider->InitGuiStyle(nullptr);
+		mBlendAreaSlider->SetName("Slider");    
+		mBlendAreaSlider->SetPosition(int2(20 , uiY + 5));
+		mBlendAreaSlider->SetTrackLength(120);
+		mBlendAreaSlider->SetValue(50);
 		//mBlendAreaSlider->EventValueChanged.bind(this, &RenderPathApp::BlendAreaSliderValueChange);
-		//window->AddChild( mBlendAreaSlider );  
+		window->AddChild( mBlendAreaSlider );  
 
-		//uiY += mBlendAreaLabel->GetSize().Y();
+		uiY += mBlendAreaSlider->GetSize().Y() + 50;
 
 		Button* button = new Button();
 		button->InitGuiStyle(nullptr);
@@ -105,10 +115,17 @@ protected:
 		RenderDevice* device = Environment::GetSingleton().GetRenderDevice();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
+		device->GetScreenFrameBuffer()->Clear(CF_Color | CF_Depth, ColorRGBA::Black, 1.0f, 0);
+		
 		// Update overlays
 		UIManager& uiMan = UIManager::GetSingleton();
-
 		uiMan.Render();
+
+		//mSpriteBatch->Begin();
+		//mSpriteBatch->Draw(mTexture, float2(100, 100), NULL, ColorRGBA::White);
+		//mSpriteBatch->End();
+		//mSpriteBatch->Flush();
+
 		sceneMan->UpdateOverlayQueue();
 
 		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay);       
@@ -117,6 +134,9 @@ protected:
 
 		device->GetScreenFrameBuffer()->SwapBuffers();
 	}
+
+	SpriteBatch* mSpriteBatch;
+	shared_ptr<Texture> mTexture;
 };
 
 int main()

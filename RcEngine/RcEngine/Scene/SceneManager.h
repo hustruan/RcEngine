@@ -2,7 +2,6 @@
 #define SceneManager_h__
 
 //  [8/20/2012 Ruan]
-
 #include <Core/Prerequisites.h>
 #include <Graphics/Renderable.h>
 #include <Graphics/GraphicsCommon.h>
@@ -12,7 +11,7 @@ namespace RcEngine {
 
 class SkyBox;
 class SceneObject;
-class Sprite;
+class SpriteBatch;
 
 typedef std::vector<Light*> LightQueue;
 
@@ -85,9 +84,9 @@ public:
 	
 	AnimationController* GetAnimationController() const;
 
-public_internal:
-	Sprite* CreateSprite( const shared_ptr<Texture>& tex, const shared_ptr<Material>& mat);
-	void DestroySprite(Sprite* sprite);
+	// Create SpriteBatch with effect. NULL for default sprite effect
+	SpriteBatch* CreateSpriteBatch();
+	SpriteBatch* CreateSpriteBatch(const shared_ptr<Effect>& effect);
 
 protected:
 	void ClearScene();
@@ -106,11 +105,10 @@ protected:
 	// Keep track of all scene lights
 	std::vector<Light*> mAllSceneLights;
 
+	std::vector<SpriteBatch*> mSpriteBatchs;
+
 	// For sky box
 	SkyBox* mSkyBox;
-
-	// Todo: Add GUI Manager
-	std::list<Sprite*> mSprites;
 
 	AnimationController* mAnimationController;
 

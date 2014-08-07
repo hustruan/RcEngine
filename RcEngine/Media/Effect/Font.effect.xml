@@ -1,17 +1,24 @@
 <Effect name="Font">
 
-<Technique name="FontTech">
-	<Pass name="p0">
-		<VertexShader file="Sprite" entry="SpriteVS"/>
-        <PixelShader file="Sprite" entry="SDFFontPS"/>
+  <!-- SamplerState will used in this Effect -->
+  <Sampler name="LinearSampler">
+    <State name="Filter" value="Min_Mag_Mip_Linear"/>
+    <State name="AddressU" value="Wrap"/>
+    <State name="AddressV" value="Wrap"/>
+  </Sampler>
+  
+  <Technique name="FontTech">
+	  <Pass name="p0">
+		  <VertexShader file="Sprite" entry="SpriteVS"/>
+          <PixelShader file="Sprite" entry="SDFFontPS"/>
 		
-		<State name="BlendEnable" value="true"/>
-		<State name="SrcBlend" value="SrcAlpha"/>
-		<State name="DestBlend" value="InvSrcAlpha"/>
-		<State name="DepthFunc" value="LessEqual"/>
-		<State name="CullMode" value="None"/> 	
+		  <State name="BlendEnable" value="true"/>
+		  <State name="SrcBlend" value="SrcAlpha"/>
+		  <State name="DestBlend" value="InvSrcAlpha"/>
+		  <State name="DepthFunc" value="LessEqual"/>
+		  <State name="CullMode" value="None"/> 	
 			
-	</Pass>
-</Technique>
+	  </Pass>
+  </Technique>
 
 </Effect>

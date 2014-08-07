@@ -1,5 +1,12 @@
 <Effect name="Sprite">
-
+  
+  <!-- SamplerState will used in this Effect -->
+  <Sampler name="LinearSampler">
+    <State name="Filter" value="Min_Mag_Mip_Linear"/>
+    <State name="AddressU" value="Wrap"/>
+    <State name="AddressV" value="Wrap"/>
+  </Sampler>
+  
   <Technique name="SpriteTech">
     <Pass name="p0">
       <VertexShader file="Sprite" entry="SpriteVS"/>

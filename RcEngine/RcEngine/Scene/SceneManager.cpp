@@ -50,9 +50,8 @@ void SceneManager::ClearScene()
 	mAllSceneNodes.clear();
 
 	// clear all sprite
-	for (Sprite* sprite : mSprites)
-		delete sprite;
-	mSprites.clear();
+	for (SpriteBatch* batch : mSpriteBatchs)
+		delete batch;
 
 	// clear all scene object
 	for (auto& kv : mSceneObjectCollections)
@@ -182,27 +181,6 @@ SceneNode* SceneManager::FindSceneNode( const String& name ) const
 	return nullptr;
 }
 
-Sprite* SceneManager::CreateSprite( const shared_ptr<Texture>& tex, const shared_ptr<Material>& mat )
-{
-	Sprite* sprite = new Sprite();
-	sprite->SetSpriteContent(tex, mat);
-	mSprites.push_back(sprite);
-
-	return sprite;
-}
-
-void SceneManager::DestroySprite( Sprite* sprite )
-{
-	if (sprite)
-	{
-		std::list<Sprite*>::iterator it = std::find(mSprites.begin(), mSprites.end(), sprite);
-		if (it != mSprites.end())
-			mSprites.erase(it);
-
-		delete sprite;
-	}
-}
-
 void SceneManager::CreateSkyBox( const shared_ptr<Texture>& texture )
 {
 	SAFE_DELETE(mSkyBox);
@@ -272,21 +250,36 @@ void SceneManager::UpdateOverlayQueue()
 {
 	mRenderQueue.ClearQueue(RenderQueue::BucketOverlay);
 
-	for (Sprite* sprite : mSprites)
-	{
-		if (sprite->Empty() == false)
-		{
-			RenderQueueItem item;
-			item.Renderable = sprite;
+	for (SpriteBatch* batch : mSpriteBatchs)
+		batch->OnUpdateRenderQueue( mRenderQueue );
 
-			// ignore render order, only handle state change order
-			item.SortKey = (float)sprite->GetMaterial()->GetEffect()->GetResourceHandle();
-			mRenderQueue.AddToQueue(item, RenderQueue::BucketOverlay);
-		}
-	}
+	//for (Sprite* sprite : mSprites)
+	//{
+	//	if (sprite->Empty() == false)
+	//	{
+	//		RenderQueueItem item;
+	//		item.Renderable = sprite;
+
+	//		// ignore render order, only handle state change order
+	//		item.SortKey = (float)sprite->GetMaterial()->GetEffect()->GetResourceHandle();
+	//		.AddToQueue(item, RenderQueue::BucketOverlay);
+	//	}
+	//}
 }
 
+SpriteBatch* SceneManager::CreateSpriteBatch( const shared_ptr<Effect>& effect )
+{
+	SpriteBatch* batch = new SpriteBatch(effect);
+	mSpriteBatchs.push_back(batch);
+	return batch;
+}
 
+SpriteBatch* SceneManager::CreateSpriteBatch()
+{
+	SpriteBatch* batch = new SpriteBatch();
+	mSpriteBatchs.push_back(batch);
+	return batch;
+}
 
 
 }
