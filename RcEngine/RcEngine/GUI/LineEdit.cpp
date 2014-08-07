@@ -19,7 +19,7 @@ LineEdit::LineEdit()
 	  mCaretBlinkTimer(0.0f),
 	  mVisibleStartX(0.0f)
 {
-	mTextColor = ColorRGBA( 1.0f, 0.0f, 0.0f, 1.0f );
+	mTextColor = ColorRGBA( 0.0f, 0.0f, 0.0f, 1.0f );
 	mSelTextColor = ColorRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
 	mSelBkColor = ColorRGBA(0, 0, 1, 1);
 	mCaretColor = ColorRGBA( 0.0f, 0, 0, 1.0f);
@@ -157,7 +157,7 @@ void LineEdit::Draw( SpriteBatch& spriteBatch, SpriteBatch& spriteBatchFont )
 			destRect.Y = ch_y;
 			destRect.Height = ch_height;
 
-			spriteBatch.Draw(fontTex, destRect, &sourceRect, mTextColor, zOrder2);
+			spriteBatchFont.Draw(fontTex, destRect, &sourceRect, mTextColor, zOrder2);
 		}
 	}
 

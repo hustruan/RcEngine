@@ -7,13 +7,17 @@
 #include <GUI/UIManager.h>
 #include <GUI/Button.h>
 #include <GUI/CheckBox.h>
+#include <GUI/ComboBox.h>
 #include <GUI/Label.h>
 #include <GUI/LineEdit.h>
 #include <GUI/ListBox.h>
+#include <GUI/TextEdit.h>
 #include <GUI/UIWindow.h>
 #include <GUI/Slider.h>
+#include <GUI/RadioButton.h>
 #include <Core/Environment.h>
 #include <Graphics/SpriteBatch.h>
+
 
 using namespace RcEngine;
 
@@ -29,7 +33,9 @@ protected:
 
 	void Initialize()
 	{
-		InitGUI();
+		InitGUIWindow1();
+		InitGUIWindow2();
+		InitGUIWindow3();
 
 		//SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 		//mSpriteBatch = sceneMan->CreateSpriteBatch();
@@ -39,60 +45,151 @@ protected:
 		//mTexture = textureRes->GetTexture();
 	}
 
-	void InitGUI()
+	void InitGUIWindow1()
 	{
 		UIElement* rootElem = UIManager::GetSingleton().GetRoot();
 
-		Label* label = new Label();
-		label->InitGuiStyle(nullptr);
-		label->SetName("FPSLabel");
-		label->SetPosition(int2(10, 700));
-		label->SetTextColor(ColorRGBA(1, 0, 0, 1));
-		label->SetSize(int2(100, 100));
-		//mFPSLabel->SetFont(UIManager::GetSingleton().GetDefaultFont(), 20.0f);
-		rootElem->AddChild( label );   
+		mUIWindow = new UIWindow;
+		mUIWindow->InitGuiStyle(nullptr);
+		mUIWindow->SetName("Panel");
+		mUIWindow->SetTitle(L"Panel1");
+		mUIWindow->SetPosition(int2(50, 50));
+		mUIWindow->SetSize(int2(350, 300));
+		rootElem->AddChild( mUIWindow );
 
-		UIWindow* window = new UIWindow;
-		window->InitGuiStyle(nullptr);
-		window->SetName("Panel");
-		window->SetTitle(L"Window Title");
-		window->SetPosition(int2(650, 430));
-		window->SetSize(int2(350, 300));
-		rootElem->AddChild( window );
+		int uiY = 40;
+
+		mCheckBox = new CheckBox();
+		mCheckBox->InitGuiStyle(nullptr);
+		mCheckBox->SetName("CheckBox");
+		mCheckBox->SetPosition(int2(20, uiY));
+		mCheckBox->SetSize(int2(150, mCheckBox->GetSize().Y()));
+		mCheckBox->SetText(L"CheckBox");
+		mCheckBox->SetChecked(true);
+		mCheckBox->EventStateChanged.bind(this, &GUIApp::CheckBoxClicked);
+		mUIWindow->AddChild( mCheckBox );      
+
+		uiY += mCheckBox->GetSize().Y() + 25;
+
+
+		RadioButton* radioButton1 = new RadioButton();
+		radioButton1->InitGuiStyle(nullptr);
+		radioButton1->SetText(L"Radio1");
+		radioButton1->SetPosition(int2(20, uiY));
+		radioButton1->SetSize(int2(150, radioButton1->GetSize().Y()));
+		mUIWindow->AddChild( radioButton1 );     
+
+		RadioButton* radioButton2 = new RadioButton();
+		radioButton2->InitGuiStyle(nullptr);
+		radioButton2->SetText(L"Radio2");
+		radioButton2->SetPosition(int2(20 + 100, uiY));
+		radioButton2->SetSize(int2(150, radioButton2->GetSize().Y()));
+		mUIWindow->AddChild( radioButton2 );  
+
+		mRadioGroup.AddButton(radioButton1);
+		mRadioGroup.AddButton(radioButton2);
+		
+		uiY += radioButton2->GetSize().Y() + 25;
+
+		mSlider = new Slider(UI_Horizontal);
+		mSlider->InitGuiStyle(nullptr);
+		mSlider->SetName("Slider");    
+		mSlider->SetPosition(int2(20 , uiY));
+		mSlider->SetTrackLength(200);
+		mSlider->SetValue(50);
+		mSlider->EventValueChanged.bind(this, &GUIApp::SliderDraged);
+		mUIWindow->AddChild( mSlider );  
+
+		uiY += mSlider->GetSize().Y() + 25;
+
+		mButton = new Button();
+		mButton->InitGuiStyle(nullptr);
+		mButton->SetName("Button");      
+		mButton->SetPosition(int2(20, uiY));
+		mButton->SetSize(int2(120, 30));
+		mButton->SetText(L"Button");
+		mButton->EventButtonClicked.bind(this, &GUIApp::ButtonClicked);
+		mUIWindow->AddChild( mButton );
+
+		uiY += mButton->GetSize().Y() + 25;
+
+		mComboBox = new ComboBox();
+		mComboBox->InitGuiStyle(nullptr);
+		mComboBox->SetName("ComboBox");      
+		mComboBox->SetPosition(int2(20, uiY));
+		mComboBox->SetSize(int2(120, 30));
+		mComboBox->InsertItem(0, L"Item0");
+		mComboBox->InsertItem(1, L"Item1");
+		mComboBox->InsertItem(2, L"Item2");
+		mComboBox->InsertItem(3, L"Item3");
+		mComboBox->EventSelectionChanged.bind(this, &GUIApp::ComboBoxItemSelected);
+		mUIWindow->AddChild( mComboBox );    
+
+	}
+
+	void InitGUIWindow2()
+	{
+		UIElement* rootElem = UIManager::GetSingleton().GetRoot();
+
+		mUIWindow2 = new UIWindow;
+		mUIWindow2->InitGuiStyle(nullptr);
+		mUIWindow2->SetName("Panel2");
+		mUIWindow2->SetTitle(L"Panel2");
+		mUIWindow2->SetPosition(int2(450, 50));
+		mUIWindow2->SetSize(int2(350, 500));
+		rootElem->AddChild( mUIWindow2 );
 
 		int uiY = 50;
 
-		CheckBox* checkBox = new CheckBox();
-		checkBox->InitGuiStyle(nullptr);
-		checkBox->SetName("CheckBox");
-		checkBox->SetPosition(int2(20, uiY));
-		checkBox->SetSize(int2(150, checkBox->GetSize().Y()));
-		checkBox->SetText(L"CheckBox");
-		checkBox->SetChecked(true);
-		//checkBox->EventStateChanged.bind(this, &RenderPathApp::SunCastShadow);
-		window->AddChild( checkBox );        
+		mLineEdit = new LineEdit;
+		mLineEdit->InitGuiStyle(nullptr);
+		mLineEdit->SetPosition(int2(20, uiY));
+		mLineEdit->SetSize(int2(300, 30));
+		mLineEdit->SetText(L"Line Edit");
+		mUIWindow2->AddChild(mLineEdit);
 
-		uiY += checkBox->GetSize().Y() + 18;
+		uiY += mLineEdit->GetSize().Y() + 20;
 
-		Slider* mBlendAreaSlider = new Slider(UI_Horizontal);
-		mBlendAreaSlider->InitGuiStyle(nullptr);
-		mBlendAreaSlider->SetName("Slider");    
-		mBlendAreaSlider->SetPosition(int2(20 , uiY + 5));
-		mBlendAreaSlider->SetTrackLength(120);
-		mBlendAreaSlider->SetValue(50);
-		//mBlendAreaSlider->EventValueChanged.bind(this, &RenderPathApp::BlendAreaSliderValueChange);
-		window->AddChild( mBlendAreaSlider );  
+		mTextEdit = new TextEdit;
+		mTextEdit->InitGuiStyle(nullptr);
+		mTextEdit->SetPosition(int2(20, uiY));
+		mTextEdit->SetSize(int2(300, 350));
+		mTextEdit->SetText(L"Text Edit\nRcEngine is a graphics engine implemented in C++, inspired by OGRE and KlayGE.");
 
-		uiY += mBlendAreaSlider->GetSize().Y() + 50;
+		mUIWindow2->AddChild(mTextEdit);
+	}
 
-		Button* button = new Button();
-		button->InitGuiStyle(nullptr);
-		button->SetName("Button");      
-		button->SetPosition(int2(20, uiY));
-		button->SetSize(int2(120, 30));
-		button->SetText(L"Button");
-		//button->EventButtonClicked.bind(this, &RenderPathApp::DumpCameraBtnClicked);
-		window->AddChild( button );    
+	void InitGUIWindow3()
+	{
+		UIElement* rootElem = UIManager::GetSingleton().GetRoot();
+
+		mUIWindow3 = new UIWindow();
+		mUIWindow3->InitGuiStyle(nullptr);
+		mUIWindow3->SetName("Panel2");
+		mUIWindow3->SetTitle(L"Panel2");
+		mUIWindow3->SetPosition(int2(50, 350));
+		mUIWindow3->SetSize(int2(350, 300));
+		rootElem->AddChild( mUIWindow3 );
+	}
+
+	void CheckBoxClicked(bool bChecked)
+	{
+		printf("CheckBox %s\n", bChecked ? "true" : "false");
+	}
+
+	void ButtonClicked()
+	{
+		printf("Button Clicked\n");
+	}
+
+	void SliderDraged(int32_t value)
+	{
+		printf("Slider Position: %d\n", value);
+	}
+
+	void ComboBoxItemSelected(int32_t index)
+	{
+		wprintf(L"ComboBox Select: %s\n", mComboBox->GetSelectedItem().c_str());
 	}
 
 	void LoadContent()
@@ -121,11 +218,6 @@ protected:
 		UIManager& uiMan = UIManager::GetSingleton();
 		uiMan.Render();
 
-		//mSpriteBatch->Begin();
-		//mSpriteBatch->Draw(mTexture, float2(100, 100), NULL, ColorRGBA::White);
-		//mSpriteBatch->End();
-		//mSpriteBatch->Flush();
-
 		sceneMan->UpdateOverlayQueue();
 
 		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay);       
@@ -134,6 +226,23 @@ protected:
 
 		device->GetScreenFrameBuffer()->SwapBuffers();
 	}
+
+
+	UIWindow* mUIWindow;
+	Button* mButton;
+	CheckBox* mCheckBox;
+	Slider* mSlider;
+	ComboBox* mComboBox;
+	Label* mLabel;
+
+	RadioButtonGroup mRadioGroup;
+
+	UIWindow* mUIWindow2;
+	LineEdit* mLineEdit;
+	TextEdit* mTextEdit;
+
+	UIWindow* mUIWindow3;
+	
 
 	SpriteBatch* mSpriteBatch;
 	shared_ptr<Texture> mTexture;

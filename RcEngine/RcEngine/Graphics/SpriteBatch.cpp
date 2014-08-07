@@ -289,10 +289,11 @@ void Sprite::UpdateGeometryBuffers()
 			void* ibData = mIndexBuffer->Map(0, ibSize, RMA_Write_Discard);
 			memcpy(ibData, &mInidces[0], ibSize);
 			mIndexBuffer->UnMap();
-
-			mRenderOperation->IndexStart = 0;
-			mRenderOperation->IndexCount = mInidces.size();
 		}
+		
+		mRenderOperation->IndexStart = 0;
+		mRenderOperation->IndexCount = mInidces.size();
+
 		mDirty = false;
 	}
 }
@@ -313,7 +314,8 @@ void Sprite::ResizeGeometryBuffers( size_t numVertex, size_t numIndex )
 		uint32_t currVBSize = mVertexBuffer->GetBufferSize();
 		if (currVBSize < vbSize)
 		{
-			mVertexBuffer = factory->CreateVertexBuffer(vbSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+			mVertexBuffer = factory->CreateVertexBuffer(currVBSize * 2, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+			mRenderOperation->BindVertexStream(0, mVertexBuffer);
 		}
 	}
 
@@ -326,7 +328,8 @@ void Sprite::ResizeGeometryBuffers( size_t numVertex, size_t numIndex )
 		uint32_t currIBSize = mIndexBuffer->GetBufferSize();
 		if (currIBSize < ibSize)
 		{
-			mIndexBuffer = factory->CreateIndexBuffer(ibSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+			mIndexBuffer = factory->CreateIndexBuffer(currIBSize * 2, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+			mRenderOperation->BindIndexStream(mIndexBuffer, IBT_Bit16);
 		}
 	}
 }

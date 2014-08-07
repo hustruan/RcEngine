@@ -1,5 +1,8 @@
 float2 InvWindowSize;
+Texture2D SpriteTexture;
+SamplerState LinearSampler;
 
+//--------------------------------------------------------------------------------
 void SpriteVS(in float3 iPos	: POSITION,
 			  in float2 iTex	: TEXCOORD0,
 			  in float4 iColor  : COLOR,
@@ -16,9 +19,7 @@ void SpriteVS(in float3 iPos	: POSITION,
 	oPosCS = float4(normPos * 2.0 - 1.0, iPos.z, 1.0);
 }
 
-Texture2D SpriteTexture;
-SamplerState LinearSampler;
-
+//--------------------------------------------------------------------------------
 void SpritePS(in float2 iTex		: TEXCOORD0,
 			  in float4 iColor		: TEXCOORD1,
 			  out float4 oFragColor : SV_Target0)
@@ -26,6 +27,7 @@ void SpritePS(in float2 iTex		: TEXCOORD0,
 	oFragColor = iColor * SpriteTexture.Sample( LinearSampler, iTex);
 }
 
+//--------------------------------------------------------------------------------
 static const float Gamma = 2.2;
 static const float Smoothness = 96.0;
 
