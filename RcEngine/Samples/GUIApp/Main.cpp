@@ -4,6 +4,8 @@
 #include <Scene/SceneManager.h>
 #include <Resource/ResourceManager.h>
 #include <Graphics/TextureResource.h>
+#include <Graphics/Effect.h>
+#include <Graphics/EffectParameter.h>
 #include <GUI/UIManager.h>
 #include <GUI/Button.h>
 #include <GUI/CheckBox.h>
@@ -17,6 +19,7 @@
 #include <GUI/RadioButton.h>
 #include <Core/Environment.h>
 #include <Graphics/SpriteBatch.h>
+#include <Graphics/Font.h>
 
 
 using namespace RcEngine;
@@ -36,13 +39,6 @@ protected:
 		InitGUIWindow1();
 		InitGUIWindow2();
 		InitGUIWindow3();
-
-		//SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
-		//mSpriteBatch = sceneMan->CreateSpriteBatch();
-
-		//ResourceManager& resMan =  ResourceManager::GetSingleton();
-		//auto textureRes = resMan.GetResourceByName<TextureResource>(RT_Texture, "./Arthas/Sword_2H_Frostmourne_D_01_Glow.dds", "Custom");
-		//mTexture = textureRes->GetTexture();
 	}
 
 	void InitGUIWindow1()
@@ -167,7 +163,7 @@ protected:
 		mUIWindow3->InitGuiStyle(nullptr);
 		mUIWindow3->SetName("Panel2");
 		mUIWindow3->SetTitle(L"Panel2");
-		mUIWindow3->SetPosition(int2(50, 350));
+		mUIWindow3->SetPosition(int2(50, 370));
 		mUIWindow3->SetSize(int2(350, 300));
 		rootElem->AddChild( mUIWindow3 );
 	}
@@ -184,7 +180,10 @@ protected:
 
 	void SliderDraged(int32_t value)
 	{
-		printf("Slider Position: %d\n", value);
+		
+		float v = (value) / 100.0f;
+		printf("Slider Position: %f\n", v);
+		mSDFEffect->GetParameterByName("GlyphCenter")->SetValue(v);
 	}
 
 	void ComboBoxItemSelected(int32_t index)
@@ -194,6 +193,18 @@ protected:
 
 	void LoadContent()
 	{
+		ResourceManager& resMan = ResourceManager::GetSingleton();
+
+		mFont = resMan.GetResourceByName<Font>(RT_Font, "Consolas Regular", "General");
+		mSDFEffect = resMan.GetResourceByName<Effect>(RT_Effect, "FontOutline.effect.xml", "General") ;
+
+		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+
+		mSpriteBatch = sceneMan->CreateSpriteBatch(mSDFEffect);
+
+		//ResourceManager& resMan =  ResourceManager::GetSingleton();
+		//auto textureRes = resMan.GetResourceByName<TextureResource>(RT_Texture, "xWinForm.dds", "General");
+		//mTexture = textureRes->GetTexture();
 
 	}
 
@@ -218,9 +229,16 @@ protected:
 		UIManager& uiMan = UIManager::GetSingleton();
 		uiMan.Render();
 
+		mSpriteBatch->Begin();
+		//mSpriteBatch->Draw(mTexture, float2(100, 100), NULL, ColorRGBA::White);
+		mFont->DrawString(*mSpriteBatch, L"@", 250, float2(100, 600), ColorRGBA::White);
+		mSpriteBatch->End();
+		mSpriteBatch->Flush();
+
+	
 		sceneMan->UpdateOverlayQueue();
 
-		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay);       
+		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
 		for (const RenderQueueItem& renderItem : guiBucket) 
 			renderItem.Renderable->Render();
 
@@ -243,6 +261,9 @@ protected:
 
 	UIWindow* mUIWindow3;
 	
+
+	shared_ptr<Font> mFont;
+	shared_ptr<Effect> mSDFEffect;
 
 	SpriteBatch* mSpriteBatch;
 	shared_ptr<Texture> mTexture;

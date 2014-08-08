@@ -12,6 +12,19 @@ namespace RcEngine {
 class SpriteBatch;
 class FontLoader;
 
+enum Alignment
+{
+	AlignLeft     = 1UL << 0,
+	AlignRight    = 1UL << 1,
+	AlignHCenter  = 1UL << 2,
+
+	AlignTop      = 1UL << 3,
+	AlignBottom   = 1UL << 4,
+	AlignVCenter  = 1UL << 5,
+
+	AlignCenter   = AlignHCenter | AlignVCenter
+};
+
 class _ApiExport Font : public Resource
 {
 public:

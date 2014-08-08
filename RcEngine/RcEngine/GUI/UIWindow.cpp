@@ -220,7 +220,7 @@ void UIWindow::Restore()
 			child->SetVisible(true);
 	}
 
-	mWindowState = Normal;
+	mWindowState = UIWindow::Normal;
 
 	mMaximizeBtn->SetVisible(true);
 	mRestoreBtn->SetVisible(false);
@@ -340,7 +340,6 @@ void UIWindow::DrawBorder( SpriteBatch& spriteBatch, SpriteBatch& spriteBatchFon
 			align = AlignTop | AlignLeft;
 
 		//std::wstring title = mTitle + std::to_wstring(mPriority);
-
 		mStyle->Font->DrawString(spriteBatchFont, mTitle, (float)mBorderThickness, align, rect, ColorRGBA::Black, zOrder);
 	}
 	
@@ -507,7 +506,7 @@ void UIWindow::UpdateState(float dt)
 
 		 if (mPosition == mLastNormalPos && mSize == mLastNormalSize)
 		 {	
-			 mMinimized = false;
+			 mMaximized = false;
 			 mMinimized = false;	
 		 }
 	 }

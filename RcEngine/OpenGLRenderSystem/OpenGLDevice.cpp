@@ -32,8 +32,6 @@ OpenGLDevice::OpenGLDevice()
 
 OpenGLDevice::~OpenGLDevice(void)
 {
-	//SAFE_DELETE(mRenderFactory);
-
 	if (mBlitFBO[0] != 0)
 		glDeleteFramebuffers(2, mBlitFBO);
 }

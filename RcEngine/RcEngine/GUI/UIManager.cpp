@@ -48,7 +48,7 @@ void UIManager::OnGraphicsInitialize()
 
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 		mSpriteBatch = sceneMan->CreateSpriteBatch();
-		mSpriteBatchFont = sceneMan->CreateSpriteBatch(/*fontEffect*/);
+		mSpriteBatchFont = sceneMan->CreateSpriteBatch(fontEffect);
 
 		mInitialize = true;
 	}

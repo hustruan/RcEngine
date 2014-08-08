@@ -1,4 +1,4 @@
-<Effect name="Font">
+<Effect name="SDFontOutline">
 
   <!-- SamplerState will used in this Effect -->
   <Sampler name="LinearSampler">
@@ -7,10 +7,10 @@
     <State name="AddressV" value="Wrap"/>
   </Sampler>
 
-  <Technique name="SDFont">
+  <Technique name="SDFontOutline">
     <Pass name="p0">
       <VertexShader file="Sprite" entry="SpriteVS"/>
-      <PixelShader file="Font" entry="SDFFontPS"/>
+      <PixelShader file="Font" entry="SDFFontOutlinePS"/>
       <State name="BlendEnable" value="true"/>
       <State name="SrcBlend" value="SrcAlpha"/>
       <State name="DestBlend" value="InvSrcAlpha"/>

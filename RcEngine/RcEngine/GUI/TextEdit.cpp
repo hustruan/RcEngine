@@ -33,7 +33,7 @@ TextEdit::TextEdit()
 {
 	mTextColor = ColorRGBA( 0.0f, 0.0f, 0.0f, 1.0f );
 	mSelTextColor = ColorRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
-	mSelBkColor = ColorRGBA( 1.0f, 0.156f, 0.196f, 0.36f );
+	mSelBkColor = ColorRGBA( 0.67f, 0.83F, 1.0f, 0.5f );
 	mCaretColor = ColorRGBA( 1.0f, 0, 0, 0 );
 
 	for (size_t i = 0; i < 4; ++i)
@@ -186,7 +186,7 @@ void TextEdit::DrawSelection( SpriteBatch& spriteBatch, SpriteBatch& spriteBatch
 				rect.SetLeft( mCharPositions[start.Y()][start.X()] );
 				rect.SetRight( mCharPositions[start.Y()].back() );
 				rect.SetTop( mTextRect.Y + mRowHeight * line );		
-				spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, ColorRGBA(0, 0, 1, 1), zOrder);
+				spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, mSelBkColor, zOrder);
 			}
 
 			// Last Line
@@ -197,7 +197,7 @@ void TextEdit::DrawSelection( SpriteBatch& spriteBatch, SpriteBatch& spriteBatch
 				rect.SetLeft( mCharPositions[end.Y()].front() );
 				rect.SetRight( mCharPositions[end.Y()][end.X()] );
 				rect.SetTop( mTextRect.Y + mRowHeight * line );		
-				spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, ColorRGBA(0, 0, 1, 1), zOrder);
+				spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, mSelBkColor, zOrder);
 			}
 
 			for (int32_t i = start.Y() + 1; i < end.Y(); ++i)
@@ -208,7 +208,7 @@ void TextEdit::DrawSelection( SpriteBatch& spriteBatch, SpriteBatch& spriteBatch
 					rect.SetLeft( mCharPositions[i].front() );
 					rect.SetRight( mCharPositions[i].back() );
 					rect.SetTop( mTextRect.Y + mRowHeight * line);	
-					spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, ColorRGBA(0, 0, 1, 1), zOrder);
+					spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, mSelBkColor, zOrder);
 				}
 			}
 		}
@@ -220,7 +220,7 @@ void TextEdit::DrawSelection( SpriteBatch& spriteBatch, SpriteBatch& spriteBatch
 				rect.SetLeft( mCharPositions[start.Y()][start.X()] );
 				rect.SetRight( mCharPositions[end.Y()][end.X()] );
 				rect.SetTop( mTextRect.Y + mRowHeight * line );		
-				spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, ColorRGBA(0, 0, 1, 1), zOrder);
+				spriteBatch.Draw(mTextEditStyle->StyleTex, rect, &mTextEditStyle->StyleStates[UI_State_Normal].TexRegion, mSelBkColor, zOrder);
 			}
 		}
 	}
