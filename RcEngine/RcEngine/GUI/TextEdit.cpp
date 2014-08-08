@@ -31,7 +31,7 @@ TextEdit::TextEdit()
 	  mCaretPos(0, 0),
 	  mSelectStartPos(0, 0)
 {
-	mTextColor = ColorRGBA( 1.0f, 0.0f, 0.0f, 1.0f );
+	mTextColor = ColorRGBA( 0.0f, 0.0f, 0.0f, 1.0f );
 	mSelTextColor = ColorRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
 	mSelBkColor = ColorRGBA( 1.0f, 0.156f, 0.196f, 0.36f );
 	mCaretColor = ColorRGBA( 1.0f, 0, 0, 0 );

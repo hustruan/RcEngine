@@ -78,6 +78,11 @@ int32_t ComboBox::GetSelectedIndex() const
 	return mItemList->GetSelectedIndex();
 }
 
+const std::wstring& ComboBox::GetSelectedItem() const
+{
+	return mItemList->GetSelectedItem();
+}
+
 void ComboBox::InitGuiStyle( const GuiSkin::StyleMap* styles /*= nullptr*/ )
 {
 	if (styles)
@@ -174,5 +179,7 @@ void ComboBox::OnResize()
 	for (UIElement* child : mChildren)
 		child->OnResize();
 }
+
+
 
 }

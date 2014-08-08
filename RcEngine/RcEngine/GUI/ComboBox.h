@@ -39,6 +39,7 @@ public:
 
 	void SetSelectedIndex(int32_t index);
 	int32_t GetSelectedIndex() const;
+	const std::wstring& GetSelectedItem() const;
 
 protected:
 	void UpdateRect();
