@@ -799,8 +799,6 @@ void TiledDeferredPath::RenderScene()
 
 	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("ToneMap");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
-
-	screenFB->SwapBuffers();
 }
 
 void TiledDeferredPath::GenereateGBuffer()
