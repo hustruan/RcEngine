@@ -6,7 +6,7 @@ uniform mat4 WorldView;
 uniform mat4 Projection;
 
 #ifdef _AlphaTest
-	out vec2 oTex;
+	layout (location = 0) out vec2 oTex;
 #endif
 
 out gl_PerVertex {
@@ -29,10 +29,23 @@ void main()
 
 [[Fragment=ShadowMapVSM]]
 
+#include "/ModelMaterialFactory.glsl"
+
+#ifdef _AlphaTest
+	layout (location = 0) in vec2 iTex;
+#endif
+
 layout(location = 0) out vec2 oFragDepth;
 
 void main()
 {
-	oFragDepth.x = gl_FragCoord.z;
-	oFragDepth.y = gl_FragCoord.z * gl_FragCoord.z;
+#ifdef _AlphaTest
+	vec4 tap = texture(DiffuseMap, iTex);
+	if (tap.a < 0.1) discard;
+#endif
+
+	float z = gl_FragCoord.z * 0.5 + 0.5;
+	
+	oFragDepth.x = z;
+	oFragDepth.y = z * z;
 }

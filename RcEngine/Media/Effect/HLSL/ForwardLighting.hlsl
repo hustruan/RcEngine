@@ -36,6 +36,7 @@ void DirectionalLightingPS(in VSOutput input,
 	// Ambient 
 	final += material.DiffuseAlbedo * 0.15;
 
-	//final = pow(final, 1.0 / 2.2);
+	final = pow(final, 1.0 / 2.2);
     oFragColor = float4(final, 1.0);
+
 }

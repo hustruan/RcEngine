@@ -265,16 +265,7 @@ CascadedShadowMap::CascadedShadowMap(RenderDevice* device)
 
 	// Load shade map blur effect
 	ResourceManager& resMan = ResourceManager::GetSingleton();
-	mBlurMaterial = std::static_pointer_cast<Material>(resMan.GetResourceByName(RT_Material, "ShadowMapBlur.material.xml", "General"));
-	mBlurMaterial->Load();
-
-	// Create Sample State
-	//SamplerStateDesc sdesc;
-	//sdesc.AddressU = sdesc.AddressV = TAM_Border;
-	//sdesc.BorderColor = ColorRGBA::White;
-	//sdesc.Filter = TF_Min_Mag_Mip_Point;
-	//sdesc.ComparisonFunc = CF_Less;
-	//mPCFSampleState = mDevice->GetRenderFactory()->CreateSamplerState(sdesc);
+	mBlurEffect = resMan.GetResourceByName<Effect>(RT_Effect, "ShadowMapBlur.effect.xml", "General");
 	
 	mFSQuadShape = BuildFSQuadShape();
 

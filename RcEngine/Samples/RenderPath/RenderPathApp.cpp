@@ -287,7 +287,7 @@ void RenderPathApp::CalculateFrameRate()
 	frameCount++;
 
 	if (mTimer.GetGameTime()-baseTime >= 1.0f)
-	{
+	{ 
 		mFramePerSecond = frameCount;
 		frameCount = 0;
 		baseTime += 1.0f;

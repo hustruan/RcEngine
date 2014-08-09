@@ -85,6 +85,7 @@ protected:
 		Light* mDirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
 		mDirLight->SetDirection(float3(0, -1, 0.5));
 		mDirLight->SetLightColor(float3(1, 1, 1));
+		mDirLight->SetLightIntensity(0.5);
 		mDirLight->SetCastShadow(false);
 		sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 	}
@@ -163,104 +164,111 @@ protected:
 		//	arthasSceneNode->AttachObject(arthasEntity);
 		//}
 
-		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
+		/*SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
 		{
-			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./AncientCity/AncientCity.mesh",  "Custom");	
+		Entity* arthasEntity = sceneMan->CreateEntity("dude", "./AncientCity/AncientCity.mesh",  "Custom");	
+		citySceneNode->SetScale(float3(10, 10, 10));
+		citySceneNode->AttachObject(arthasEntity);
+		}*/
+
+		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("DragonGardon");
+		{
+			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./DragonGardon/DragonGardon.mesh",  "Custom");	
 			citySceneNode->SetScale(float3(10, 10, 10));
 			citySceneNode->AttachObject(arthasEntity);
 		}
 
-		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
-		{
-			Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
-
-			
-			Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
-			Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
-
-			BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
-			BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
-			sword1Node->AttachObject(sword1);
-			sword2Node->AttachObject(sword2);
-
-			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
-
-			const String AnimClips[] = { 
-				"./Sinbad/Dance.anim", 
-			    "./Sinbad/DrawSwords.anim",
-				"./Sinbad/JumpStart.anim",
-				"./Sinbad/JumpLoop.anim",
-				"./Sinbad/JumpEnd.anim",
-				"./Sinbad/HandsClosed.anim",
-				"./Sinbad/HandsRelaxed.anim",
-				"./Sinbad/IdleBase.anim",
-				"./Sinbad/IdleTop.anim",
-				"./Sinbad/RunBase.anim",
-				"./Sinbad/RunTop.anim",
-				"./Sinbad/SliceHorizontal.anim",
-				"./Sinbad/SliceVertical.anim",
-			};
-
-			for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
-			{
-				AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
-				animState->WrapMode = AnimationState::Wrap_Loop;
-			}
-			
-			AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
-			SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
-
-			SliceHorizontal->Play();
-			animPlayer->PlayClip("IdleBase");
-
-			/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
-			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-			takeClip->Play();
-
-			AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
-			runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-			runBaseClip->Play();*/
-
-			arthasSceneNode->SetScale(float3(5, 5, 5));
-			arthasSceneNode->SetPosition(float3(0, 50, 0));
-			arthasSceneNode->AttachObject(arthasEntity);
-
-			mDudeEntity = arthasEntity;
-		}
-
-
-		//String modelName = "./LOL/blitzcrank/blitzcrank.mesh";
-		////String modelName = "./LOL/Ahri/ahri.mesh";
-		//SceneNode* blitzcrankSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("blitzcrank");
+		//SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
 		//{
-		//	Entity* blitzcrankEntity = sceneMan->CreateEntity("blitzcrank", modelName,  "Custom");	
-		//	blitzcrankSceneNode->AttachObject(blitzcrankEntity);
+		//	Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
 
-		//	AnimationPlayer* animPlayer = blitzcrankEntity->GetAnimationPlayer();
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/dance.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/run.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/laugh.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle1.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle2.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle3.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack1.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack2.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack3.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/death.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/windup.anim", "Custom"));
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/taunt.anim", "Custom"));
 		//	
-		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/Take 001.anim", "Custom"));
+		//	Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+		//	Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
 
-		//	AnimationState* takeClip = animPlayer->GetClip("Take 001");
+		//	BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
+		//	BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
+		//	sword1Node->AttachObject(sword1);
+		//	sword2Node->AttachObject(sword2);
+
+		//	AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
+
+		//	const String AnimClips[] = { 
+		//		"./Sinbad/Dance.anim", 
+		//	    "./Sinbad/DrawSwords.anim",
+		//		"./Sinbad/JumpStart.anim",
+		//		"./Sinbad/JumpLoop.anim",
+		//		"./Sinbad/JumpEnd.anim",
+		//		"./Sinbad/HandsClosed.anim",
+		//		"./Sinbad/HandsRelaxed.anim",
+		//		"./Sinbad/IdleBase.anim",
+		//		"./Sinbad/IdleTop.anim",
+		//		"./Sinbad/RunBase.anim",
+		//		"./Sinbad/RunTop.anim",
+		//		"./Sinbad/SliceHorizontal.anim",
+		//		"./Sinbad/SliceVertical.anim",
+		//	};
+
+		//	for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
+		//	{
+		//		AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
+		//		animState->WrapMode = AnimationState::Wrap_Loop;
+		//	}
+		//	
+		//	AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
+		//	SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
+
+		//	SliceHorizontal->Play();
+		//	animPlayer->PlayClip("IdleBase");
+
+		//	/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
 		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
 		//	takeClip->Play();
 
-		//	blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
-		//	//blitzcrankSceneNode->SetPosition(float3(0, 50, 0));
+		//	AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
+		//	runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	runBaseClip->Play();*/
 
-		//	mDudeEntity = blitzcrankEntity;
+		//	arthasSceneNode->SetScale(float3(5, 5, 5));
+		//	arthasSceneNode->SetPosition(float3(0, 50, 0));
+		//	arthasSceneNode->AttachObject(arthasEntity);
+
+		//	mDudeEntity = arthasEntity;
 		//}
+
+
+		String modelName = "./LOL/blitzcrank/blitzcrank.mesh";
+		//String modelName = "./LOL/Ahri/ahri.mesh";
+		SceneNode* blitzcrankSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("blitzcrank");
+		{
+			Entity* blitzcrankEntity = sceneMan->CreateEntity("blitzcrank", modelName,  "Custom");	
+			blitzcrankSceneNode->AttachObject(blitzcrankEntity);
+
+			AnimationPlayer* animPlayer = blitzcrankEntity->GetAnimationPlayer();
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/dance.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/run.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/laugh.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle1.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle2.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/idle3.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack1.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack2.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/attack3.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/death.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/windup.anim", "Custom"));
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/taunt.anim", "Custom"));
+			
+			animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/Take 001.anim", "Custom"));
+
+			AnimationState* takeClip = animPlayer->GetClip("run");
+			takeClip->WrapMode = (AnimationState::Wrap_Loop);
+			takeClip->Play();
+
+			blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
+			blitzcrankSceneNode->SetPosition(float3(150, 29, 0));
+
+			mDudeEntity = blitzcrankEntity;
+		}
 	}
 	
 

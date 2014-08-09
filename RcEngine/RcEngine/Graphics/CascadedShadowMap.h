@@ -45,7 +45,7 @@ private:
 	shared_ptr<Texture> mShadowMapTempBlur1;
 	shared_ptr<RenderView> mShadowMapTempBlurRTV1;
 
-	shared_ptr<Material> mBlurMaterial;
+	shared_ptr<Effect> mBlurEffect;
 
 	// FSQuad
 	shared_ptr<RenderOperation> mFSQuadShape;

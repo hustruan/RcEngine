@@ -214,6 +214,8 @@ ForwardPath::ForwardPath()
 void ForwardPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 {
 	RenderPath::OnGraphicsInit(camera);
+
+	mShadowMan = new CascadedShadowMap(mDevice);
 }
 
 void ForwardPath::OnWindowResize( uint32_t width, uint32_t height )
@@ -245,6 +247,12 @@ void ForwardPath::RenderScene()
 		String techName;
 		if (light->GetLightType() == LT_DirectionalLight)
 		{
+			//if (light->GetCastShadow())
+			//{
+			//	// Generate shadow map
+			//	mShadowMan->MakeCascadedShadowMap(*light);
+			//}
+
 			techName = "DirectionalLighting";
 
 			for (const RenderQueueItem& renderItem : opaqueBucket) 
@@ -799,8 +807,6 @@ void TiledDeferredPath::RenderScene()
 
 	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("ToneMap");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
-
-	screenFB->SwapBuffers();
 }
 
 void TiledDeferredPath::GenereateGBuffer()

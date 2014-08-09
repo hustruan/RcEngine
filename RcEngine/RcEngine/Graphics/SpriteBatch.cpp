@@ -259,6 +259,8 @@ Sprite::Sprite( SpriteBatch& batch, shared_ptr<Texture> texture )
 		VertexElement(sizeof(float3) + sizeof(float2), VEF_Float4, VEU_Color, 0)
 	};
 
+	static_assert(sizeof(SpriteVertex) == sizeof(float) *9, "Error");
+
 	mRenderOperation = std::make_shared<RenderOperation>();
 	mRenderOperation->PrimitiveType = PT_Triangle_List;
 	mRenderOperation->BindVertexStream(0, mVertexBuffer);
@@ -355,7 +357,7 @@ vector<uint16_t>& Sprite::GetIndices()
 
 void Sprite::Render()
 {
-	EffectTechnique* technique = mBatch.mEffect->GetTechniqueByIndex(0);
+	EffectTechnique* technique = mBatch.mEffect->GetCurrentTechnique();
 
 	mBatch.mSpriteTexParam->SetValue(mSpriteTexture->GetShaderResourceView());
 	Environment::GetSingleton().GetRenderDevice()->Draw(technique, *mRenderOperation);

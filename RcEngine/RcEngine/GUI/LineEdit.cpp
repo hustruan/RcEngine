@@ -21,7 +21,7 @@ LineEdit::LineEdit()
 {
 	mTextColor = ColorRGBA( 0.0f, 0.0f, 0.0f, 1.0f );
 	mSelTextColor = ColorRGBA( 1.0f, 1.0f, 1.0f, 1.0f );
-	mSelBkColor = ColorRGBA(0, 0, 1, 1);
+	mSelBkColor = ColorRGBA( 0.67f, 0.83F, 1.0f, 0.5f );
 	mCaretColor = ColorRGBA( 0.0f, 0, 0, 1.0f);
 }
 
