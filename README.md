@@ -22,7 +22,7 @@ RcEngine is a graphics engine implemented in C++,  inspired by OGRE and [KlayGE]
 ###Samples:
 
 **GUI**
-![](https://github.com/hustruan/RcEngine/tree/master/RcEngine/Samples/GUIApp.png)
+![](https://github.com/hustruan/RcEngine/blob/master/RcEngine/Samples/GUIApp.png)
 
 
 
