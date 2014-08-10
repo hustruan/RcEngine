@@ -51,8 +51,8 @@ protected:
 	void Initialize()
 	{
 		mCamera = std::make_shared<Camera>();
-		mCamera->CreateLookAt(float3(-7.404108, 39.924358, -153.436646), float3(-7.288536, 39.863396, -152.445221), float3(0.007056, 0.998140, 0.060553));
-		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
+		mCamera->CreateLookAt(float3(0, 150, -250), float3(0, 0, 0));
+		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 500.0f );
 
 		auto view = mCamera->GetViewMatrix();
 		auto proj = mCamera->GetProjMatrix();
@@ -83,9 +83,10 @@ protected:
 		screenFB->SetCamera(mCamera);
 
 		Light* mDirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
-		mDirLight->SetDirection(float3(0, -1, 0.5));
+		mDirLight->SetDirection(float3(1, -1, 0));
 		mDirLight->SetLightColor(float3(1, 1, 1));
-		mDirLight->SetCastShadow(false);
+		mDirLight->SetCastShadow(true);
+		mDirLight->SetShadowCascades(1);
 		sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 	}
 
@@ -163,70 +164,70 @@ protected:
 		//	arthasSceneNode->AttachObject(arthasEntity);
 		//}
 
-		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("AncientCity");
+		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("PSSMScene");
 		{
-			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./AncientCity/AncientCity.mesh",  "Custom");	
-			citySceneNode->SetScale(float3(10, 10, 10));
+			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./PSSMScene/PSSMScene.mesh",  "Custom");	
+			//citySceneNode->SetScale(float3(10, 10, 10));
 			citySceneNode->AttachObject(arthasEntity);
 		}
 
-		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
-		{
-			Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
+		//SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
+		//{
+		//	Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
 
-			
-			Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
-			Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+		//	
+		//	Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
+		//	Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
 
-			BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
-			BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
-			sword1Node->AttachObject(sword1);
-			sword2Node->AttachObject(sword2);
+		//	BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
+		//	BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
+		//	sword1Node->AttachObject(sword1);
+		//	sword2Node->AttachObject(sword2);
 
-			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
+		//	AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
 
-			const String AnimClips[] = { 
-				"./Sinbad/Dance.anim", 
-			    "./Sinbad/DrawSwords.anim",
-				"./Sinbad/JumpStart.anim",
-				"./Sinbad/JumpLoop.anim",
-				"./Sinbad/JumpEnd.anim",
-				"./Sinbad/HandsClosed.anim",
-				"./Sinbad/HandsRelaxed.anim",
-				"./Sinbad/IdleBase.anim",
-				"./Sinbad/IdleTop.anim",
-				"./Sinbad/RunBase.anim",
-				"./Sinbad/RunTop.anim",
-				"./Sinbad/SliceHorizontal.anim",
-				"./Sinbad/SliceVertical.anim",
-			};
+		//	const String AnimClips[] = { 
+		//		"./Sinbad/Dance.anim", 
+		//	    "./Sinbad/DrawSwords.anim",
+		//		"./Sinbad/JumpStart.anim",
+		//		"./Sinbad/JumpLoop.anim",
+		//		"./Sinbad/JumpEnd.anim",
+		//		"./Sinbad/HandsClosed.anim",
+		//		"./Sinbad/HandsRelaxed.anim",
+		//		"./Sinbad/IdleBase.anim",
+		//		"./Sinbad/IdleTop.anim",
+		//		"./Sinbad/RunBase.anim",
+		//		"./Sinbad/RunTop.anim",
+		//		"./Sinbad/SliceHorizontal.anim",
+		//		"./Sinbad/SliceVertical.anim",
+		//	};
 
-			for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
-			{
-				AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
-				animState->WrapMode = AnimationState::Wrap_Loop;
-			}
-			
-			AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
-			SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
+		//	for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
+		//	{
+		//		AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
+		//		animState->WrapMode = AnimationState::Wrap_Loop;
+		//	}
+		//	
+		//	AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
+		//	SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
 
-			SliceHorizontal->Play();
-			animPlayer->PlayClip("IdleBase");
+		//	SliceHorizontal->Play();
+		//	animPlayer->PlayClip("IdleBase");
 
-			/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
-			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-			takeClip->Play();
+		//	/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
+		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	takeClip->Play();
 
-			AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
-			runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-			runBaseClip->Play();*/
+		//	AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
+		//	runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	runBaseClip->Play();*/
 
-			arthasSceneNode->SetScale(float3(5, 5, 5));
-			arthasSceneNode->SetPosition(float3(0, 50, 0));
-			arthasSceneNode->AttachObject(arthasEntity);
+		//	arthasSceneNode->SetScale(float3(5, 5, 5));
+		//	arthasSceneNode->SetPosition(float3(0, 50, 0));
+		//	arthasSceneNode->AttachObject(arthasEntity);
 
-			mDudeEntity = arthasEntity;
-		}
+		//	mDudeEntity = arthasEntity;
+		//}
 
 
 		//String modelName = "./LOL/blitzcrank/blitzcrank.mesh";

@@ -78,9 +78,12 @@ void Frustum<Real>::Update( const Matrix4<Real>& viewProjection )
 											 viewProjection.M34 - viewProjection.M33);
 	Planes[FPS_Far].Distance = viewProjection.M44 - viewProjection.M43;
 	Planes[FPS_Far].Normalize();
+}
 
-	//Update Corner
-	/*Corner[FC_Near_Top_Left] = Internal::IntersectionOfPlanes(Planes[FPS_Near], Planes[FPS_Top], Planes[FPS_Left]);
+template<typename Real>
+void Frustum<Real>::UpdateCorner()
+{
+	Corner[FC_Near_Top_Left] = Internal::IntersectionOfPlanes(Planes[FPS_Near], Planes[FPS_Top], Planes[FPS_Left]);
 	Corner[FC_Near_Top_Right] = Internal::IntersectionOfPlanes(Planes[FPS_Near], Planes[FPS_Top], Planes[FPS_Right]);
 	Corner[FC_Near_Bottom_Left] = Internal::IntersectionOfPlanes(Planes[FPS_Near], Planes[FPS_Bottom], Planes[FPS_Left]);
 	Corner[FC_Near_Bottom_Right] = Internal::IntersectionOfPlanes(Planes[FPS_Near], Planes[FPS_Bottom], Planes[FPS_Right]);
@@ -88,39 +91,8 @@ void Frustum<Real>::Update( const Matrix4<Real>& viewProjection )
 	Corner[FC_Far_Top_Right] = Internal::IntersectionOfPlanes(Planes[FPS_Far], Planes[FPS_Top], Planes[FPS_Right]);
 	Corner[FC_Far_Bottom_Left] = Internal::IntersectionOfPlanes(Planes[FPS_Far], Planes[FPS_Bottom], Planes[FPS_Left]);
 	Corner[FC_Far_Bottom_Right] = Internal::IntersectionOfPlanes(Planes[FPS_Far], Planes[FPS_Bottom], Planes[FPS_Right]);
-	*/
-	/*auto side = Planes[FPS_Near].DistanceTo(Corner[FC_Near_Top_Left]); 
-	side = Planes[FPS_Top].DistanceTo(Corner[FC_Near_Top_Left]);
-	side = Planes[FPS_Left].DistanceTo(Corner[FC_Near_Top_Left]);
-
-	side = Planes[FPS_Near].DistanceTo(Corner[FC_Near_Top_Right]); 
-	side = Planes[FPS_Top].DistanceTo(Corner[FC_Near_Top_Right]);
-	side = Planes[FPS_Right].DistanceTo(Corner[FC_Near_Top_Right]);
-
-	side = Planes[FPS_Near].DistanceTo(Corner[FC_Near_Bottom_Left]); 
-	side = Planes[FPS_Bottom].DistanceTo(Corner[FC_Near_Bottom_Left]);
-	side = Planes[FPS_Left].DistanceTo(Corner[FC_Near_Bottom_Left]);
-
-	side = Planes[FPS_Near].DistanceTo(Corner[FC_Near_Bottom_Right]); 
-	side = Planes[FPS_Bottom].DistanceTo(Corner[FC_Near_Bottom_Right]);
-	side = Planes[FPS_Right].DistanceTo(Corner[FC_Near_Bottom_Right]);
-
-	side = Planes[FPS_Far].DistanceTo(Corner[FC_Far_Top_Left]); 
-	side = Planes[FPS_Top].DistanceTo(Corner[FC_Far_Top_Left]);
-	side = Planes[FPS_Left].DistanceTo(Corner[FC_Far_Top_Left]);
-
-	side = Planes[FPS_Far].DistanceTo(Corner[FC_Far_Top_Right]); 
-	side = Planes[FPS_Top].DistanceTo(Corner[FC_Far_Top_Right]);
-	side = Planes[FPS_Right].DistanceTo(Corner[FC_Far_Top_Right]);
-
-	side = Planes[FPS_Far].DistanceTo(Corner[FC_Far_Bottom_Left]); 
-	side = Planes[FPS_Bottom].DistanceTo(Corner[FC_Far_Bottom_Left]);
-	side = Planes[FPS_Left].DistanceTo(Corner[FC_Far_Bottom_Left]);
-
-	side = Planes[FPS_Far].DistanceTo(Corner[FC_Far_Bottom_Right]); 
-	side = Planes[FPS_Bottom].DistanceTo(Corner[FC_Far_Bottom_Right]);
-	side = Planes[FPS_Right].DistanceTo(Corner[FC_Far_Bottom_Right]);*/
 }
+
 
 template<typename Real>
 ContainmentType Frustum<Real>::Contain( const BoundingSphere<Real>& sphere ) const

@@ -1,4 +1,3 @@
-	
 #define MAX_CASCADE_COUNT 4
 	
 Texture2DArray CascadeShadowTex;

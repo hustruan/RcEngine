@@ -23,6 +23,13 @@
       <State name="AddressV" value="Wrap"/>
   </Sampler>
 
+  <!-- SamplerState will used in this Effect -->
+  <Sampler name="ShadowSampler">
+    <State name="Filter" value="Min_Mag_Mip_Linear"/>
+    <State name="AddressU" value="Wrap"/>
+    <State name="AddressV" value="Wrap"/>
+  </Sampler>
+
   <!-- Effect techniques -->
   <Technique name="VSM">
 	  <Pass name="p0">

@@ -132,25 +132,25 @@ uint32_t SceneNode::GetNumAttachedObjects() const
 	return mAttachedObjects.size();
 }
 
-void SceneNode::OnUpdateRenderQueues(const Camera& camera,  RenderOrder order)
+void SceneNode::OnUpdateRenderQueues( const Camera& camera, RenderOrder order, uint32_t buckterFilter, uint32_t filterIgnore )
 {
 	const BoundingBoxf& worldBound = GetWorldBoundingBox();
-	
+
 	if (!camera.Visible(GetWorldBoundingBox()))
 		return;
 
 	RenderQueue& renderQueue = mScene->GetRenderQueue();
 	for (SceneObject* pSceneObject : mAttachedObjects)
 	{
-		if (pSceneObject->Renderable() && pSceneObject->IsVisible())
-			pSceneObject->OnUpdateRenderQueue(&renderQueue, camera, order);
+		if (pSceneObject->IsActive() && pSceneObject->Renderable())
+			pSceneObject->OnUpdateRenderQueue(&renderQueue, camera, order, buckterFilter, filterIgnore);
 	}
 
 	// recursively call children
 	for (Node* node : mChildren)
 	{
 		SceneNode* child = static_cast<SceneNode*>(node);
-		child->OnUpdateRenderQueues(camera, order);
+		child->OnUpdateRenderQueues(camera, order, buckterFilter, filterIgnore);
 	}
 }
 

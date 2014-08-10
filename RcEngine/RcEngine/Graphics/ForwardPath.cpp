@@ -124,7 +124,7 @@ void ForwardPlusPath::DepthPrePass()
 	mDepthStencilView->ClearDepthStencil(1.0f, 0);
 
 	// Todo: update render queue with render bucket filter
-	mSceneMan->UpdateRenderQueue(*mCamera, RO_None);   
+	//mSceneMan->UpdateRenderQueue(mCamera, RO_None, );   
 
 	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 

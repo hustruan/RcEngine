@@ -48,6 +48,8 @@ public:
 	ContainmentType Contain(const BoundingBox<Real>& box) const; 
 	/*ContainmentType Contain(const Frustum<Real>& frustum) const; */
 
+	void UpdateCorner();
+
 public:
 	Plane<Real> Planes[6];
 	Vector<Real,3> Corner[8];  // Corner points

@@ -21,7 +21,7 @@ enum SceneObejctType
 
 /**
  * Base class for Objects in a scene graph, contained by scene nodes, referenced 
- * from Ogre. Note that scene management use the same design concept whit Ogre. 
+ * from Ogre. Note that scene management use the same design concept with Ogre. 
  * We try to decouple the struct(the scene graph) from its content.Unlike other 
  * engines use complex inheritance hierarchy, subclass every type from scene node.
  * We use Composition, all node content data subclass scene object. Like Entity, 
@@ -33,14 +33,32 @@ class _ApiExport SceneObject
 	friend class SceneNode;
 
 public:
+	enum Flags
+	{
+		NoDraw			= 1UL << 0,
+		NoCastShadow	= 1UL << 1,
+		NoRayQuery	    = 1UL << 2,
+		Inactive		= 1UL << 3
+	};
+
+public:
 	SceneObject( const String& name, SceneObejctType type, bool renderable = false );
 	virtual ~SceneObject();
 
-	const String& GetName() const { return mName; }
+	inline const String& GetName() const				{ return mName; }
 
-	SceneObejctType GetSceneObjectType() const { return mType; }
+	inline SceneObejctType GetSceneObjectType() const	{ return mType; }
 
-	bool Renderable() const	{ return mRenderable; }
+	inline bool IsAttached() const						{ return mParentNode != nullptr; }
+
+	inline SceneNode* GetParentNode() const				{ return mParentNode; }
+
+	void SetFlags(uint32_t flags)					    { mFlags = flags; }
+	inline uint32_t GetFlags() const					{ return mFlags; }
+	
+	void SetActive(bool bActive);
+	inline bool IsActive() const						{ return (mFlags & Inactive) == 0;}
+	inline bool Renderable() const						{ return (mFlags & NoDraw) == 0; }
 
 	/**
 	 * Return a undefined bounding sphere, subclass must overload
@@ -54,15 +72,7 @@ public:
 	/**
 	 * Called when scene manger update render queue.
 	 */
-	virtual void OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& cam, RenderOrder order );
-	
-	SceneNode* GetParentNode() const { return mParentNode; }
-
-	bool IsVisible() const { return mVisible; }
-
-	void SetVisible( bool visible ) { mVisible = visible; }
-
-	bool IsAttached() const  { return mParentNode != nullptr; }
+	virtual void OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& cam, RenderOrder order, uint32_t buckets, uint32_t filterIgnore );
 
 protected:
 
@@ -75,16 +85,11 @@ protected:
 
 	SceneObejctType mType;
 
-	bool mRenderable;
-
 	BoundingBoxf mBoundingBox;
 
 	SceneNode* mParentNode;
 
-	uint32_t mFlag;
-
-	bool mVisible;
-	 
+	uint32_t mFlags;
 };
 
 }

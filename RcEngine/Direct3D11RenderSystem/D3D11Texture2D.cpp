@@ -36,6 +36,8 @@ D3D11Texture2D::D3D11Texture2D( PixelFormat format, uint32_t arraySize, uint32_t
 	{
 		texDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		
+		assert(numMipMaps == 0);
+
 		// May defer it to DeviceContext::GenerateMips called.
 		mMipLevels = Texture::CalculateMipmapLevels((std::max)(width, height));
 		texDesc.MipLevels = mMipLevels;
@@ -54,14 +56,14 @@ D3D11Texture2D::D3D11Texture2D( PixelFormat format, uint32_t arraySize, uint32_t
 
 	if (initData)
 	{
-		uint32_t numSubResource = mTextureArraySize * numMipMaps;
+		uint32_t numSubResource = mTextureArraySize * mMipLevels;
 		vector<D3D11_SUBRESOURCE_DATA> subResourceData(numSubResource);
 
 		for (uint32_t arrayIdx = 0; arrayIdx < mTextureArraySize; ++arrayIdx)
 		{
-			for (uint32_t level = 0; level < numMipMaps; ++level)
+			for (uint32_t level = 0; level < mMipLevels; ++level)
 			{
-				uint32_t index = arrayIdx * numMipMaps + level;
+				uint32_t index = arrayIdx * mMipLevels + level;
 				
 				subResourceData[index].pSysMem = initData[index].pData;
 				subResourceData[index].SysMemPitch = initData[index].rowPitch;
@@ -111,7 +113,7 @@ D3D11Texture2D::D3D11Texture2D( PixelFormat format, uint32_t arraySize, uint32_t
 			else
 			{
 				viewDesc.Texture2D.MostDetailedMip = 0;
-				viewDesc.Texture2D.MipLevels = numMipMaps;
+				viewDesc.Texture2D.MipLevels = mMipLevels;
 				viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			}
 		}
@@ -128,7 +130,7 @@ D3D11Texture2D::D3D11Texture2D( PixelFormat format, uint32_t arraySize, uint32_t
 				viewDesc.Texture2DArray.FirstArraySlice = 0;
 				viewDesc.Texture2DArray.ArraySize = mTextureArraySize;
 				viewDesc.Texture2DArray.MostDetailedMip = 0;
-				viewDesc.Texture2DArray.MipLevels = numMipMaps;
+				viewDesc.Texture2DArray.MipLevels = mMipLevels;
 				viewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
 			}	
 		}
@@ -189,6 +191,7 @@ void* D3D11Texture2D::Map2D( uint32_t arrayIndex, uint32_t level, ResourceMapAcc
 
 			texDesc.BindFlags = 0;
 			texDesc.Usage = D3D11_USAGE_STAGING;
+			texDesc.MiscFlags = 0;
 
 			ID3D11Device* deviceD3D11 = gD3D11Device->DeviceD3D11;
 			D3D11_VERRY( deviceD3D11->CreateTexture2D( &texDesc, NULL, (ID3D11Texture2D**)&mStagingTextureD3D11) );

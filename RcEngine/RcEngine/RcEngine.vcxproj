@@ -136,6 +136,7 @@
     <ClCompile Include="Graphics\Image.cpp" />
     <ClCompile Include="Graphics\Material.cpp" />
     <ClCompile Include="Graphics\Mesh.cpp" />
+    <ClCompile Include="Graphics\pfm.cpp" />
     <ClCompile Include="Graphics\PixelFormat.cpp" />
     <ClCompile Include="Graphics\Renderable.cpp" />
     <ClCompile Include="Graphics\RenderDevice.cpp" />
@@ -202,6 +203,7 @@
     <None Include="..\Media\Effect\GLSL\ModelMaterialFactory.glsl" />
     <None Include="..\Media\Effect\GLSL\ModelVertexFactory.glsl" />
     <None Include="..\Media\Effect\GLSL\Model.glsl" />
+    <None Include="..\Media\Effect\GLSL\ShadowMapBlur.glsl" />
     <None Include="..\Media\Effect\GLSL\ShadowMapGen.glsl" />
     <None Include="..\Media\Effect\GLSL\Sprite.glsl" />
     <None Include="..\Media\Effect\GLSL\Tessellation.glsl" />
@@ -308,6 +310,7 @@
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="..\Media\Effect\FontOutline.effect.xml" />
+    <Xml Include="..\Media\Effect\ShadowMapBlur.effect.xml" />
     <Xml Include="..\Media\Effect\Sprite.effect.xml" />
     <Xml Include="..\Media\Effect\Tessellation.effect.xml">
       <SubType>Designer</SubType>

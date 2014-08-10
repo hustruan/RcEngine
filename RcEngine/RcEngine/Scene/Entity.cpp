@@ -134,39 +134,45 @@ AnimationPlayer* Entity::GetAnimationPlayer()
 	return mAnimationPlayer;
 }
 
-void Entity::OnUpdateRenderQueue(RenderQueue* renderQueue, const Camera& camera, RenderOrder order)
+void Entity::OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& camera, RenderOrder order, uint32_t buckterFilter, uint32_t filterIgnore )
 {
 	// Add each visible SubEntity to the queue
-	for (SubEntity* subEntity : mSubEntityList)
+
+	if ((mFlags & filterIgnore) == 0)
 	{
-		BoundingBoxf subWorldBoud = Transform(subEntity->GetBoundingBox(), mParentNode->GetWorldTransform());
-
-		// Todo  mesh part world bounding has some bugs.
-		if(camera.Visible(subWorldBoud))
+		for (SubEntity* subEntity : mSubEntityList)
 		{
-			float sortKey = 0;
 			RenderQueue::Bucket bucket = (RenderQueue::Bucket)subEntity->GetMaterial()->GetQueueBucket();
+			if ( (buckterFilter & bucket) == 0 ) 
+				continue;
 
-			switch( order )
-			{
-			case RO_StateChange:
-				sortKey = (float)subEntity->GetMaterial()->GetEffect()->GetResourceHandle();
-				break;
-			case RO_FrontToBack:
-				sortKey = NearestDistToAABB( camera.GetPosition(), subWorldBoud.Min, subWorldBoud.Max);
-				break;
-			case RO_BackToFront:
-				sortKey = -NearestDistToAABB( camera.GetPosition(), subWorldBoud.Min, subWorldBoud.Max);
-				break;
-			}
-			
-			if (bucket == RenderQueue::BucketTransparent)
-			{
-				// Transparent object must render from furthest to nearest
-				sortKey = -NearestDistToAABB( camera.GetPosition(), subWorldBoud.Min, subWorldBoud.Max);
-			}
+			BoundingBoxf subWorldBoud = Transform(subEntity->GetBoundingBox(), mParentNode->GetWorldTransform());
 
-			renderQueue->AddToQueue(RenderQueueItem(subEntity, sortKey), bucket);			
+			// Todo:  mesh part world bounding has some bugs.
+			if(camera.Visible(subWorldBoud))
+			{
+				float sortKey = 0;
+				switch( order )
+				{
+				case RO_StateChange:
+					sortKey = (float)subEntity->GetMaterial()->GetEffect()->GetResourceHandle();
+					break;
+				case RO_FrontToBack:
+					sortKey = NearestDistToAABB( camera.GetPosition(), subWorldBoud.Min, subWorldBoud.Max);
+					break;
+				case RO_BackToFront:
+					sortKey = -NearestDistToAABB( camera.GetPosition(), subWorldBoud.Min, subWorldBoud.Max);
+					break;
+				}
+
+				if (bucket == RenderQueue::BucketTransparent)
+				{
+					// Transparent object must render from furthest to nearest
+					sortKey = -NearestDistToAABB( camera.GetPosition(), subWorldBoud.Min, subWorldBoud.Max);
+				}
+
+				renderQueue->AddToQueue(RenderQueueItem(subEntity, sortKey), bucket);			
+			}
 		}
 	}
 
@@ -177,7 +183,7 @@ void Entity::OnUpdateRenderQueue(RenderQueue* renderQueue, const Camera& camera,
 
 		for (BoneSceneNode* boneSceneNode : mBoneSceneNodes)
 		{
-			boneSceneNode->OnUpdateRenderQueues(camera, order);
+			boneSceneNode->OnUpdateRenderQueues(camera, order, buckterFilter, filterIgnore);
 		}
 	}
 }

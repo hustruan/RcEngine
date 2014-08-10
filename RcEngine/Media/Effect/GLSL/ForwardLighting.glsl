@@ -2,10 +2,12 @@
 
 #include "/ModelMaterialFactory.glsl"
 #include "/LightingUtil.glsl"
+#include "/PSSM.glsl"
 
 uniform vec4 LightDir;
 uniform vec3 LightColor;
 uniform vec3 CameraOrigin;
+uniform bool ShadowEnabled;
 
 // shader input
 in vec4 oPosWS;
@@ -47,10 +49,16 @@ void main()
         final = (material.DiffuseAlbedo + normTerm * CalculateSpecular(N, H, material.Shininess) * fresnel) * LightColor * NdotL;
 	}
 
+	if (ShadowEnabled)
+	{
+		int iCascadeSelected = 0;
+        float percentLit = EvalCascadeShadow(oPosWS, iCascadeSelected);
+		final *= percentLit;
+	}
+	
 	// Ambient
 	final += material.DiffuseAlbedo * 0.1;
 
+	//final = pow(final, vec3(1.0 / 2.2));
 	oFragColor = vec4(final, 1.0);
-
-   // oFragColor = vec4(LightColor * NdotL, final.r);
 }

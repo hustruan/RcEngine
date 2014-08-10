@@ -72,9 +72,7 @@ public:
 	/**
 	 * Update render queue, and remove scene node outside of the camera frustum.
 	 */
-	void UpdateRenderQueue(const Camera& cam, RenderOrder order);
-	void UpdateBackgroundQueue(const Camera& cam);
-	void UpdateOverlayQueue();
+	void UpdateRenderQueue(shared_ptr<Camera> camera, RenderOrder order, uint32_t renderBuckets, uint32_t filterIgnore);
 	void UpdateLightQueue(const Camera& cam);
 	
 	RenderQueue& GetRenderQueue()						{ return mRenderQueue; }

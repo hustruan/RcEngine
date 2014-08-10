@@ -1,9 +1,10 @@
-
 #define MAX_CASCADE_COUNT 4
 	
 uniform sampler2DArray CascadeShadowTex;	
+#pragma CascadeShadowTex : ShadowSampler 
+
 uniform int NumCascades;
-uniform mat4 ShadowView;
+uniform mat4 ShadowView;						// Light View Matrix
 uniform vec4 CascadeScale[MAX_CASCADE_COUNT];   // Shadow projection info
 uniform vec4 CascadeOffset[MAX_CASCADE_COUNT];	
 uniform vec2 BorderPaddingMinMax;				// For map based selection, this keep pixels in valid range.

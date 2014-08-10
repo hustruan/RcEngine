@@ -2,7 +2,7 @@
 #define CascadedShadowMap_h__
 
 #include <Core/Prerequisites.h>
-#include <Graphics/FrameBuffer.h>
+#include <Graphics/RenderOperation.h>
 #include <Math/Matrix.h>
 
 namespace RcEngine {
@@ -45,10 +45,10 @@ private:
 	shared_ptr<Texture> mShadowMapTempBlur1;
 	shared_ptr<RenderView> mShadowMapTempBlurRTV1;
 
-	shared_ptr<Material> mBlurMaterial;
+	shared_ptr<Effect> mBlurEffect;
 
 	// FSQuad
-	shared_ptr<RenderOperation> mFSQuadShape;
+	RenderOperation mFSQuadRop;
 
 public:
 	shared_ptr<Texture> mShadowDepth;

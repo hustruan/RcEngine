@@ -56,6 +56,7 @@ void Camera::CreateOrthoOffCenter( float left, float right, float bottom, float 
 
 	mEngineProjMatrix = mProjMatrix;
 	Environment::GetSingleton().GetRenderDevice()->AdjustProjectionMatrix(mEngineProjMatrix);
+	mEngineViewProjMatrix = mViewMatrix * mEngineProjMatrix;
 	
 	mFrustumDirty = true;
 }

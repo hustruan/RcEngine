@@ -6,6 +6,7 @@
 #include <Graphics/Material.h>
 #include <Graphics/Effect.h>
 #include <Graphics/Camera.h>
+#include <Graphics/Geometry.h>
 #include <Graphics/RenderQueue.h>
 #include <Graphics/RenderFactory.h>
 #include <Graphics/RenderOperation.h>
@@ -20,157 +21,7 @@
 #include <Core/Exception.h>
 #include <Math/MathUtil.h>
 #include <Resource/ResourceManager.h>
-#include <MainApp/Application.h>
 #include <Input/InputSystem.h>
-
-
-namespace {
-
-using namespace RcEngine;
-
-void BuildFullscreenTrangle(RenderOperation& oOperation)
-{
-	oOperation.SetVertexRange(0, 3);
-	oOperation.PrimitiveType = PT_Triangle_List;
-}
-
-void BuildPointLightShape(RenderOperation& oOperation)
-{
-	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
-
-	const int nRings = 30;
-	const int nSegments = 30;
-	const float r = 1.0f;
-
-	int32_t vertexCount = (nRings + 1) * (nSegments+1);
-	int32_t indicesCount =  6 * nRings * (nSegments + 1);
-
-	uint32_t vbSize = 3 * vertexCount * sizeof(float);
-	shared_ptr<GraphicsBuffer> vertexBuffer= factory->CreateVertexBuffer(vbSize, EAH_GPU_Read | EAH_CPU_Write, BufferCreate_Vertex, nullptr);
-
-	uint32_t ibSize = indicesCount * sizeof(unsigned short);
-	shared_ptr<GraphicsBuffer> indexBuffer = factory->CreateIndexBuffer(ibSize, EAH_GPU_Read | EAH_CPU_Write, BufferCreate_Index, nullptr);
-
-	float* pVertex = static_cast<float*>(vertexBuffer->Map(0, MAP_ALL_BUFFER, RMA_Write_Discard));
-	unsigned short* pIndices = static_cast<unsigned short*>(indexBuffer->Map(0, MAP_ALL_BUFFER, RMA_Write_Discard));
-
-	float fDeltaRingAngle = Mathf::PI / nRings;
-	float fDeltaSegAngle = Mathf::TWO_PI / nSegments;
-	unsigned short wVerticeIndex = 0 ;
-
-	// Generate the group of rings for the sphere
-	for( int ring = 0; ring <= nRings; ring++ ) {
-		float r0 = r * sinf (ring * fDeltaRingAngle);
-		float y0 = r * cosf (ring * fDeltaRingAngle);
-
-		// Generate the group of segments for the current ring
-		for(int seg = 0; seg <= nSegments; seg++) {
-			float x0 = r0 * sinf(seg * fDeltaSegAngle);
-			float z0 = r0 * cosf(seg * fDeltaSegAngle);
-
-			// Add one vertex to the strip which makes up the sphere
-			*pVertex++ = x0;
-			*pVertex++ = y0;
-			*pVertex++ = z0;
-
-			if (ring != nRings) {
-				// each vertex (except the last) has six indices pointing to it
-				*pIndices++ = wVerticeIndex + nSegments + 1;
-				*pIndices++ = wVerticeIndex;               
-				*pIndices++ = wVerticeIndex + nSegments;
-				*pIndices++ = wVerticeIndex + nSegments + 1;
-				*pIndices++ = wVerticeIndex + 1;
-				*pIndices++ = wVerticeIndex;
-				wVerticeIndex ++;				
-			}
-		}; // end for seg
-	} // end for ring
-
-	vertexBuffer->UnMap();
-	indexBuffer->UnMap();
-
-	oOperation.PrimitiveType = PT_Triangle_List;
-	oOperation.BindVertexStream(0, vertexBuffer);
-	oOperation.BindIndexStream(indexBuffer, IBT_Bit16);
-	oOperation.IndexCount = indicesCount;
-
-	VertexElement vdsc[] = {
-		VertexElement(0, VEF_Float3,  VEU_Position, 0),
-	};
-	oOperation.VertexDecl = factory->CreateVertexDeclaration(vdsc, 1);
-}
-
-void BuildSpotLightShape(RenderOperation& oOperation) 
-{
-	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
-
-	float mRadius = 1.f;
-	float mHeight = 1.f;
-	uint16_t nCapSegments = 30;
-
-	uint16_t vertexCount = nCapSegments+1;
-	uint16_t indicesCount = (nCapSegments+nCapSegments-2)*3;
-
-	uint32_t vbSize = 3 * vertexCount * sizeof(float);
-	shared_ptr<GraphicsBuffer> vertexBuffer= factory->CreateVertexBuffer(vbSize, EAH_GPU_Read | EAH_CPU_Write, BufferCreate_Vertex, nullptr);
-
-	uint32_t ibSize = indicesCount * sizeof(uint16_t);
-	shared_ptr<GraphicsBuffer> indexBuffer = factory->CreateIndexBuffer(ibSize, EAH_GPU_Read | EAH_CPU_Write, BufferCreate_Index,nullptr);
-
-	float* pVertex = static_cast<float*>(vertexBuffer->Map(0, MAP_ALL_BUFFER, RMA_Write_Discard));
-	uint16_t* pIndices = static_cast<uint16_t*>(indexBuffer->Map(0, MAP_ALL_BUFFER, RMA_Write_Discard));
-
-	std::vector<float3> Vertices;
-	std::vector<int> Indices;
-
-	uint16_t topPointOffset = 0;
-	*pVertex++ = 0.0f;
-	*pVertex++ = 0.0f;
-	*pVertex++ = 0.0f;
-
-	int ringStartOffset = 1;
-	float deltaAngle = (Mathf::TWO_PI / nCapSegments);
-	for (uint16_t i = 0; i < nCapSegments; i++)
-	{
-		float x0 = mRadius* cosf(i*deltaAngle);
-		float z0 = mRadius * sinf(i*deltaAngle);
-
-		*pVertex++ = x0;
-		*pVertex++ = mHeight;
-		*pVertex++ = z0;
-	}
-
-	for (uint16_t i = 0; i < nCapSegments; ++i)
-	{
-		*pIndices++ = topPointOffset;
-		*pIndices++ = ringStartOffset+i;
-		*pIndices++ = ringStartOffset+ (i+1)%nCapSegments;
-	}
-
-	// Caps
-	for (uint16_t i = 0; i < nCapSegments - 2; ++i)
-	{
-		*pIndices++ = ringStartOffset;
-		*pIndices++ = ringStartOffset+i+1+1;
-		*pIndices++ = ringStartOffset+i+1;
-	}
-
-	vertexBuffer->UnMap();
-	indexBuffer->UnMap();
-
-
-	oOperation.PrimitiveType = PT_Triangle_List;
-	oOperation.BindVertexStream(0, vertexBuffer);
-	oOperation.BindIndexStream(indexBuffer, IBT_Bit16);
-	oOperation.IndexCount = indicesCount;
-
-	VertexElement vdsc[] = {
-		VertexElement(0, VEF_Float3,  VEU_Position, 0),
-	};
-	oOperation.VertexDecl = factory->CreateVertexDeclaration(vdsc, 1);
-}
-
-}
 
 namespace RcEngine {
 
@@ -188,7 +39,7 @@ RenderPath::RenderPath()
 void RenderPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 {
 	mCamera = camera;
-	BuildFullscreenTrangle(mFullscreenTrangle);
+	BuildFullscreenTriangle(mFullscreenTrangle);
 }
 
 void RenderPath::DrawOverlays()
@@ -214,6 +65,7 @@ ForwardPath::ForwardPath()
 void ForwardPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 {
 	RenderPath::OnGraphicsInit(camera);
+	mShadowMan = new CascadedShadowMap(mDevice);
 }
 
 void ForwardPath::OnWindowResize( uint32_t width, uint32_t height )
@@ -226,25 +78,31 @@ void ForwardPath::RenderScene()
 	shared_ptr<FrameBuffer> screenFB = mDevice->GetCurrentFrameBuffer();
 	shared_ptr<Camera> viewCamera = screenFB->GetCamera();
 
+	mSceneMan->UpdateRenderQueue(viewCamera, RO_None, RenderQueue::BucketAll, 0);
+
 	// Draw Sky box first
-	mSceneMan->UpdateBackgroundQueue(*viewCamera);
 	RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
 	for (RenderQueueItem& item : bkgBucket)
 		item.Renderable->Render();
 
+	// Update Light Queue
 	mSceneMan->UpdateLightQueue(*viewCamera);
 	const LightQueue& sceneLights = mSceneMan->GetLightQueue();
 
 	// Draw opaque 
-	mSceneMan->UpdateRenderQueue(*viewCamera, RO_None);   
-
-	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
-
+	RenderBucket opaqueBucket;
+	mSceneMan->GetRenderQueue().SwapRenderBucket(opaqueBucket, RenderQueue::BucketOpaque);
+	
 	for (Light* light : sceneLights)
 	{
+		bool bCastShadow = light->GetCastShadow();
+
 		String techName;
 		if (light->GetLightType() == LT_DirectionalLight)
 		{
+			if (bCastShadow)
+				mShadowMan->MakeCascadedShadowMap(*light);
+
 			techName = "DirectionalLighting";
 
 			for (const RenderQueueItem& renderItem : opaqueBucket) 
@@ -253,12 +111,27 @@ void ForwardPath::RenderScene()
 
 				material->SetCurrentTechnique(techName);
 				
+				shared_ptr<Effect> effect = material->GetEffect();
+
 				float3 lightColor = light->GetLightColor() * light->GetLightIntensity();
-				material->GetEffect()->GetParameterByUsage(EPU_Light_Color)->SetValue(lightColor);
+				effect->GetParameterByUsage(EPU_Light_Color)->SetValue(lightColor);
 
 				const float3& worldDirection = light->GetDerivedDirection();
 				float4 lightDir(worldDirection[0], worldDirection[1], worldDirection[2], 0.0f);
-				material->GetEffect()->GetParameterByUsage(EPU_Light_Dir)->SetValue(lightDir);
+				effect->GetParameterByUsage(EPU_Light_Dir)->SetValue(lightDir);
+
+				EffectParameter* enableShadowParam = effect->GetParameterByName("ShadowEnabled");
+				enableShadowParam->SetValue(bCastShadow);
+				if (bCastShadow)
+				{       
+					effect->GetParameterByName("CascadeShadowTex")->SetValue( mShadowMan->mShadowTexture->GetShaderResourceView());
+					effect->GetParameterByName("ShadowView")->SetValue(mShadowMan->mShadowView);
+					effect->GetParameterByName("NumCascades")->SetValue((int)light->GetShadowCascades());
+					effect->GetParameterByName("BorderPaddingMinMax")->SetValue(mShadowMan->mBorderPaddingMinMax);
+					effect->GetParameterByName("CascadeScale")->SetValue(&mShadowMan->mShadowCascadeScale[0], MAX_CASCADES);
+					effect->GetParameterByName("CascadeOffset")->SetValue(&mShadowMan->mShadowCascadeOffset[0], MAX_CASCADES); 
+					//effect->GetParameterByName("CascadeBlendArea")->SetValue(mCascadedShadowMap->mCascadeBlendArea);
+				}
 
 				renderItem.Renderable->Render();
 			}
@@ -298,8 +171,8 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	CreateBuffers(windowWidth, windowHeight);
 	
 	// Build light volume
-	BuildSpotLightShape(mSpotLightShape);
-	BuildPointLightShape(mPointLightShape);
+	BuildConeOperation(mSpotLightShape, 1.0f, 1.0f, 30);
+	BuildShpereOperation(mPointLightShape, 1.0f, 10, 10);
 
 	mGBufferFB->SetCamera(camera);
 	mLightAccumulateFB->SetCamera(camera);
@@ -396,7 +269,6 @@ void DeferredPath::CreateBuffers( uint32_t windowWidth, uint32_t windowHeight )
 	mToneMapEffect->GetParameterByName("HDRBuffer")->SetValue(mHDRBuffer->GetShaderResourceView());	
 }
 
-
 void DeferredPath::OnWindowResize( uint32_t windowWidth, uint32_t windowHeight )
 {
 	CreateBuffers(windowWidth, windowHeight);
@@ -460,7 +332,7 @@ void DeferredPath::GenereateGBuffer()
 	mGBufferFB->Clear(CF_Color | CF_Depth | CF_Stencil, ColorRGBA(0, 0, 0, 0), 1.0f, 0);
 
 	// Todo: update render queue with render bucket filter
-	mSceneMan->UpdateRenderQueue(*mCamera, RO_None);   
+	mSceneMan->UpdateRenderQueue(mCamera, RO_None, RenderQueue::BucketAll, 0);   
 
 	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
@@ -554,7 +426,6 @@ void DeferredPath::DeferredShading()
 	mHDRBufferRTV->ClearColor(ColorRGBA(0, 0, 0, 0));
 	
 	// Draw Sky box first
-	mSceneMan->UpdateBackgroundQueue(*(mGBufferFB->GetCamera()));
 	RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
 	for (RenderQueueItem& item : bkgBucket)
 		item.Renderable->Render();
@@ -808,7 +679,7 @@ void TiledDeferredPath::GenereateGBuffer()
 
 	// Todo: update render queue with render bucket filter
 	shared_ptr<Camera> camera = mGBufferFB->GetCamera();
-	mSceneMan->UpdateRenderQueue(*camera, RO_None);   
+	mSceneMan->UpdateRenderQueue(camera, RO_None, RenderQueue::BucketAll, 0);   
 
 	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
@@ -832,24 +703,28 @@ void TiledDeferredPath::TiledDeferredLighting()
 	mSceneMan->UpdateLightQueue(*mCamera);
 	const LightQueue& sceneLights = mSceneMan->GetLightQueue();
 
-	// Fill light data
-	PointLight* pLights = reinterpret_cast<PointLight*>( mLightBuffer->Map(0, sizeof(PointLight) * sceneLights.size(), RMA_Write_Discard) );
-
 	uint32_t numTotalCount = 0;
-	for (Light* light : sceneLights)
+
+	// Fill light data
+	if (sceneLights.size())
 	{
-		if (light->GetLightType() == LT_PointLight)
+		PointLight* pLights = reinterpret_cast<PointLight*>( mLightBuffer->Map(0, sizeof(PointLight) * sceneLights.size(), RMA_Write_Discard) );
+
+		for (Light* light : sceneLights)
 		{
-			pLights[numTotalCount].Color = light->GetLightColor() * light->GetLightIntensity();
-			pLights[numTotalCount].Position = light->GetPosition();
-			pLights[numTotalCount].Range = light->GetRange();
-			pLights[numTotalCount].Falloff = light->GetAttenuation();
+			if (light->GetLightType() == LT_PointLight)
+			{
+				pLights[numTotalCount].Color = light->GetLightColor() * light->GetLightIntensity();
+				pLights[numTotalCount].Position = light->GetPosition();
+				pLights[numTotalCount].Range = light->GetRange();
+				pLights[numTotalCount].Falloff = light->GetAttenuation();
 
-			numTotalCount++;
+				numTotalCount++;
+			}
 		}
+		mLightBuffer->UnMap();
 	}
-	mLightBuffer->UnMap();
-
+	
 	const float4x4& view = mCamera->GetViewMatrix();
 	const float4x4& proj = mCamera->GetProjMatrix();
 	const float4x4 invViewProj = MatrixInverse(view * proj);
@@ -882,7 +757,6 @@ void TiledDeferredPath::DeferredShading()
 	mHDRBufferRTV->ClearColor(ColorRGBA(0, 0, 0, 0));
 	
 	// Draw Sky box first
-	mSceneMan->UpdateBackgroundQueue(*(mGBufferFB->GetCamera()));
 	RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
 	for (RenderQueueItem& item : bkgBucket)
 		item.Renderable->Render();

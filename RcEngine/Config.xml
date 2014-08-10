@@ -4,7 +4,7 @@
 		<SyncInterval Interval="0"/>
 	</Graphics>
 	
-	<RenderSystem System="OpenGL"/>
+	<RenderSystem System="Direct3D11"/>
 	
 	<Resource>
 		<Group Name="General">

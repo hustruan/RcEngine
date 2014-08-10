@@ -31,13 +31,9 @@ int main()
 
 	fbxProcesser.Initialize();
 
-	if (fbxProcesser.LoadScene("../../Media/Mesh/Sponza/Sponza.fbx"))
+	if (fbxProcesser.LoadScene("../../Media/Mesh/PSSMScene/PSSMScene.fbx"))
 	{
-		fbxProcesser.mSceneName = "Ahri";
-		fbxProcesser.mAnimationName = "Dance";
-
-		//fbxProcesser.ProcessScene();
-		//fbxProcesser.BuildAndSaveXML();
+		fbxProcesser.ProcessScene();
 		fbxProcesser.BuildAndSaveBinary();
 		fbxProcesser.BuildAndSaveMaterial();
 		fbxProcesser.ExportMaterial();

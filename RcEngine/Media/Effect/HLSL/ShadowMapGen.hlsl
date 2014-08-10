@@ -1,8 +1,8 @@
 #include "ModelVertexFactory.hlsl"
 #include "ModelMaterialFactory.hlsl"
 
-float4x4 WorldView;
-float4x4 Projection;
+float4x4 World;
+float4x4 ViewProj;
 
 void ShadowMapVS(VSInput input, 
 			#if defined(_AlphaTest)
@@ -10,13 +10,14 @@ void ShadowMapVS(VSInput input,
 			#endif
 				 out float4 oPosCS : SV_POSITION)
 {
-	float4x4 wvp = mul(WorldView, Projection);
 
+// calculate position in view space:
 #ifdef _Skinning
 	float4x4 Skin = CalculateSkinMatrix(input.BlendWeights, input.BlendIndices);
-	oPosCS = mul(float4(input.Pos, 1.0), mul(Skin, wvp));
+	float4x4 SkinWorld = mul(Skin, World);
+	oPosCS = mul( float4(input.Pos, 1.0), mul(SkinWorld, ViewProj));
 #else
-	oPosCS = mul(float4(input.Pos, 1.0), wvp);
+	oPosCS = mul( float4(input.Pos, 1.0), mul(World, ViewProj));
 #endif
 	
 #if defined(_AlphaTest)

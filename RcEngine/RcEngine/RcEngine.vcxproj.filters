@@ -566,6 +566,9 @@
     <ClCompile Include="Graphics\Font.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\pfm.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\BoundingBox.inl">
@@ -662,6 +665,9 @@
       <Filter>Asset\GLSL</Filter>
     </None>
     <None Include="..\Media\Effect\GLSL\Font.glsl">
+      <Filter>Asset\GLSL</Filter>
+    </None>
+    <None Include="..\Media\Effect\GLSL\ShadowMapBlur.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
   </ItemGroup>
@@ -765,6 +771,9 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\FontOutline.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\ShadowMapBlur.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>
