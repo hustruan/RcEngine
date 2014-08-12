@@ -130,7 +130,7 @@ void ForwardPath::RenderScene()
 					effect->GetParameterByName("BorderPaddingMinMax")->SetValue(mShadowMan->mBorderPaddingMinMax);
 					effect->GetParameterByName("CascadeScale")->SetValue(&mShadowMan->mShadowCascadeScale[0], MAX_CASCADES);
 					effect->GetParameterByName("CascadeOffset")->SetValue(&mShadowMan->mShadowCascadeOffset[0], MAX_CASCADES); 
-					//effect->GetParameterByName("CascadeBlendArea")->SetValue(mCascadedShadowMap->mCascadeBlendArea);
+					//effect->GetParameterByName("CascadeBlendArea")->SetValue(mShadowMan->mCascadeBlendArea);
 				}
 
 				renderItem.Renderable->Render();

@@ -2,7 +2,7 @@
 Texture2DArray ShadowMap; // Texture Array for PSSM
 Texture2D ShadowMapBlurX;
 SamplerState ShadowSampler;
-int ArraySlice;
+float ArraySlice;
 
 void ShadowBlurXPS(in float2 iTex : TEXCOORD0,
 				     out float2 oFragColor : SV_Target0)
@@ -35,7 +35,7 @@ void ShadowBlurXPS(in float2 iTex : TEXCOORD0,
 
         
 void ShadowBlurYPS(in float2 iTex : TEXCOORD0,
-				     out float2 oFragColor : SV_Target0)
+				  out float2 oFragColor : SV_Target0)
 {
 	float2 filtered  = 0.0;
         

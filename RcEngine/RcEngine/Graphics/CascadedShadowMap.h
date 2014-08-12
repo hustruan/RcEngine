@@ -58,9 +58,11 @@ public:
 	shared_ptr<SamplerState> mPCFSampleState;
 	shared_ptr<SamplerState> mVSMSampleState;
 
-
 	// Light view matrix
 	float4x4 mShadowView; 
+
+	// Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
+	float4x4 mShadowTextureNorm;
 	
 	// Light ortho projection scale and offset 
 	std::vector<float4> mShadowCascadeScale;

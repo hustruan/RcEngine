@@ -482,6 +482,47 @@ void Image::SaveImageToFile( const String& filename )
 
 		WritePfm(filename.c_str(), w, h, 1, &temp[0]);
 	}
+	else if (mFormat == PF_RG32F)
+	{		
+		float* pixel = (float*)mSurfaces.front().pData;
+
+		uint32_t w = mWidth, h = mHeight;
+
+		vector<float> temp;
+		temp.resize(w * h * 3);
+		float* imageData = &temp[0];
+
+		if (Application::msApp->GetAppSettings().RHDeviceType == RD_Direct3D11)
+		{
+			for (uint32_t j = 0; j < h; j++)
+				for(uint32_t i = 0; i < w; i ++)
+				{
+					float r = pixel[((h-j-1) * w + i)*2 + 0];
+					float g = pixel[((h-j-1) * w + i)*2 + 1];
+					float b = pixel[((h-j-1) * w + i)*2 + 2];
+	
+					*imageData++ = r;
+					*imageData++ = g;
+					*imageData++ = 0;
+				}
+		}
+		else
+		{
+			for (uint32_t j = 0; j < h; j++)
+				for(uint32_t i = 0; i < w; i ++)
+				{
+					float r = pixel[(j * w + i)*2 + 0];
+					float g = pixel[(j * w + i)*2 +1];
+					float b = pixel[(j * w + i)*2 +2];
+
+					*imageData++ = r;
+					*imageData++ = g;
+					*imageData++ = 0;
+				}
+		}
+
+		WritePfm(filename.c_str(), w, h, 3, &temp[0]);
+	}
 }
 
 void Image::SaveLinearDepthToFile( const String& filename, float projM33, float projM43 )

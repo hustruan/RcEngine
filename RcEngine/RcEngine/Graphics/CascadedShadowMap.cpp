@@ -17,6 +17,7 @@
 #include <Math/MathUtil.h>
 #include <Graphics/pfm.h>
 #include <Graphics/DebugDrawManager.h>
+#include <MainApp/Application.h>
 
 namespace {
 
@@ -246,6 +247,9 @@ CascadedShadowMap::CascadedShadowMap(RenderDevice* device)
 	//mBorderPaddingMinMax = float2(0.0, 1.0);
 	mBorderPaddingMinMax = float2(float(1)/float(SHADOW_MAP_SIZE), float(SHADOW_MAP_SIZE-1)/float(SHADOW_MAP_SIZE));
 	mCascadeBlendArea = mBorderPaddingMinMax[1];
+
+	float scaleY = (Application::msApp->GetAppSettings().RHDeviceType == RD_Direct3D11) ? -0.5f : 0.5f;
+	mShadowTextureNorm = CreateScaling(0.5f, scaleY, 1.0f) * CreateTranslation(0.5f, 0.5f, 0.0f);
 }
 
 void CascadedShadowMap::UpdateShadowMapStorage( const Light& light )
@@ -373,56 +377,64 @@ void CascadedShadowMap::MakeCascadedShadowMap(const Light& light)
 		}
 	}
 
+
 	// Blur shadow map
-	//for (uint32_t i = 0; i < light.GetShadowCascades(); ++i)
-	//{
-	//	mDevice->BindFrameBuffer(mShadowFrameBuffer);	
-	//	mShadowFrameBuffer->Attach(ATT_Color0, mShadowMapTempBlurRTV);
-	//	//bool b = mShadowFrameBuffer->CheckFramebufferStatus();	
+	for (uint32_t i = 0; i < light.GetShadowCascades(); ++i)
+	{
+		mShadowFrameBuffer->AttachRTV(ATT_Color0, mShadowMapTempBlurRTV);
+		mDevice->BindFrameBuffer(mShadowFrameBuffer);	
 
-	//	mBlurMaterial->SetCurrentTechnique("ShadowMapBlurX");
-	//	mBlurMaterial->SetTexture("InputTex", mShadowTexture);
-	//	mBlurMaterial->GetEffect()->GetParameterByName("ArraySlice")->SetValue(float(i));
-	//	mDevice->Render(*mBlurMaterial->GetCurrentTechnique(), *mFSQuadShape);
+		mBlurEffect->SetCurrentTechnique("BlurX");
+		mBlurEffect->GetParameterByName("ShadowMap")->SetValue(mShadowTexture->GetShaderResourceView());
+		mBlurEffect->GetParameterByName("ArraySlice")->SetValue(float(i));
+		mDevice->Draw(mBlurEffect->GetCurrentTechnique(), mFSQuadRop);
 
-	//	//String texFile = "E:/BlurX" + std::to_string(i) + ".pfm";
-	//	//mDevice->GetRenderFactory()->SaveTexture2D(texFile, mShadowMapTempBlur, 0, 0);
+		mShadowFrameBuffer->AttachRTV(ATT_Color0, mShadowSplitsRTV[i]);
+		mDevice->BindFrameBuffer(mShadowFrameBuffer);	
 
-	//	//mShadowFrameBuffer->Attach(ATT_Color0, mShadowMapTempBlurRTV1);
+		mBlurEffect->SetCurrentTechnique("BlurY");
+		mBlurEffect->GetParameterByName("ShadowMapBlurX")->SetValue(mShadowMapTempBlur->GetShaderResourceView());
+		mDevice->Draw(mBlurEffect->GetCurrentTechnique(), mFSQuadRop);
 
-	//	mShadowFrameBuffer->Attach(ATT_Color0, mShadowSplitsRTV[i]);
-	//	//b = mShadowFrameBuffer->CheckFramebufferStatus();
-	//	mBlurMaterial->SetTexture("InputTex", mShadowMapTempBlur);
-	//	mBlurMaterial->SetCurrentTechnique("ShadowMapBlurY");
-	//	mDevice->Render(*mBlurMaterial->GetCurrentTechnique(), *mFSQuadShape);
+		//String texFile = "E:/BlurX" + std::to_string(i) + ".pfm";
+		//mDevice->GetRenderFactory()->SaveTextureToFile(texFile, mShadowMapTempBlur);
 
-	//	//texFile = "E:/BlurY" + std::to_string(i) + ".pfm";
-	//	//mDevice->GetRenderFactory()->SaveTexture2D(texFile, mShadowMapTempBlur1, 0, 0);
-	//}
+		//mShadowFrameBuffer->Attach(ATT_Color0, mShadowMapTempBlurRTV1);
+
+		//
+		////b = mShadowFrameBuffer->CheckFramebufferStatus();
+		//mBlurMaterial->SetTexture("InputTex", mShadowMapTempBlur);
+		//mBlurMaterial->SetCurrentTechnique("ShadowMapBlurY");
+		//mDevice->Render(*mBlurMaterial->GetCurrentTechnique(), *mFSQuadShape);
+
+		//texFile = "E:/BlurY" + std::to_string(i) + ".pfm";
+		//mDevice->GetRenderFactory()->SaveTexture2D(texFile, mShadowMapTempBlur1, 0, 0);
+	}
 	
 	//mShadowTexture->BuildMipMap();
-
 	mDevice->BindFrameBuffer(currFrameBuffer);	
 
-	vector<float> pfmData(SHADOW_MAP_SIZE * SHADOW_MAP_SIZE);
-	for (size_t layer = 0; layer < light.GetShadowCascades(); ++layer)
-	{
-		uint32_t rowPitch;
-		float* pData = (float*)mShadowTexture->Map2D(layer, 0, RMA_Read_Only, rowPitch);
-		for (size_t iY = 0; iY < SHADOW_MAP_SIZE; ++iY)
-		{
-			for (size_t iX = 0; iX < SHADOW_MAP_SIZE; ++iX)
-			{
-				pfmData[iY * SHADOW_MAP_SIZE + iX] = *pData;
+	//uint32_t level = 0;
+	//uint32_t shadowMapSize = SHADOW_MAP_SIZE >> level;
+	//vector<float> pfmData(shadowMapSize * shadowMapSize);
+	//for (size_t layer = 0; layer < light.GetShadowCascades(); ++layer)
+	//{
+	//	uint32_t rowPitch;
+	//	float* pData = (float*)mShadowTexture->Map2D(layer, level, RMA_Read_Only, rowPitch);
+	//	for (size_t iY = 0; iY < shadowMapSize; ++iY)
+	//	{
+	//		for (size_t iX = 0; iX < shadowMapSize; ++iX)
+	//		{
+	//			pfmData[iY * shadowMapSize + iX] = *pData;
 
-				pData += 2;
-			}
-		}
-		mShadowTexture->Unmap2D(layer, 0);
+	//			pData += 2;
+	//		}
+	//	}
+	//	mShadowTexture->Unmap2D(layer, 0);
 
-		String Name = "E:/PSSM" + std::to_string(layer) + ".pfm";
-		WritePfm(Name.c_str(), SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, &pfmData[0]);
-	}
+	//	String Name = "E:/PSSM" + std::to_string(layer) + ".pfm";
+	//	WritePfm(Name.c_str(), shadowMapSize, shadowMapSize, 1, &pfmData[0]);
+	//}
 }
 
 void CascadedShadowMap::UpdateShadowMatrix( const Camera& camera, const Light& light )
@@ -555,7 +567,7 @@ void CascadedShadowMap::UpdateShadowMatrix( const Camera& camera, const Light& l
 												   boundSplit.Min.Y(), boundSplit.Max.Y(),
 												   boundSplit.Min.Z(), boundSplit.Max.Z());
 
-		const float4x4& orthoProjection = mLightCamera[iSplit]->GetProjMatrix();
+		float4x4 orthoProjection = mLightCamera[iSplit]->GetProjMatrix() * mShadowTextureNorm;
 		mShadowCascadeScale[iSplit] = float4(orthoProjection.M11, orthoProjection.M22, orthoProjection.M33, 1.0f);
 		mShadowCascadeOffset[iSplit] = float4(orthoProjection.M41, orthoProjection.M42, orthoProjection.M43, 0.0f);
 

@@ -52,7 +52,8 @@ protected:
 	{
 		mCamera = std::make_shared<Camera>();
 		mCamera->CreateLookAt(float3(0, 150, -250), float3(0, 0, 0));
-		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 500.0f );
+		//mCamera->CreateLookAt(float3(-395.7, 839.9, 2061.9), float3(-395.4, 839.6, 2061.0));
+		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 8000.0f );
 
 		auto view = mCamera->GetViewMatrix();
 		auto proj = mCamera->GetProjMatrix();
@@ -86,7 +87,7 @@ protected:
 		mDirLight->SetDirection(float3(1, -1, 0));
 		mDirLight->SetLightColor(float3(1, 1, 1));
 		mDirLight->SetCastShadow(true);
-		mDirLight->SetShadowCascades(1);
+		mDirLight->SetShadowCascades(4);
 		sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 	}
 
@@ -166,7 +167,7 @@ protected:
 
 		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("PSSMScene");
 		{
-			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./PSSMScene/PSSMScene.mesh",  "Custom");	
+			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Tree/Tree.mesh",  "Custom");	
 			//citySceneNode->SetScale(float3(10, 10, 10));
 			citySceneNode->AttachObject(arthasEntity);
 		}

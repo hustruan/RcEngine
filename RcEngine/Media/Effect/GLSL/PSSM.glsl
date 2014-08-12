@@ -45,8 +45,8 @@ float CalculateVarianceShadow(in vec4 CascadeShadowTexCoord, in vec4 posShadowVi
 	vec4 CascadeShadowTexCoordDDX = dFdx(posShadowViewSpace) * CascadeScale[iCascade];
 	vec4 CascadeShadowTexCoordDDY = dFdy(posShadowViewSpace) * CascadeScale[iCascade];
 	
-	vec2 moments = textureGrad(CascadeShadowTex, CascadeShadowTexCoord.xyz, CascadeShadowTexCoordDDX.xy, CascadeShadowTexCoordDDY.xy).rg;
-	
+	//vec2 moments = textureGrad(CascadeShadowTex, CascadeShadowTexCoord.xyz, CascadeShadowTexCoordDDX.xy, CascadeShadowTexCoordDDY.xy).rg;
+	vec2 moments = textureLod(CascadeShadowTex, CascadeShadowTexCoord.xyz, 0).rg;
 	return ChebyshevUpperBound(moments, CascadeShadowTexCoord.w, 0.0001);
 }
 
@@ -71,7 +71,6 @@ float EvalCascadeShadow(in vec4 posWorldSpace, out int selectCascade)
 	for( int iCascade = 0; iCascade < NumCascades && cascadeFound == 0; ++iCascade ) 
 	{
 		CascadeShadowTexCoord = posShadowVS * CascadeScale[iCascade] + CascadeOffset[iCascade];		
-		CascadeShadowTexCoord.xy = CascadeShadowTexCoord.xy * 0.5 + 0.5; // Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
 			
 		if ( min( CascadeShadowTexCoord.x, CascadeShadowTexCoord.y ) > BorderPaddingMinMax.x && 
              max( CascadeShadowTexCoord.x, CascadeShadowTexCoord.y ) < BorderPaddingMinMax.y )
@@ -87,7 +86,7 @@ float EvalCascadeShadow(in vec4 posWorldSpace, out int selectCascade)
 	
 	percentLit = CalculateVarianceShadow(CascadeShadowTexCoord,  posShadowVS, iCascadeSelected);	
 	
-	/*
+	
 	// Blend between cascades
 	int iNextCascadeIndex = min ( NumCascades - 1, iCascadeSelected + 1 ); 
 	CascadeShadowTexCoordBlend = posShadowVS * CascadeScale[iNextCascadeIndex] + CascadeOffset[iNextCascadeIndex];
@@ -107,7 +106,7 @@ float EvalCascadeShadow(in vec4 posWorldSpace, out int selectCascade)
 		// Blend the two calculated shadows by the blend amount.
         percentLit = mix(percentLitBlend, percentLit, cascadeBlendWeight); 
 	}	
-	*/
+	
 	
 	selectCascade = iCascadeSelected;
 	return percentLit;

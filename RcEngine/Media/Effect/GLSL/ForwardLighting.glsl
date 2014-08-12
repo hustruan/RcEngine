@@ -9,6 +9,13 @@ uniform vec3 LightColor;
 uniform vec3 CameraOrigin;
 uniform bool ShadowEnabled;
 
+const vec3 vCascadeColorsMultiplier[4] = vec3[4](
+    vec3 ( 1.5, 0.0, 0.0 ),
+    vec3 ( 0.0, 1.5, 0.0 ),
+    vec3 ( 0.0, 0.0, 1.5 ),
+    vec3 ( 1.5, 1.5, 0.0 )
+);
+
 // shader input
 in vec4 oPosWS;
 in vec2 oTex;
@@ -53,7 +60,9 @@ void main()
 	{
 		int iCascadeSelected = 0;
         float percentLit = EvalCascadeShadow(oPosWS, iCascadeSelected);
-		final *= percentLit;
+		final *= percentLit; 
+		//final = final  * max(1.0, percentLit);
+		//final = final * vCascadeColorsMultiplier[iCascadeSelected];
 	}
 	
 	// Ambient

@@ -2,11 +2,11 @@
 
 #include "/ModelVertexFactory.glsl"
 
-uniform mat4 WorldView;	
-uniform mat4 Projection;
+uniform mat4 World;	
+uniform mat4 ViewProj;
 
 #ifdef _AlphaTest
-	out vec2 oTex;
+	layout (location = 0) out vec2 oTex;
 #endif
 
 out gl_PerVertex {
@@ -17,9 +17,10 @@ void main()
 {
 #ifdef _Skinning
 	mat4 Skin = CalculateSkinMatrix();
-	gl_Position = vec4(iPos, 1.0) * Skin * WorldView * Projection;
+	mat4 SkinWorld = Skin * World;
+	gl_Position = vec4(iPos, 1.0)* SkinWorld * ViewProj;
 #else
-	gl_Position = vec4(iPos, 1.0) * WorldView * Projection;
+	gl_Position = vec4(iPos, 1.0)* World * ViewProj;
 #endif
 
 #ifdef _AlphaTest
@@ -29,10 +30,18 @@ void main()
 
 [[Fragment=ShadowMapVSM]]
 
-layout(location = 0) out vec2 oFragDepth;
+#include "/ModelMaterialFactory.glsl"
+
+layout (location = 0) in vec2 iTex;
+layout (location = 0) out vec2 oFragDepth;
 
 void main()
 {
+#ifdef _AlphaTest
+	vec4 diffuseTap = texture2D(DiffuseMap, iTex);
+	if( diffuseTap.a < 0.01 ) discard;
+#endif	
+
 	oFragDepth.x = gl_FragCoord.z;
 	oFragDepth.y = gl_FragCoord.z * gl_FragCoord.z;
 }

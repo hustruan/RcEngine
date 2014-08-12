@@ -1,5 +1,6 @@
 #include "D3D11Texture.h"
 #include "D3D11Device.h"
+#include "D3D11View.h"
 #include <Core/Exception.h>
 
 namespace RcEngine {
@@ -14,7 +15,13 @@ D3D11Texture::D3D11Texture( TextureType type, PixelFormat format, uint32_t array
 
 void D3D11Texture::BuildMipMap()
 {
-	SAFE_RELEASE(mStagingTextureD3D11);
+	assert(mCreateFlags & (TexCreate_GenerateMipmaps | TexCreate_ShaderResource | TexCreate_RenderTarget));
+	assert(mTextureSRV);
+	
+	ID3D11DeviceContext* deviceContext = gD3D11Device->DeviceContextD3D11;
+	ID3D11ShaderResourceView* srvD3D11 = (static_pointer_cast_checked <D3D11ShaderResouceView>(mTextureSRV))->ShaderResourceViewD3D11;
+	
+	deviceContext->GenerateMips(srvD3D11);
 }
 
 void* D3D11Texture::Map1D( uint32_t arrayIndex, uint32_t level, ResourceMapAccess mapType )

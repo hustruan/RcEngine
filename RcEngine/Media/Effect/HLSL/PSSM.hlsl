@@ -37,7 +37,7 @@ float ChebyshevUpperBound(float2 moments, float depth, float minVariance)
 	
 	 // To combat light-bleeding, experiment with raising p_max to some power
      // (Try values from 0.1 to 100.0, if you like.)	
-	return pow( max(p, pmax), 5.0 );
+	return pow( max(p, pmax), 100.0 );
 }
 
 float CalculateVarianceShadow(in float4 CascadeShadowTexCoord, in float4 posShadowViewSpace, in int iCascade)
@@ -45,7 +45,9 @@ float CalculateVarianceShadow(in float4 CascadeShadowTexCoord, in float4 posShad
 	float4 CascadeShadowTexCoordDDX = ddx(posShadowViewSpace) * CascadeScale[iCascade];
 	float4 CascadeShadowTexCoordDDY = ddy(posShadowViewSpace) * CascadeScale[iCascade];
 	
-	float2 moments = CascadeShadowTex.SampleGrad(ShadowSampler, CascadeShadowTexCoord.xyz, CascadeShadowTexCoordDDX.xy, CascadeShadowTexCoordDDY.xy).rg;
+	//float2 moments = CascadeShadowTex.SampleGrad(ShadowSampler, CascadeShadowTexCoord.xyz, CascadeShadowTexCoordDDX.xy, CascadeShadowTexCoordDDY.xy).rg;
+
+	float2 moments = CascadeShadowTex.SampleLevel(ShadowSampler, CascadeShadowTexCoord.xyz, 0).rg;
 
 	return ChebyshevUpperBound(moments, CascadeShadowTexCoord.w, 0.0001);
 }
@@ -71,8 +73,7 @@ float EvalCascadeShadow(in float4 posWorldSpace, out int selectCascade)
 	for( int iCascade = 0; iCascade < NumCascades && cascadeFound == 0; ++iCascade ) 
 	{
 		CascadeShadowTexCoord = posShadowVS * CascadeScale[iCascade] + CascadeOffset[iCascade];		
-		CascadeShadowTexCoord.xy = CascadeShadowTexCoord.xy * 0.5 + 0.5; // Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
-			
+
 		if ( min( CascadeShadowTexCoord.x, CascadeShadowTexCoord.y ) > BorderPaddingMinMax.x && 
              max( CascadeShadowTexCoord.x, CascadeShadowTexCoord.y ) < BorderPaddingMinMax.y )
         { 
@@ -80,7 +81,7 @@ float EvalCascadeShadow(in float4 posWorldSpace, out int selectCascade)
             cascadeFound = 1; 
         }		
 	}
-		
+	
 	// Store selected cascade index in z
 	CascadeShadowTexCoord.w = CascadeShadowTexCoord.z;
 	CascadeShadowTexCoord.z = (float)iCascadeSelected;

@@ -203,6 +203,7 @@
     <None Include="..\Media\Effect\GLSL\ModelMaterialFactory.glsl" />
     <None Include="..\Media\Effect\GLSL\ModelVertexFactory.glsl" />
     <None Include="..\Media\Effect\GLSL\Model.glsl" />
+    <None Include="..\Media\Effect\GLSL\PSSM.glsl" />
     <None Include="..\Media\Effect\GLSL\ShadowMapBlur.glsl" />
     <None Include="..\Media\Effect\GLSL\ShadowMapGen.glsl" />
     <None Include="..\Media\Effect\GLSL\Sprite.glsl" />
@@ -238,6 +239,7 @@
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\Font.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\ForwardLighting.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -283,12 +285,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ShadowMapBlur.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\ShadowMapGen.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\Sprite.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\TiledDeferredShading.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

@@ -840,6 +840,17 @@ void FbxProcesser::ProcessMesh( FbxNode* pNode )
 
 	ExportLog::LogMsg(0, "Process mesh: %s\n", pNode->GetName());
 
+	if (!pMesh->IsTriangleMesh())
+	{
+		FbxGeometryConverter GeometryConverter(mFBXSdkManager);
+		if( !GeometryConverter.Triangulate(pNode->GetNodeAttribute(), true) )
+		{
+			ExportLog::LogError("FbxMesh: %s triangulation failed!", pNode->GetName());
+			return;
+		}
+		pMesh = pNode->GetMesh();
+	}
+
 	// material count this mesh will use
 	int numMaterial = pNode->GetMaterialCount();
 

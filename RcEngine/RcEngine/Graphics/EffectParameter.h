@@ -181,6 +181,35 @@ protected:
 	T mValue;
 };
 
+// For boolean type
+template<>
+class _ApiExport EffectParameterNumberic<bool> : public EffectParameter
+{
+public:
+	EffectParameterNumberic(const String& name, EffectParameterType type, EffectConstantBuffer* pCB = nullptr) 
+		: EffectParameter(name, type, pCB) {}
+
+	void GetValue(bool& value) const { value = mValue; }
+	void SetValue(const bool& value)
+	{
+		if (value != mValue)
+		{
+			mValue = value;
+
+			// Update data in uniform buffer
+			if (mUniformBuffer)
+			{
+				*(reinterpret_cast<int*>(mUniformBuffer->GetRawData(mOffset))) = mValue ? 1 : 0;
+			}
+
+			MakeDirty();
+		}
+	}
+
+protected:
+	bool mValue;
+};
+
 template< typename T >
 class _ApiExport EffectParameterNumbericArray : public EffectParameter
 {

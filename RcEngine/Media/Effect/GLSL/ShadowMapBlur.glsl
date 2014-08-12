@@ -18,7 +18,7 @@ void main()
     filtered  += textureLodOffset(ShadowMap, vec3(iTex, ArraySlice), 0, ivec2(0,  0)).rg;
     filtered  += textureLodOffset(ShadowMap, vec3(iTex, ArraySlice), 0, ivec2(1,  0)).rg;
     filtered  += textureLodOffset(ShadowMap, vec3(iTex, ArraySlice), 0, ivec2(2,  0)).rg;
-    oFragColor = filtered;
+    oFragColor = filtered * 0.2;
     
     //filtered  += textureLodOffset(ShadowMap, vec3(iTex, ArraySlice), 0, ivec2(-3, 0)).rg;
     //filtered  += textureLodOffset(ShadowMap, vec3(iTex, ArraySlice), 0, ivec2(3, 0)).rg;

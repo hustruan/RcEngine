@@ -31,7 +31,7 @@ int main()
 
 	fbxProcesser.Initialize();
 
-	if (fbxProcesser.LoadScene("../../Media/Mesh/PSSMScene/PSSMScene.fbx"))
+	if (fbxProcesser.LoadScene("../../Media/Mesh/Tree/Tree.FBX"))
 	{
 		fbxProcesser.ProcessScene();
 		fbxProcesser.BuildAndSaveBinary();

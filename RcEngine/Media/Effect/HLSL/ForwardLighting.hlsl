@@ -9,6 +9,14 @@ float3 CameraOrigin;
 
 bool ShadowEnabled;
 
+static const float3 vCascadeColorsMultiplier[4] = {
+
+    float3 ( 1.5, 0.0, 0.0 ),
+    float3 ( 0.0, 1.5, 0.0 ),
+    float3 ( 0.0, 0.0, 1.5 ),
+    float3 ( 1.5, 1.5, 0.0 )
+};
+
 void DirectionalLightingPS(in VSOutput input,
 						   out float4 oFragColor : SV_Target0 ) 
 {
@@ -40,7 +48,9 @@ void DirectionalLightingPS(in VSOutput input,
 	{
 		int iCascadeSelected = 0;
 		float percentLit = EvalCascadeShadow(input.PosWS, iCascadeSelected);
-		final *= percentLit;
+		final *= percentLit; 
+		//final = final  * max(1.0, percentLit);
+		//final = final * vCascadeColorsMultiplier[iCascadeSelected];
 	}
     
 	// Ambient 
