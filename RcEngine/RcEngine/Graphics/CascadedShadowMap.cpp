@@ -377,46 +377,10 @@ void CascadedShadowMap::MakeCascadedShadowMap(const Light& light)
 		}
 	}
 
-
-	// Blur shadow map
-	for (uint32_t i = 0; i < light.GetShadowCascades(); ++i)
-	{
-		mShadowFrameBuffer->AttachRTV(ATT_Color0, mShadowMapTempBlurRTV);
-		mDevice->BindFrameBuffer(mShadowFrameBuffer);	
-
-		mBlurEffect->SetCurrentTechnique("BlurX");
-		mBlurEffect->GetParameterByName("ShadowMap")->SetValue(mShadowTexture->GetShaderResourceView());
-		mBlurEffect->GetParameterByName("ArraySlice")->SetValue(float(i));
-		mDevice->Draw(mBlurEffect->GetCurrentTechnique(), mFSQuadRop);
-
-		mShadowFrameBuffer->AttachRTV(ATT_Color0, mShadowSplitsRTV[i]);
-		mDevice->BindFrameBuffer(mShadowFrameBuffer);	
-
-		mBlurEffect->SetCurrentTechnique("BlurY");
-		mBlurEffect->GetParameterByName("ShadowMapBlurX")->SetValue(mShadowMapTempBlur->GetShaderResourceView());
-		mDevice->Draw(mBlurEffect->GetCurrentTechnique(), mFSQuadRop);
-
-		//String texFile = "E:/BlurX" + std::to_string(i) + ".pfm";
-		//mDevice->GetRenderFactory()->SaveTextureToFile(texFile, mShadowMapTempBlur);
-
-		//mShadowFrameBuffer->Attach(ATT_Color0, mShadowMapTempBlurRTV1);
-
-		//
-		////b = mShadowFrameBuffer->CheckFramebufferStatus();
-		//mBlurMaterial->SetTexture("InputTex", mShadowMapTempBlur);
-		//mBlurMaterial->SetCurrentTechnique("ShadowMapBlurY");
-		//mDevice->Render(*mBlurMaterial->GetCurrentTechnique(), *mFSQuadShape);
-
-		//texFile = "E:/BlurY" + std::to_string(i) + ".pfm";
-		//mDevice->GetRenderFactory()->SaveTexture2D(texFile, mShadowMapTempBlur1, 0, 0);
-	}
-	
-	//mShadowTexture->BuildMipMap();
-	mDevice->BindFrameBuffer(currFrameBuffer);	
-
 	//uint32_t level = 0;
 	//uint32_t shadowMapSize = SHADOW_MAP_SIZE >> level;
 	//vector<float> pfmData(shadowMapSize * shadowMapSize);
+
 	//for (size_t layer = 0; layer < light.GetShadowCascades(); ++layer)
 	//{
 	//	uint32_t rowPitch;
@@ -433,6 +397,50 @@ void CascadedShadowMap::MakeCascadedShadowMap(const Light& light)
 	//	mShadowTexture->Unmap2D(layer, 0);
 
 	//	String Name = "E:/PSSM" + std::to_string(layer) + ".pfm";
+	//	WritePfm(Name.c_str(), shadowMapSize, shadowMapSize, 1, &pfmData[0]);
+	//}
+
+	// Blur shadow map
+	for (uint32_t i = 0; i < light.GetShadowCascades(); ++i)
+	{
+		mShadowFrameBuffer->AttachRTV(ATT_Color0, mShadowMapTempBlurRTV);
+		mDevice->BindFrameBuffer(mShadowFrameBuffer);	
+
+		mBlurEffect->SetCurrentTechnique("BlurX");
+		mBlurEffect->GetParameterByName("ShadowMap")->SetValue(mShadowTexture->GetShaderResourceView());
+		mBlurEffect->GetParameterByName("ArraySlice")->SetValue(float(i));
+		mDevice->Draw(mBlurEffect->GetCurrentTechnique(), mFSQuadRop);
+
+		//String filename = "E:/BlurX" + std::to_string(i) + ".pfm";
+		//mDevice->GetRenderFactory()->SaveTextureToFile(filename, mShadowMapTempBlur);
+
+		mShadowFrameBuffer->AttachRTV(ATT_Color0, mShadowSplitsRTV[i]);
+		mDevice->BindFrameBuffer(mShadowFrameBuffer);	
+
+		mBlurEffect->SetCurrentTechnique("BlurY");
+		mBlurEffect->GetParameterByName("ShadowMapBlurX")->SetValue(mShadowMapTempBlur->GetShaderResourceView());
+		mDevice->Draw(mBlurEffect->GetCurrentTechnique(), mFSQuadRop);
+	}
+	//mShadowTexture->BuildMipMap();
+	
+	mDevice->BindFrameBuffer(currFrameBuffer);	
+
+	//for (size_t layer = 0; layer < light.GetShadowCascades(); ++layer)
+	//{
+	//	uint32_t rowPitch;
+	//	float* pData = (float*)mShadowTexture->Map2D(layer, level, RMA_Read_Only, rowPitch);
+	//	for (size_t iY = 0; iY < shadowMapSize; ++iY)
+	//	{
+	//		for (size_t iX = 0; iX < shadowMapSize; ++iX)
+	//		{
+	//			pfmData[iY * shadowMapSize + iX] = *pData;
+
+	//			pData += 2;
+	//		}
+	//	}
+	//	mShadowTexture->Unmap2D(layer, 0);
+
+	//	String Name = "E:/BlurY" + std::to_string(layer) + ".pfm";
 	//	WritePfm(Name.c_str(), shadowMapSize, shadowMapSize, 1, &pfmData[0]);
 	//}
 }
@@ -510,7 +518,7 @@ void CascadedShadowMap::UpdateShadowMatrix( const Camera& camera, const Light& l
 			boundSplit.Merge(Corners[farSplitIdx][i]);
 		}
 
-		float3 worldUnitsPerTexel = 0.0f;
+		float3 worldUnitsPerTexel = float3(0.0f);
 		{
 			// We calculate a looser bound based on the size of the blur kernel.  This ensures us that we're 
 			// sampling within the correct map.
@@ -547,18 +555,6 @@ void CascadedShadowMap::UpdateShadowMatrix( const Camera& camera, const Light& l
 			boundSplit.Max.Y() = floorf( boundSplit.Max.Y()  );
 			boundSplit.Max.Y() *= worldUnitsPerTexel.Y();
 		}
-		
-		 //Calculate SceneAABB (min, max) depth in light space
-		//float minZLightSpace = FLT_MAX;
-		//float maxZLightSpace = -FLT_MAX;
-		//for (int i = 0; i < 8; ++i)
-		//{
-		//	float vertCoordZ = sceneAABBPointsLightSpace[i].Z();
-		//	if (sceneAABBPointsLightSpace[i].Z() < minZLightSpace) minZLightSpace = vertCoordZ;
-		//	if (sceneAABBPointsLightSpace[i].Z() > maxZLightSpace) maxZLightSpace = vertCoordZ;
-		//}
-		//boundSplit.Min.Z() = minZLightSpace;
-		//boundSplit.Max.Z() = maxZLightSpace;
 
 		CalculateLightNearFar(boundSplit, sceneAABBPointsLightSpace);
 

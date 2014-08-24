@@ -221,6 +221,14 @@ void SceneManager::UpdateRenderQueue( shared_ptr<Camera> camera, RenderOrder ord
 		GetRootSceneNode()->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);	
 }
 
+void SceneManager::UpdateOverlayQueue()
+{
+	mRenderQueue.ClearQueues(RenderQueue::BucketOverlay);
+	for (SpriteBatch* batch : mSpriteBatchs)
+		batch->OnUpdateRenderQueue( mRenderQueue );
+}
+
+
 void SceneManager::UpdateLightQueue( const Camera& cam )
 {
 	mLightQueue.clear();
@@ -261,6 +269,16 @@ SpriteBatch* SceneManager::CreateSpriteBatch()
 	SpriteBatch* batch = new SpriteBatch();
 	mSpriteBatchs.push_back(batch);
 	return batch;
+}
+
+void SceneManager::DestrySpriteBatch( SpriteBatch* batch )
+{
+	auto it = std::find(mSpriteBatchs.begin(), mSpriteBatchs.end(), batch);
+	if (it != mSpriteBatchs.end())
+	{
+		delete batch;
+		mSpriteBatchs.erase(it);
+	}
 }
 
 

@@ -50,7 +50,7 @@ void main()
     if (NdotL > 0.0)
     {	
 		float normTerm = (material.Shininess + 2.0) / 8.0;
-        float fresnel = CalculateFresnel(material.SpecularAlbedo, L, H);
+        vec3 fresnel = CalculateFresnel(material.SpecularAlbedo, L, H);
 
 		// Diffuse + Specular
         final = (material.DiffuseAlbedo + normTerm * CalculateSpecular(N, H, material.Shininess) * fresnel) * LightColor * NdotL;
@@ -61,8 +61,8 @@ void main()
 		int iCascadeSelected = 0;
         float percentLit = EvalCascadeShadow(oPosWS, iCascadeSelected);
 		final *= percentLit; 
-		//final = final  * max(1.0, percentLit);
-		//final = final * vCascadeColorsMultiplier[iCascadeSelected];
+		final = final  * max(1.0, percentLit);
+		final = final * vCascadeColorsMultiplier[iCascadeSelected];
 	}
 	
 	// Ambient

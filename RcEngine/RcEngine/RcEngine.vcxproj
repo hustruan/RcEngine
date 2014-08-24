@@ -199,6 +199,7 @@
     <None Include="..\Media\Effect\GLSL\FSQuad.glsl" />
     <None Include="..\Media\Effect\GLSL\FullscreenTriangle.glsl" />
     <None Include="..\Media\Effect\GLSL\GBuffer.glsl" />
+    <None Include="..\Media\Effect\GLSL\HDR.glsl" />
     <None Include="..\Media\Effect\GLSL\LightingUtil.glsl" />
     <None Include="..\Media\Effect\GLSL\ModelMaterialFactory.glsl" />
     <None Include="..\Media\Effect\GLSL\ModelVertexFactory.glsl" />
@@ -211,7 +212,6 @@
     <None Include="..\Media\Effect\GLSL\TessQuad.glsl" />
     <None Include="..\Media\Effect\GLSL\TessTeapot.glsl" />
     <None Include="..\Media\Effect\GLSL\TiledDeferredShading.glsl" />
-    <None Include="..\Media\Effect\GLSL\ToneMap.glsl" />
     <None Include="Math\BoundingBox.inl" />
     <None Include="Math\BoundingSphere.inl" />
     <None Include="Math\ColorRGBA.inl" />
@@ -261,6 +261,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\HDR.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\LightingUtil.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -281,10 +285,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\RenderCascadeScene.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\ShadowMapBlur.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -298,10 +298,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\TiledDeferredShading.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\ToneMap.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
@@ -328,7 +324,7 @@
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
       <SubType>Designer</SubType>
     </Xml>
-    <Xml Include="..\Media\Effect\HDRToneMap.effect.xml" />
+    <Xml Include="..\Media\Effect\HDR.effect.xml" />
     <Xml Include="..\Media\Effect\Model.effect.xml">
       <SubType>Designer</SubType>
     </Xml>

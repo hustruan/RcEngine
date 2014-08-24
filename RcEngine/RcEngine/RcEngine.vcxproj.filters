@@ -637,9 +637,6 @@
     <None Include="..\Media\Effect\GLSL\GBuffer.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
-    <None Include="..\Media\Effect\GLSL\ToneMap.glsl">
-      <Filter>Asset\GLSL</Filter>
-    </None>
     <None Include="..\Media\Effect\GLSL\DebugView.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
@@ -671,6 +668,9 @@
       <Filter>Asset\GLSL</Filter>
     </None>
     <None Include="..\Media\Effect\GLSL\PSSM.glsl">
+      <Filter>Asset\GLSL</Filter>
+    </None>
+    <None Include="..\Media\Effect\GLSL\HDR.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
   </ItemGroup>
@@ -705,16 +705,10 @@
     <FxCompile Include="..\Media\Effect\HLSL\PSSM.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\RenderCascadeScene.hlsl">
-      <Filter>Asset\HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\ShadowMapGen.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\GBuffer.hlsl">
-      <Filter>Asset\HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\ToneMap.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DebugView.hlsl">
@@ -735,6 +729,9 @@
     <FxCompile Include="..\Media\Effect\HLSL\ShadowMapBlur.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\HDR.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -750,9 +747,6 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\AlphaTest.effect.xml">
-      <Filter>Asset\Effect</Filter>
-    </Xml>
-    <Xml Include="..\Media\Effect\HDRToneMap.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\DebugView.effect.xml">
@@ -780,6 +774,9 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\ShadowMapBlur.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\HDR.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

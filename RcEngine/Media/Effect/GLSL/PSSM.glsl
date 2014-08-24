@@ -37,7 +37,7 @@ float ChebyshevUpperBound(vec2 moments, float depth, float minVariance)
 	
 	 // To combat light-bleeding, experiment with raising p_max to some power
      // (Try values from 0.1 to 100.0, if you like.)	
-	return pow( max(p, pmax), 5.0 );
+	return pow( max(p, pmax), 100.0 );
 }
 
 float CalculateVarianceShadow(in vec4 CascadeShadowTexCoord, in vec4 posShadowViewSpace, in int iCascade)
@@ -85,27 +85,26 @@ float EvalCascadeShadow(in vec4 posWorldSpace, out int selectCascade)
 	CascadeShadowTexCoord.z = float(iCascadeSelected);
 	
 	percentLit = CalculateVarianceShadow(CascadeShadowTexCoord,  posShadowVS, iCascadeSelected);	
-	
-	
-	// Blend between cascades
-	int iNextCascadeIndex = min ( NumCascades - 1, iCascadeSelected + 1 ); 
-	CascadeShadowTexCoordBlend = posShadowVS * CascadeScale[iNextCascadeIndex] + CascadeOffset[iNextCascadeIndex];
-	CascadeShadowTexCoordBlend.xy = CascadeShadowTexCoordBlend.xy * 0.5 + 0.5; // Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
-	CascadeShadowTexCoordBlend.w = CascadeShadowTexCoordBlend.z;
-	CascadeShadowTexCoordBlend.z = float(iNextCascadeIndex);
+
+	//// Blend between cascades
+	//int iNextCascadeIndex = min ( NumCascades - 1, iCascadeSelected + 1 ); 
+	//CascadeShadowTexCoordBlend = posShadowVS * CascadeScale[iNextCascadeIndex] + CascadeOffset[iNextCascadeIndex];
+	//CascadeShadowTexCoordBlend.xy = CascadeShadowTexCoordBlend.xy * 0.5 + 0.5; // Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
+	//CascadeShadowTexCoordBlend.w = CascadeShadowTexCoordBlend.z;
+	//CascadeShadowTexCoordBlend.z = float(iNextCascadeIndex);
 		
-	// Calculate cascade blend
-	float cascadeBlendWeight = 1.0f;
-	float blendBandLocation = 1.0f;
+	//// Calculate cascade blend
+	//float cascadeBlendWeight = 1.0f;
+	//float blendBandLocation = 1.0f;
 		
-	CalculateBlendAmountForMap(CascadeShadowTexCoord.xy, CascadeBlendArea, blendBandLocation, cascadeBlendWeight);
-	if (blendBandLocation < CascadeBlendArea)
-	{
-		float percentLitBlend = CalculateVarianceShadow(CascadeShadowTexCoordBlend, posShadowVS, iNextCascadeIndex);
+	//CalculateBlendAmountForMap(CascadeShadowTexCoord.xy, CascadeBlendArea, blendBandLocation, cascadeBlendWeight);
+	//if (blendBandLocation < CascadeBlendArea)
+	//{
+	//	float percentLitBlend = CalculateVarianceShadow(CascadeShadowTexCoordBlend, posShadowVS, iNextCascadeIndex);
 			
-		// Blend the two calculated shadows by the blend amount.
-        percentLit = mix(percentLitBlend, percentLit, cascadeBlendWeight); 
-	}	
+	//	// Blend the two calculated shadows by the blend amount.
+ //       percentLit = mix(percentLitBlend, percentLit, cascadeBlendWeight); 
+	//}	
 	
 	
 	selectCascade = iCascadeSelected;

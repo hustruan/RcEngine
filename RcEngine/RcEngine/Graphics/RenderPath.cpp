@@ -160,7 +160,7 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 
 	// Load deferred lighting effect
 	mDeferredEffect = resMan.GetResourceByName<Effect>(RT_Effect, "DeferredLighting.effect.xml", "General");
-	mToneMapEffect = resMan.GetResourceByName<Effect>(RT_Effect, "HDRToneMap.effect.xml", "General");
+	mToneMapEffect = resMan.GetResourceByName<Effect>(RT_Effect, "HDR.effect.xml", "General");
 	mDebugEffect = resMan.GetResourceByName<Effect>(RT_Effect, "DebugView.effect.xml", "General");
 
 	mDirLightTech = mDeferredEffect->GetTechniqueByName("DirectionalLighting");
@@ -374,8 +374,6 @@ void DeferredPath::DeferredLighting()
 
 	// Copy depth and stencil
 	mDepthStencilBuffer->CopyToTexture(*mDepthStencilBufferLight);
-	//EffectTechnique* copyDepthTech = mDeferredEffect->GetTechniqueByName("CopyDepth");
-	//mDevice->Draw(copyDepthTech, mFullscreenTrangle);
 
 	// Set all common effect parameters
 	mDeferredEffect->GetParameterByName("InvViewProj")->SetValue(mInvViewProj);
@@ -411,13 +409,13 @@ void DeferredPath::DeferredLighting()
 	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer0.pfm", mGBuffer[0]);
 	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer1.tga", mGBuffer[1]);
 	mDevice->GetRenderFactory()->SaveTextureToFile("E:/LightAccu.pfm", mLightAccumulateBuffer);
-	}*/
+	}
 
 	if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
 	{
 		mDevice->GetRenderFactory()->SaveLinearDepthTextureToFile("E:/depth.pfm", mDepthStencilBufferLight, proj.M33, proj.M43);
 		mDevice->GetRenderFactory()->SaveTextureToFile("E:/LightAccu.pfm", mLightAccumulateBuffer);
-	}
+	}*/
 }
 
 void DeferredPath::DeferredShading()
@@ -445,7 +443,7 @@ void DeferredPath::PostProcess()
 	mDevice->BindFrameBuffer(screenFB);
 	screenFB->Clear(CF_Color | CF_Depth, ColorRGBA::Black, 1.0, 0);
 
-	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("ToneMap");
+	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("CopyDepthColor");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
 }
 
@@ -582,7 +580,7 @@ void TiledDeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 
 	// Load deferred lighting effect
 	mTiledDeferredEffect = resMan.GetResourceByName<Effect>(RT_Effect, "TiledDeferredShading.effect.xml", "General");
-	mToneMapEffect = resMan.GetResourceByName<Effect>(RT_Effect, "HDRToneMap.effect.xml", "General");
+	mToneMapEffect = resMan.GetResourceByName<Effect>(RT_Effect, "HDR.effect.xml", "General");
 
 	mTileTech = mTiledDeferredEffect->GetTechniqueByName("Tile");
 	mShadingTech = mTiledDeferredEffect->GetTechniqueByName("Shading");
@@ -645,6 +643,7 @@ void TiledDeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mTiledDeferredEffect->GetParameterByName("Lights")->SetValue(mLightBufferSRV);
 
 	mToneMapEffect->GetParameterByName("HDRBuffer")->SetValue(mHDRBuffer->GetShaderResourceView());	
+	//mToneMapEffect->GetParameterByName("DepthBuffer")->SetValue(mDepthStencilBuffer->GetShaderResourceView());
 }
 
 void TiledDeferredPath::OnWindowResize( uint32_t width, uint32_t height )
@@ -668,7 +667,7 @@ void TiledDeferredPath::RenderScene()
 	mDevice->BindFrameBuffer(screenFB);
 	screenFB->Clear(CF_Color | CF_Depth, ColorRGBA(1, 0, 1, 1), 1.0, 0);
 
-	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("ToneMap");
+	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("CopyColor");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
 }
 

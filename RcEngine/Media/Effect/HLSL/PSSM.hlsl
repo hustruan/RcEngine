@@ -37,7 +37,7 @@ float ChebyshevUpperBound(float2 moments, float depth, float minVariance)
 	
 	 // To combat light-bleeding, experiment with raising p_max to some power
      // (Try values from 0.1 to 100.0, if you like.)	
-	return pow( max(p, pmax), 100.0 );
+	return pow( max(p, pmax), 100.0f );
 }
 
 float CalculateVarianceShadow(in float4 CascadeShadowTexCoord, in float4 posShadowViewSpace, in int iCascade)

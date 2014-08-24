@@ -56,6 +56,11 @@ void UIManager::OnGraphicsInitialize()
 
 void UIManager::OnGraphicsFinalize()
 {
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+
+	sceneMan->DestrySpriteBatch(mSpriteBatch);
+	sceneMan->DestrySpriteBatch(mSpriteBatchFont);
+
 	mFont.reset();
 	SAFE_DELETE(mDefaultSkin);
 }

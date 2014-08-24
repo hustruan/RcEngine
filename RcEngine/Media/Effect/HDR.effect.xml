@@ -1,0 +1,22 @@
+<Effect name="HDRTech">
+
+  <!-- Effect techniques -->
+  <Technique name="CopyColor">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="HDR" entry="CopyColor"/>
+      <State name="DepthEnable" value="false"/>
+      <State name="DepthWriteMask" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="CopyColorDepth">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="HDR" entry="CopyColorDepth"/>
+      <State name="DepthEnable" value="true"/>
+      <State name="DepthFunc" value="Always"/>
+    </Pass>
+  </Technique>
+
+</Effect>

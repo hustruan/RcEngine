@@ -28,6 +28,7 @@
 #include <Math/MathUtil.h>
 #include <Core/Profiler.h>
 #include <Core/XMLDom.h>
+#include <Math/Frustum.h>
 #include <fstream>
 
 CharacterApp::CharacterApp( const String& config )
@@ -46,7 +47,7 @@ void CharacterApp::Initialize()
 {
 	mCamera = std::make_shared<Camera>();
 	mCamera->CreateLookAt(float3(3.405924, 22.548273, -31.670168), float3(3.326280, 22.028830, -30.819384), float3(-0.048415, 0.854505, 0.517183));
-	mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 3000.0f );
+	mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 1500.0f );
 
 	/*mCameraControler = new RcEngine::Test::FPSCameraControler;
 	mCameraControler->AttachCamera(*mCamera);
@@ -87,7 +88,8 @@ void CharacterApp::LoadContent()
 	}
 
 	//Entity* arena = sceneMan->CreateEntity("Arena", "./Sinbad/Floor.mesh",  "Custom");
-	//sceneMan->GetRootSceneNode()->AttachObject(arena);
+	//SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Floor", float3(0, 18.5f, 0));
+	//citySceneNode->AttachObject(arena);
 
 	mSinbadController = new SinbadCharacterController(mCamera);
 	mThirdPersonCamera = new ThirdPersonCamera(mSinbadController, mCamera);
@@ -117,7 +119,6 @@ void CharacterApp::Update( float deltaTime )
 	mThirdPersonCamera->Update(deltaTime);
 
 	//mCameraControler->Update(deltaTime);
-
 
 	if ( InputSystem::GetSingleton().KeyPress(KC_P) )
 	{

@@ -211,9 +211,6 @@ void OpenGLTexture2D::CreateWithMutableStorage(ElementInitData* initData)
 
 void* OpenGLTexture2D::Map2D( uint32_t arrayIndex, uint32_t level, ResourceMapAccess mapType, uint32_t& rowPitch )
 {
-	// Not work for texture array
-	assert( mTextureArraySize == 1 );
-
 	void* pMappedData;
 	mTextureMapAccess = mapType;
 
@@ -254,12 +251,30 @@ void* OpenGLTexture2D::Map2D( uint32_t arrayIndex, uint32_t level, ResourceMapAc
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, mPixelBufferID);
 			glBufferData(GL_PIXEL_PACK_BUFFER, imageSize, NULL, bufferUsage);
 			
-			glBindTexture(mTextureTarget, mTextureOGL);
-			if (PixelFormatUtils::IsCompressed(mFormat))
-				glGetCompressedTexImage(mTextureTarget, level, NULL);
+			if (GLEW_ARB_get_texture_sub_image) // OpenGL 4.5
+			{
+				if (PixelFormatUtils::IsCompressed(mFormat))
+				{
+					glGetCompressedTextureSubImage(mTextureOGL, level, 0, 0, arrayIndex, 
+						levelWidth, levelHeight, 1, imageSize, NULL);
+				}
+				else
+				{
+					glGetTextureSubImage(mTextureOGL, level, 0, 0, arrayIndex,
+						levelWidth, levelHeight, 1, externFormat, formatType, imageSize, NULL);
+				}
+			}
 			else
-				glGetTexImage(mTextureTarget, level, externFormat, formatType, NULL);
+			{
+				assert(arrayIndex == 0);
 
+				glBindTexture(mTextureTarget, mTextureOGL);
+				if (PixelFormatUtils::IsCompressed(mFormat))
+					glGetCompressedTexImage(mTextureTarget, level, NULL);
+				else
+					glGetTexImage(mTextureTarget, level, externFormat, formatType, NULL);
+			}
+			
 			pMappedData =  glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, imageSize, mapUsage);
 		}
 		break;

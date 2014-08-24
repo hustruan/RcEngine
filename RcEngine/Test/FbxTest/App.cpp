@@ -11,6 +11,8 @@
 #include <Graphics/Material.h>
 #include <Graphics/Mesh.h>
 #include <Graphics/Effect.h>
+#include <Graphics/Font.h>
+#include <Graphics/SpriteBatch.h>
 #include <Graphics/EffectParameter.h>
 #include <Graphics/Camera.h>
 #include <Graphics/RenderPath.h>
@@ -30,8 +32,12 @@
 #include <Core/Profiler.h>
 #include <Core/XMLDom.h>
 #include <fstream>
+#include <random>
 
 using namespace RcEngine;
+
+std::mt19937 rng(1337);
+std::uniform_real<float> AngleDist(0.0f, Mathf::TWO_PI); 
 
 class TesselationApp : public Application
 {
@@ -51,7 +57,8 @@ protected:
 	void Initialize()
 	{
 		mCamera = std::make_shared<Camera>();
-		mCamera->CreateLookAt(float3(0, 150, -250), float3(0, 0, 0));
+		mCamera->CreateLookAt(float3(0, 20, 0), float3(1, 20, 0));
+		//mCamera->CreateLookAt(float3(0, 150, -250), float3(0, 150, 0));
 		//mCamera->CreateLookAt(float3(-395.7, 839.9, 2061.9), float3(-395.4, 839.6, 2061.0));
 		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 8000.0f );
 
@@ -79,14 +86,19 @@ protected:
 		
 		LoadDudeEntity();
 
+		mFont = resMan.GetResourceByName<Font>(RT_Font, "Consolas Regular", "General");
+		auto mSDFEffect = resMan.GetResourceByName<Effect>(RT_Effect, "Font.effect.xml", "General") ;
+		mSpriteBatch = sceneMan->CreateSpriteBatch(mSDFEffect);
+
 		// Set as default camera
 		auto screenFB = Environment::GetSingleton().GetRenderDevice()->GetScreenFrameBuffer();
 		screenFB->SetCamera(mCamera);
 
 		Light* mDirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
-		mDirLight->SetDirection(float3(1, -1, 0));
+		mDirLight->SetDirection(float3(1, -0.5, 0));
 		mDirLight->SetLightColor(float3(1, 1, 1));
-		mDirLight->SetCastShadow(true);
+		mDirLight->SetLightIntensity(1.0);
+		mDirLight->SetCastShadow(false);
 		mDirLight->SetShadowCascades(4);
 		sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 	}
@@ -165,12 +177,12 @@ protected:
 		//	arthasSceneNode->AttachObject(arthasEntity);
 		//}
 
-		SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("PSSMScene");
-		{
-			Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Tree/Tree.mesh",  "Custom");	
-			//citySceneNode->SetScale(float3(10, 10, 10));
-			citySceneNode->AttachObject(arthasEntity);
-		}
+		//SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("PSSMScene");
+		//{
+		//	Entity* arthasEntity = sceneMan->CreateEntity("dude", "./Tree/Tree.mesh",  "Custom");	
+		//	//citySceneNode->SetScale(float3(10, 10, 10));
+		//	citySceneNode->AttachObject(arthasEntity);
+		//}
 
 		//SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
 		//{
@@ -263,9 +275,11 @@ protected:
 
 		//	mDudeEntity = blitzcrankEntity;
 		//}
+
+		Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");
+		sceneMan->GetRootSceneNode()->AttachObject(sponzaEnt);
 	}
 	
-
 	void UnloadContent()
 	{
 
@@ -291,6 +305,18 @@ protected:
 		CalculateFrameRate();
 		mCameraControler->Update(deltaTime);
 
+		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+
+		auto center = mCamera->GetPosition() + mCamera->GetForward() * 200.0f;
+
+		wchar_t buffer[255];
+		std::swprintf(buffer, L"Camera (%.1f, %.1f, %.1f), FPS: %d", center.X(), center.Y(), center.Z(), mFramePerSecond);
+
+		mSpriteBatch->Begin();
+		mFont->DrawString(*mSpriteBatch, buffer, 25, float2(20, 750), ColorRGBA::White);
+		mSpriteBatch->End();
+		mSpriteBatch->Flush();
+
 		if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
 		{
 			auto target = mCamera->GetLookAt();
@@ -304,10 +330,6 @@ protected:
 				up[0], up[1], up[2]);
 			fclose(f);
 		}
-
-		char buffer[255];
-		std::sprintf(buffer, "FPS: %d", mFramePerSecond);
-		mMainWindow->SetTitle(buffer);
 	}
 
 	void Render()
@@ -320,6 +342,48 @@ protected:
 		screenFB->Clear(CF_Color | CF_Depth, ColorRGBA::White, 1.0, 0);
 
 		mRenderPath->RenderScene();
+
+		auto center = mCamera->GetPosition() + mCamera->GetForward() * 200.0f;
+		DebugDrawManager::GetSingleton().DrawSphere(center, 10.0f, ColorRGBA::Red, true);
+
+
+		//const float3 Points[] = {
+		//	float3(1240, 50, -510),
+		//	float3(1240, 50, 610),
+		//	float3(-1350, 50, 610),
+		//	float3(-1350, 50, -510),
+
+		//	float3(750, 50, -120),
+		//	float3(750, 50, 230),
+		//	float3(-900, 50, 230),
+		//	float3(-900, 50, -100),
+		//};
+		//for (int i = 0; i < ARRAY_SIZE(Points); ++i)
+		//	DebugDrawManager::GetSingleton().DrawSphere(Points[i], 10.0f, ColorRGBA::Red, true);
+
+
+		//const int NumEllipses = 10;
+		//const int NumLightsEllipse = 20;
+
+		//for (int i = 0; i < NumEllipses; ++i)
+		//{
+		//	for (int j = 0; j < NumLightsEllipse; ++j)
+		//	{
+		//		float Height = Lerp(10.0f, 1200.0f, float(i) / NumEllipses);
+		//		float Angle = Mathf::TWO_PI / NumLightsEllipse * j;
+
+		//		float3 pos(950.0f * cosf(Angle), Height, 175.0f * sinf(Angle));
+
+		//		DebugDrawManager::GetSingleton().DrawSphere(pos, 10.0f, ColorRGBA::Red, true);
+		//	}
+		//}
+
+		DebugDrawManager::GetSingleton().DrawSphere(float3(-1320, 160, 40), 150, ColorRGBA::Red, true);
+
+		sceneMan->UpdateOverlayQueue();
+		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
+		for (const RenderQueueItem& renderItem : guiBucket) 
+			renderItem.Renderable->Render();
 
 		//auto bbox = mDudeSceneNode->GetWorldBoundingBox();
 		//DebugDrawManager::GetSingleton().DrawBoundingBox(bbox, ColorRGBA::Red);
@@ -369,13 +433,8 @@ protected:
 
 	int mFramePerSecond;
 
-	struct SkinnedSphere
-	{
-		String BoneName;
-		float Radius;
-		float Offset;
-	};
-	std::vector<SkinnedSphere> mDudeCollisionSpheres;
+	shared_ptr<Font> mFont;
+	SpriteBatch* mSpriteBatch;
 };
 
 

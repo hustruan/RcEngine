@@ -162,7 +162,7 @@ private:
 private:
 
 	enum { TileGroupSize = 32 };
-	enum { MaxNumLights = 512 };
+	enum { MaxNumLights = 1500 };
 
 	// Normal + Specular Shininess,  Albedo + Specular Intensity
 	shared_ptr<Texture> mGBuffer[2];
@@ -226,7 +226,7 @@ private:
 private:
 	
 	enum { TileGroupSize = 32 };
-	enum { MaxNumLights = 512 };
+	enum { MaxNumLights = 1500 };
 	enum { MaxNumLightsPerTile = 256 };
 
 	uint32_t mNumTileX, mNumTileY;

@@ -215,7 +215,7 @@ protected:
 
 	void Update(float deltaTime)
 	{
-
+		
 	}
 	
 	void Render()
@@ -235,7 +235,6 @@ protected:
 		mSpriteBatch->End();
 		mSpriteBatch->Flush();
 
-	
 		sceneMan->UpdateOverlayQueue();
 
 		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   

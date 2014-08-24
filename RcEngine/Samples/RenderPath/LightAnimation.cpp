@@ -3,26 +3,36 @@
 #include <Core/Environment.h>
 #include <Scene/SceneManager.h>
 #include <Scene/SceneNode.h>
-
-#define D3DX_PI 3.1415926f
+#include <Graphics/DebugDrawManager.h>
 
 const float MaxRadius = 100.0f;
 const float AttenuationStartFactor = 0.8f;
 
+const float AnimLineMoveSpeed = 100.0f;
+
+const float SponzaFloorHeightRange[][2] = { { 50.0f, 300.0f },
+											 { 480.0f, 730.0f } };
+const float3 SponzaExtent[] = {
+	float3(1240, 0, -510),
+	float3(1240, 0, 610),
+	float3(-1350, 0, 610),
+	float3(-1350, 0, -510),
+};
+
+const float3 SponzaCenter(-100, 0, 55);
+
 // Use a constant seed for consistency
 std::mt19937 rng(1337);
 
+std::uniform_real<float> SignedNormDist(-1.0f, 1.0f);
+std::uniform_real<float> NormDist(-1.0f, 1.0f);
 std::uniform_real<float> RadiusNormDist(0.0f, 1.0f);
-std::uniform_real<float> AngleDist(0.0f, 360.0f); 
-std::uniform_real<float> HeightDist(0.0f, 20.0f);
-std::uniform_real<float> AnimationSpeedDist(2.0f, 20.0f);
+std::uniform_real<float> AngleDist(0.0f, Mathf::TWO_PI); 
+std::uniform_real<float> AnimationSpeedDist(Mathf::ToRadian(5.0f), Mathf::ToRadian(10.0f));
 std::uniform_int<int> AnimationDirection(0, 1);
 std::uniform_real<float> HueDist(0.0f, 1.0f);
 std::uniform_real<float> IntensityDist(0.4f, 0.8f);
 std::uniform_real<float> AttenuationDist(40.0f, 80.0f);
-std::uniform_real<float> SpotInnerAngleDist(30.0f, 45.0f);
-std::uniform_real<float> SpotOuterAngleDist(30.0f, 45.0f);
-std::uniform_real<float> SpotDropoffDist(0.0f, 50.0f);
 
 namespace {
 
@@ -46,9 +56,8 @@ float3 HueToRGB(float hue)
 
 }
 
-
 LightAnimation::LightAnimation()
-	: mTotalTime(0.0f)
+	: mNumTotalLights(0)
 {
 
 }
@@ -60,176 +69,217 @@ LightAnimation::~LightAnimation()
 
 void LightAnimation::Move( float elapsedTime )
 {
-	mTotalTime += elapsedTime;
+	MoveAnimLine(elapsedTime);
+	MoveAnimEllipse(elapsedTime);
+}
 
-	// Update positions of active lights
-	for (unsigned int i = 0; i < mLights.size(); ++i) 
+void LightAnimation::DebugDrawLights()
+{
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+	const LightQueue& lightQueue = sceneMan->GetLightQueue();
+
+	for (Light* light : lightQueue)
 	{
-		// Only animate point light
-		if (mLights[i].Light->GetLightType() == LT_PointLight)
+		if (light->GetLightType() == LT_PointLight)
 		{
-			float angle = mLights[i].Angle + mTotalTime * mLights[i].AnimationSpeed;
-
-			float3 lightPos = float3(mLights[i].Radius * cosf(angle),
-									 mLights[i].Height,
-									 mLights[i].Radius * sinf(angle));
-
-			mLights[i].Light->SetPosition(lightPos);
-		}		
+			ColorRGBA color(light->GetLightColor().X(), light->GetLightColor().Y(), light->GetLightColor().Y(), 1.0f);
+			DebugDrawManager::GetSingleton().DrawSphere(light->GetDerivedPosition(), light->GetRange() * 0.5f, color, true);
+		}
 	}
 }
 
-void LightAnimation::RandonPointLight( int numLight )
+void LightAnimation::SetupLights()
 {
-	SceneManager& sceneMan = *Environment::GetSingleton().GetSceneManager();
+	CreateLightsWithAnimStatic();
+	CreateLightsWithAnimLine();
+	CreateLightsWithAnimEllipse();
+}
 
-	for (int i = 0; i < numLight; ++i)
+void LightAnimation::CreateLightsWithAnimStatic()
+{
+	const float3 SponzaExtentInner[] = {
+		float3(750,  10, -120),
+		float3(750,  10, 230),
+		float3(-950, 10, 230),
+		float3(-950, 10, -100) };
+
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+
+	const int NumLightX = 40;
+	const int NumLightZ = 12;
+	for (int i = 0; i < NumLightZ; ++i)
 	{
-		LightParam lightParam;
+		float t = float(i) / NumLightZ;
+		float3 start = Lerp(SponzaExtentInner[0], SponzaExtentInner[1], t);
+		float3 end = Lerp(SponzaExtentInner[3], SponzaExtentInner[2], t);
 
-		lightParam.Light = sceneMan.CreateLight("PointLight" + std::to_string(i), LT_PointLight);
-		lightParam.Light->SetLightColor( IntensityDist(rng) * HueToRGB(HueDist(rng)) );
-		lightParam.Light->SetRange(AttenuationDist(rng));
+		for (int j = 0; j < NumLightX; ++j)
+		{
+			Light* light = sceneMan->CreateLight("", LT_PointLight);
+			light->SetPosition(Lerp(start, end, float(j)/NumLightX));
 
-		//light.LightAttenuation.Y() = AttenuationDist(rng);
-		//light.LightAttenuation.X() = AttenuationStartFactor * light.LightAttenuation.X();
-		
-		lightParam.Radius = std::sqrt(RadiusNormDist(rng)) * MaxRadius;
-		lightParam.Angle = AngleDist(rng) * D3DX_PI / 180.0f;
-		lightParam.Height = HeightDist(rng);
-		// Normalize by arc length
-		lightParam.AnimationSpeed = (AnimationDirection(rng) * 2 - 1) * AnimationSpeedDist(rng) / lightParam.Radius;
+			float3 color = IntensityDist(rng) * HueToRGB(HueDist(rng));
+			light->SetLightColor(color);
 
-		mLights.push_back(lightParam);
+			light->SetLightIntensity(1.0);
+			light->SetAttenuation(1.0f, 0.0f);
+			light->SetRange(25.0f);
+			sceneMan->GetRootSceneNode()->AttachObject(light);
+
+			mNumTotalLights++;
+		}
 	}
-
-	Move(0);
 }
 
-void LightAnimation::AddPointLight( const float3& position )
+void LightAnimation::CreateLightsWithAnimLine()
 {
-	SceneManager& sceneMan = *Environment::GetSingleton().GetSceneManager();
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+	
+	const int NumBandLights[] = { 10, 20 };
 
-	LightParam lightParam;
-
-	lightParam.Light = sceneMan.CreateLight("PointLight" + std::to_string(mLights.size()), LT_PointLight);
-	lightParam.Light->SetLightColor(HueToRGB(HueDist(rng)));
-	lightParam.Light->SetLightIntensity(IntensityDist(rng));
-	lightParam.Light->SetRange(AttenuationDist(rng));
-	lightParam.Light->SetAttenuation(1.0f, 0.0f);
-	lightParam.Light->SetPosition(position);
-	sceneMan.GetRootSceneNode()->AttachObject(lightParam.Light);
-
-	//light.LightAttenuation.Y() = AttenuationDist(rng);
-	//light.LightAttenuation.X() = AttenuationStartFactor * light.LightAttenuation.X();
-
-	lightParam.Radius = std::sqrt(position.X()*position.X() + position.Z()*position.Z());
-	lightParam.Angle = atan2f(position.Z(), position.X());
-	lightParam.Height = position.Y();
-	// Normalize by arc length
-	lightParam.AnimationSpeed = (AnimationDirection(rng) * 2 - 1) * AnimationSpeedDist(rng) / lightParam.Radius;
-
-	mLights.push_back(lightParam);
-}
-
-
-//void LightAnimation::RecordLight( const CFirstPersonCamera& camera, UINT uMsg, WPARAM wParam, LPARAM lParam )
-//{
-//	switch(uMsg)
-//	{
-//	case WM_KEYDOWN:
-//		{
-//			if (wParam == '1' + LT_PointLight)
-//			{
-//				Light light;
-//				
-//				light.LightType = LT_PointLight;
-//
-//				light.LightColor = IntensityDist(rng) * HueToRGB(HueDist(rng));
-//				light.LightAttenuation.Y() = AttenuationDist(rng);
-//				light.LightAttenuation.X() = AttenuationStartFactor * light.LightAttenuation.Y();
-//
-//				const float3& cameraPos = *camera.GetEyePt();
-//				light.Height = cameraPos.Y();
-//				light.Radius = (std::min)(sqrtf(cameraPos.X()*cameraPos.X()+cameraPos.z*cameraPos.z), 100.0f);
-//				light.Angle = atan2f(cameraPos.z, cameraPos.X());
-//				if (light.Angle < 0) light.Angle += 2.0f * D3DX_PI;
-//				
-//				// Normalize by arc length
-//				light.AnimationSpeed = (AnimationDirection(rng) * 2 - 1) * AnimationSpeedDist(rng) / light.Radius;
-//				
-//				mLights.push_back(light);
-//
-//				Move(0);
-//			}
-//		}
-//		break;
-//	}
-//}
-
-//void LightAnimation::SaveLights( const String& filename )
-//{
-//	if (mLights.empty())
-//		return;
-//
-//	stream* pFile = fopen(filename.c_str(), "w");
-//	if (pFile)
-//	{
-//		for (size_t i = 0; i < mLights.size(); ++i)
-//		{
-//			float3 lightColor = mLights[i].Light->GetLightColor();
-//			float3 lightPosition = mLights[i].Light->GetDerivedPosition();
-//			float intensity = mLights[i].Light->GetLightIntensity();
-//			float range = mLights[i].Light->GetRange();
-//
-//			fprintf(pFile, "%f %f %f %f %f %f %f %f \n", lightPosition[0], lightPosition[1], lightPosition[2],
-//												  lightColor[0], lightColor[1], lightColor[2], 
-//												  intensity, range);
-//		}
-//
-//		fclose(pFile);
-//	}
-//}
-
-void LightAnimation::LoadLights( const std::string& filename )
-{
-	SceneManager& sceneMan = *Environment::GetSingleton().GetSceneManager();
-
-	float3 lightColor, lightPosition;
-	float intensity, range;
-
-	std::ifstream stream(filename);
-	std::string line;
-	while(std::getline(stream, line))
+	for (int iFloor = 0; iFloor < 2; ++iFloor)
 	{
-		std::stringstream ss;
-		ss << line;
-		ss >> lightPosition[0]>>lightPosition[1]>>lightPosition[2]>>
-			  lightColor[0]>>lightColor[1]>>lightColor[2]>>intensity>>range;
+		for (int iLine = 0; iLine < 4; ++iLine)
+		{
+			const int NumLight = NumBandLights[iLine & 0x1];
+			const float3 LeftPos = SponzaExtent[iLine];
+			const float3 RightPos = SponzaExtent[(iLine+1)%4];
 
-		LightParam lightParam;
+			for (int32_t iLight = 0; iLight <  NumLight; ++iLight)
+			{
+				float3 position = Lerp(LeftPos, RightPos, float(iLight) / NumLight);
 
-		lightParam.Light = sceneMan.CreateLight("PointLight" + std::to_string(mLights.size()), LT_PointLight);
-		lightParam.Light->SetLightColor(lightColor);
-		lightParam.Light->SetLightIntensity(intensity);
-		lightParam.Light->SetRange(range);
-		lightParam.Light->SetAttenuation(1.0f, 0.0f);
-		lightParam.Light->SetPosition(lightPosition);
-		sceneMan.GetRootSceneNode()->AttachObject(lightParam.Light);
+				position.Y() = SponzaFloorHeightRange[iFloor][0];
 
-		//light.LightAttenuation.Y() = AttenuationDist(rng);
-		//light.LightAttenuation.X() = AttenuationStartFactor * light.LightAttenuation.X();
+				//position.Y() = Lerp(SponzaFloorHeightRange[iFloor][0], SponzaFloorHeightRange[iFloor][1], NormDist(rng));
 
-		lightParam.Radius = std::sqrt(lightPosition.X()*lightPosition.X() + lightPosition.Z()*lightPosition.Z());
-		lightParam.Angle = atan2f(lightPosition.Z(), lightPosition.X());
-		lightParam.Height = lightPosition.Y();
-		// Normalize by arc length
-		lightParam.AnimationSpeed = (AnimationDirection(rng) * 2 - 1) * AnimationSpeedDist(rng) / lightParam.Radius;
+				float3 color = IntensityDist(rng) * HueToRGB(HueDist(rng));
 
-		mLights.push_back(lightParam);
+				Light* light = sceneMan->CreateLight("", LT_PointLight);
+				light->SetPosition(position);
+				light->SetLightColor(color);
+				light->SetLightIntensity(1.0);
+				light->SetAttenuation(1.0f, 0.0f);
+				light->SetRange(100);
+				sceneMan->GetRootSceneNode()->AttachObject(light);
+
+				LineAnimatedLight aminLight;
+				aminLight.Light = light;
+				aminLight.LineIndex = iLine;
+				aminLight.FloorIndex = iFloor;
+				mLineAnimatedLights.push_back(aminLight);
+
+				mNumTotalLights++;
+			}
+		}
 	}
 }
 
+void LightAnimation::MoveAnimLine( float elapsedTime )
+{
+	for (LineAnimatedLight& lineLight : mLineAnimatedLights)
+	{
+		float3 pos = lineLight.Light->GetDerivedPosition();
+
+		switch (lineLight.LineIndex)
+		{
+		case 0:
+			{
+				pos.Z() += AnimLineMoveSpeed * elapsedTime;
+				if (pos.Z() > SponzaExtent[1].Z())
+				{
+					pos.Z() = SponzaExtent[1].Z();
+					lineLight.LineIndex = 1;
+				}
+			}
+			break;
+		case 1:
+			{
+				pos.X() -= AnimLineMoveSpeed * elapsedTime;
+				if (pos.X() < SponzaExtent[2].X())
+				{
+					pos.X() = SponzaExtent[2].X();
+					lineLight.LineIndex = 2;
+				}
+			}
+			break;
+		case 2:
+			{
+				pos.Z() -= AnimLineMoveSpeed * elapsedTime;
+				if (pos.Z() < SponzaExtent[3].Z())
+				{
+					pos.Z() = SponzaExtent[3].Z();
+					lineLight.LineIndex = 3;
+				}
+			}
+			break;
+		case 3:
+			{
+				pos.X() += AnimLineMoveSpeed * elapsedTime;
+				if (pos.X() > SponzaExtent[0].X())
+				{
+					pos.X() = SponzaExtent[0].X();
+					lineLight.LineIndex = 0;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+
+		lineLight.Light->SetPosition(pos);
+	}
+}
+
+void LightAnimation::CreateLightsWithAnimEllipse()
+{
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+
+	const int NumEllipses = 10;
+	const int NumLightsEllipse = 40;
+
+	for (int i = 0; i < NumEllipses; ++i)
+	{
+		for (int j = 0; j < NumLightsEllipse; ++j)
+		{
+			EllipseAnimatedLight aminLight;
+
+			aminLight.EllipseWidth = 950.0f;
+			aminLight.EllipseHeight = 175.0f;
+			aminLight.Height = Lerp(100.0f, 1000.0f, float(i) / NumEllipses);
+
+			//aminLight.Angle = Mathf::TWO_PI / NumLightsEllipse * j;
+			aminLight.Angle = AngleDist(rng);
+			aminLight.AnimationSpeed = (AnimationDirection(rng) * 2 - 1) * AnimationSpeedDist(rng);
+
+			float3 pos(aminLight.EllipseWidth * cosf(aminLight.Angle), aminLight.Height, aminLight.EllipseHeight * sinf(aminLight.Angle));
+			float3 color = IntensityDist(rng) * HueToRGB(HueDist(rng));
+
+			Light* light = sceneMan->CreateLight("", LT_PointLight);
+			light->SetPosition(pos);
+			light->SetLightColor(color);
+			light->SetLightIntensity(1.0);
+			light->SetAttenuation(1.0f, 0.0f);
+			light->SetRange(100);
+			sceneMan->GetRootSceneNode()->AttachObject(light);
+
+			aminLight.Light = light;
+			mEllipseAnimatedLights.push_back(aminLight);
+
+			mNumTotalLights++;
+		}
+	}
+}
+
+void LightAnimation::MoveAnimEllipse( float elapsedTime )
+{
+	for (EllipseAnimatedLight& aminLight : mEllipseAnimatedLights)
+	{
+		aminLight.Angle += aminLight.AnimationSpeed * elapsedTime;
+		float3 pos(aminLight.EllipseWidth * cosf(aminLight.Angle), aminLight.Height, aminLight.EllipseHeight * sinf(aminLight.Angle));
+		aminLight.Light->SetPosition(pos);
+	}
+}
 
 
 
