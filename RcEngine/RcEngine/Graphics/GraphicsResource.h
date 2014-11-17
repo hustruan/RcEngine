@@ -96,7 +96,7 @@ public:
 	inline uint32_t GetMipLevels() const				{ return mMipLevels; }
 	inline uint32_t GetCreateFlags() const				{ return mCreateFlags; }
 
-	inline shared_ptr<ShaderResourceView> GetShaderResourceView() const { return mTextureSRV; }
+	inline const shared_ptr<ShaderResourceView>& GetShaderResourceView() const { return mTextureSRV; }
 
 	inline uint32_t GetWidth() const		{ return mWidth; }
 	inline uint32_t GetHeight() const		{ return mHeight; }

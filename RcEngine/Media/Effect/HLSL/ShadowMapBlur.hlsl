@@ -4,10 +4,10 @@ Texture2D ShadowMapBlurX;
 SamplerState ShadowSampler;
 int ArraySlice;
 
-void GaussianBlurXPS(in float2 iTex : TEXCOORD0,
+void ShadowBlurXPS(in float2 iTex : TEXCOORD0,
 				     out float2 oFragColor : SV_Target0)
 {
-	float2 filtered  = float2(0.0);
+	float2 filtered  = 0.0;
         
     // box filter
     filtered  += ShadowMap.SampleLevel(ShadowSampler, float3(iTex, ArraySlice), 0, int2(-2, 0)).rg;
@@ -34,10 +34,10 @@ void GaussianBlurXPS(in float2 iTex : TEXCOORD0,
 }         
 
         
-void GaussianBlurYPS(in float2 iTex : TEXCOORD0,
+void ShadowBlurYPS(in float2 iTex : TEXCOORD0,
 				     out float2 oFragColor : SV_Target0)
 {
-	float2 filtered  = float2(0.0);
+	float2 filtered  = 0.0;
         
     // box filter
     filtered  += ShadowMapBlurX.SampleLevel(ShadowSampler, iTex, 0, int2(-2, 0)).rg;

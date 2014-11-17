@@ -74,7 +74,7 @@ void CharacterApp::LoadContent()
 	Light* mDirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
 	mDirLight->SetDirection(float3(0, -1, 0.5));
 	mDirLight->SetLightColor(float3(1, 1, 1));
-	mDirLight->SetCastShadow(false);
+	mDirLight->SetCastShadow(true);
 	sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 
 

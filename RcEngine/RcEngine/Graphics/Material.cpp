@@ -251,50 +251,18 @@ void Material::ApplyMaterial( const float4x4& world )
 	RenderDevice* renderDevice = Environment::GetSingleton().GetRenderDevice();
 	const shared_ptr<Camera> camera = renderDevice->GetCurrentFrameBuffer()->GetCamera();
 
-	for (auto effectParam : mAutoBindings)
+	for (EffectParameter* effectParam : mAutoBindings)
 	{
 		switch (effectParam->GetParameterUsage())
 		{
-		case EPU_WorldMatrix:
-			{
-				effectParam->SetValue(world);
-			}		
-			break;
-		case EPU_ViewMatrix:
-			{
-				effectParam->SetValue(camera->GetViewMatrix());
-			}			
-			break;
-		case EPU_ProjectionMatrix:
-			{
-				effectParam->SetValue(camera->GetEngineProjMatrix());
-			}	
-			break;
-		case EPU_WorldViewMatrix:
-			{
-				effectParam->SetValue(world * camera->GetViewMatrix());
-			}		
-			break;
-		case EPU_ViewProjectionMatrix:
-			{
-				effectParam->SetValue(camera->GetEngineViewProjMatrix());
-			}			
-			break;	
-		case EPU_WorldViewProjection:
-			{
-				effectParam->SetValue(world * camera->GetEngineViewProjMatrix());
-			}			
-			break;
-		case EPU_WorldInverseTranspose:
-			{
-				effectParam->SetValue(world.Inverse().Transpose());
-			}
-			break;
-		case EPU_WorldMatrixInverse:
-			{
-				effectParam->SetValue(world.Inverse());
-			}
-			break;
+		case EPU_WorldMatrix:			{ effectParam->SetValue(world); } break;
+		case EPU_ViewMatrix:			{ effectParam->SetValue(camera->GetViewMatrix()); }	break;
+		case EPU_ProjectionMatrix:		{ effectParam->SetValue(camera->GetEngineProjMatrix()); } break;
+		case EPU_WorldViewMatrix:		{ effectParam->SetValue(world * camera->GetViewMatrix()); }	break;
+		case EPU_ViewProjectionMatrix:  { effectParam->SetValue(camera->GetEngineViewProjMatrix()); } break;	
+		case EPU_WorldViewProjection:   { effectParam->SetValue(world * camera->GetEngineViewProjMatrix()); } break;
+		case EPU_WorldInverseTranspose: { effectParam->SetValue(world.Inverse().Transpose()); } break;
+		case EPU_WorldMatrixInverse:	{ effectParam->SetValue(world.Inverse()); } break;
 		/*case EPU_ViewMatrixInverse:
 			{
 				effectParam->SetValue(camera->GetInvViewMatrix());
@@ -305,42 +273,16 @@ void Material::ApplyMaterial( const float4x4& world )
 				effectParam->SetValue(camera->GetInvProjMatrix());
 			}
 			break;*/
-		case EPU_Material_Ambient_Color:
-			{
-				effectParam->SetValue(mAmbient);
-			}
-			break;
-		case EPU_Material_Diffuse_Color:
-			{
-				effectParam->SetValue(mDiffuse);
-			}
-			break;
-		case EPU_Material_Specular_Color:
-			{
-				effectParam->SetValue(mSpecular);
-			}
-			break;
-		case EPU_Material_Power:
-			{
-				effectParam->SetValue(mPower);
-			}
-			break;
+		case EPU_Camera_Position:         { effectParam->SetValue(camera->GetPosition()); } break;
+		case EPU_Material_Ambient_Color:  { effectParam->SetValue(mAmbient); } break;
+		case EPU_Material_Diffuse_Color:  { effectParam->SetValue(mDiffuse); } break;
+		case EPU_Material_Specular_Color: { effectParam->SetValue(mSpecular); } break;
+		case EPU_Material_Power:		  { effectParam->SetValue(mPower); } break;
 		case EPU_Material_DiffuseMap:
 		case EPU_Material_SpecularMap:
-		case EPU_Material_NormalMap:
-			{
-				effectParam->SetValue(mTextureSRVs[effectParam->GetName()]);
-			}
-			break;
-		case EPU_Camera_Position:
-			{
-				effectParam->SetValue(camera->GetPosition());
-			}
-			break;
+		case EPU_Material_NormalMap:	  { effectParam->SetValue(mTextureSRVs[effectParam->GetName()]); } break;
 		default:
-			{
-
-			}
+			{ }
 		}
 	}
 }
