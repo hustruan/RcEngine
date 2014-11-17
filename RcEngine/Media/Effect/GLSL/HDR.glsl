@@ -1,9 +1,4 @@
-[[Fragment==CopyColor]]
-
-/**
- * Todo: Move common code out of [[]] shader section,
- * so those code can shared in file scope.
- */
+[[Fragment=CopyColor]]
 
 uniform sampler2D HDRBuffer;
 uniform sampler2D DepthBuffer;
@@ -17,7 +12,7 @@ void main()
 	oFragColor = texelFetch(HDRBuffer, samplePos, 0);
 }
 
-[[Fragment==CopyColorDepth]]
+[[Fragment=CopyColorDepth]]
 
 uniform sampler2D HDRBuffer;
 uniform sampler2D DepthBuffer;

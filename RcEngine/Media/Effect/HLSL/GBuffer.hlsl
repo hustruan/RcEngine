@@ -21,6 +21,6 @@ void GBufferPS(in VSOutput input,
 	//normal = normal * 0.5 + 0.5;
 	//CompressUnsignedNormalToNormalsBuffer(normal);	
 
-	oFragColor0 = float4(normal, material.Shininess / 255.0);
+	oFragColor0 = float4(normal, material.Shininess);
 	oFragColor1 = float4(material.DiffuseAlbedo, dot(material.SpecularAlbedo, float3(0.2126, 0.7152, 0.0722)) );	 // Specular luminance
 }

@@ -26,8 +26,8 @@
   <!-- SamplerState will used in this Effect -->
   <Sampler name="ShadowSampler">
     <State name="Filter" value="Min_Mag_Mip_Linear"/>
-    <State name="AddressU" value="Wrap"/>
-    <State name="AddressV" value="Wrap"/>
+    <State name="AddressU" value="Clamp"/>
+    <State name="AddressV" value="Clamp"/>
   </Sampler>
 
   <!-- Effect techniques -->

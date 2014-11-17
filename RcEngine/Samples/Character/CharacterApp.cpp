@@ -31,6 +31,8 @@
 #include <Math/Frustum.h>
 #include <fstream>
 
+String gTitle;
+
 CharacterApp::CharacterApp( const String& config )
 	: Application(config), 
 	  mFramePerSecond(60)
@@ -59,6 +61,9 @@ void CharacterApp::Initialize()
 
 	DebugDrawManager::Initialize();
 	DebugDrawManager::GetSingleton().OnGraphicsInitialize();
+
+	gTitle = (mAppSettings.RHDeviceType == RD_OpenGL) ? "OpenGL Application" : "Direct3D11 Application";
+	mMainWindow->SetTitle(gTitle);	
 }
 
 void CharacterApp::LoadContent()
@@ -120,23 +125,22 @@ void CharacterApp::Update( float deltaTime )
 
 	//mCameraControler->Update(deltaTime);
 
-	if ( InputSystem::GetSingleton().KeyPress(KC_P) )
-	{
-		auto target = mCamera->GetLookAt();
-		auto eye = mCamera->GetPosition();
-		auto up = mCamera->GetUp();
+	//if ( InputSystem::GetSingleton().KeyPress(KC_P) )
+	//{
+	//	auto target = mCamera->GetLookAt();
+	//	auto eye = mCamera->GetPosition();
+	//	auto up = mCamera->GetUp();
 
-		FILE* f = fopen("E:/camera.txt", "w");
-		fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
-			eye[0], eye[1], eye[2], 
-			target[0], target[1], target[2],
-			up[0], up[1], up[2]);
-		fclose(f);
-	}
+	//	FILE* f = fopen("E:/camera.txt", "w");
+	//	fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
+	//		eye[0], eye[1], eye[2], 
+	//		target[0], target[1], target[2],
+	//		up[0], up[1], up[2]);
+	//	fclose(f);
+	//}
 
-	char buffer[255];
-	std::sprintf(buffer, "FPS: %d", mFramePerSecond);
-	mMainWindow->SetTitle(buffer);
+	String title = gTitle + " FPS: " + std::to_string(mFramePerSecond);
+	mMainWindow->SetTitle(title);
 }
 
 void CharacterApp::Render()

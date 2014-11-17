@@ -1,4 +1,5 @@
 #include <MainApp/Application.h>
+#include <MainApp/Window.h>
 #include <Graphics/RenderDevice.h>
 #include <Graphics/FrameBuffer.h>
 #include <Scene/SceneManager.h>
@@ -39,6 +40,9 @@ protected:
 		InitGUIWindow1();
 		InitGUIWindow2();
 		InitGUIWindow3();
+
+		String title = (mAppSettings.RHDeviceType == RD_OpenGL) ? "OpenGL Application" : "Direct3D11 Application";
+		mMainWindow->SetTitle(title);	
 	}
 
 	void InitGUIWindow1()

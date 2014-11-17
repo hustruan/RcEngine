@@ -1,5 +1,6 @@
 #include "RenderPathApp.h"
 #include <MainApp/Application.h>
+#include <MainApp/Window.h>
 #include <Graphics/CameraController1.h>
 #include <Graphics/RenderPath.h>
 #include <Resource/ResourceManager.h>
@@ -62,6 +63,9 @@ protected:
 		mCameraControler->Update(0);
 
 		InitGUI();
+
+		String title = (mAppSettings.RHDeviceType == RD_OpenGL) ? "OpenGL Application" : "Direct3D11 Application";
+		mMainWindow->SetTitle(title);	
 	}
 
 	void InitGUI()
@@ -136,9 +140,9 @@ protected:
 		if (mAnimateLights)
 			mLightAnimation.Move(deltaTime);
 
-		wchar_t buffer[128];
+	/*	wchar_t buffer[128];
 		std::swprintf(buffer, L"FPS: %d", mFramePerSecond);
-		mFPSLabel->SetText(buffer);
+		mFPSLabel->SetText(buffer);*/
 	}
 
 	void Render()
