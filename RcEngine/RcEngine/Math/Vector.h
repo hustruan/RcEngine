@@ -23,8 +23,8 @@ public:
 	Vector(Real fX, Real fY, Real fZ);
 	Vector(Real fX, Real fY, Real fZ, Real fW);
 
-	Vector(const Real* fTuple);
-	Vector(Real value);
+	explicit Vector(const Real* fTuple);
+	explicit Vector(Real value);
 		
 	template<typename T>
 	Vector(const Vector<T, Size>& rhs);
@@ -96,9 +96,6 @@ inline Real Dot( const Vector<Real, Size>& lfs, const Vector<Real, Size>& rhs );
 
 template< typename Real, int32_t Size >
 inline Vector<Real, Size> Normalize(const Vector<Real, Size>& vec);
-
-template< typename Real, int32_t Size >
-inline Vector<Real, Size> Lerp(const Vector<Real, Size>& vec1, const Vector<Real, Size>& vec2, float s);
 
 template< typename Real, int32_t Size >
 inline Vector<Real, Size> Clamp( const Vector<Real, Size>& value, const Vector<Real, Size>& min,  const Vector<Real, Size>& max );

@@ -11,6 +11,7 @@
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
       <PixelShader file="ShadowMapBlur" entry="ShadowBlurXPS"/>
+      <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>
   
@@ -18,6 +19,7 @@
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
       <PixelShader file="ShadowMapBlur" entry="ShadowBlurYPS"/>
+      <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>
 

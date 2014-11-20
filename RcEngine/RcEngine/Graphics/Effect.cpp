@@ -498,6 +498,7 @@ void Effect::LoadImpl()
 				{
 					String value = stateNode->Attribute("value")->ValueString();
 					desc.ComparisonFunc = (CompareFunction)Internal::SamplerDefs::GetSingleton().GetSamplerState(value);
+					desc.CompareSampler = true;
 				}
 				else if (stateName == "BorderColor")
 				{
@@ -547,6 +548,17 @@ void Effect::UnloadImpl()
 shared_ptr<Resource> Effect::FactoryFunc( ResourceManager* creator, ResourceHandle handle, const String& name, const String& group )
 {
 	return std::make_shared<Effect>(creator, handle, name, group);
+}
+
+EffectConstantBuffer* Effect::GetConstantBuffer( const String& name ) const
+{
+	for (EffectConstantBuffer* cb : mConstantBuffers)
+	{
+		if (cb->GetName() == name)
+			return cb;
+	}
+
+	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////

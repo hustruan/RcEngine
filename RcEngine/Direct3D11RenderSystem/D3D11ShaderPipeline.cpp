@@ -37,6 +37,33 @@ private:
 	EffectConstantBuffer* GlobalCBuffer;
 	TimeStamp UpdateTimeStamp;
 };
+
+// For boolean type
+template<>
+struct ShaderParameterCommit<bool>
+{
+	ShaderParameterCommit(EffectConstantBuffer* globalCB, EffectParameter* param, uint32_t offset) 
+		: Param(param), GlobalCBuffer(globalCB), Offset(offset), UpdateTimeStamp(0) {}
+
+	void operator() ()
+	{
+		if (Param->GetTimeStamp() != UpdateTimeStamp)
+		{
+			bool value;  Param->GetValue(value);
+
+			*(reinterpret_cast<int*>(GlobalCBuffer->GetRawData(Offset))) = value ? 1 : 0;
+
+			GlobalCBuffer->MakeDirty();
+			UpdateTimeStamp = Param->GetTimeStamp();
+		} 
+	}
+
+private:
+	uint32_t Offset;
+	EffectParameter* Param;
+	EffectConstantBuffer* GlobalCBuffer;
+	TimeStamp UpdateTimeStamp;
+};
 	
 template<>
 struct ShaderParameterCommit<float4x4>
@@ -81,7 +108,7 @@ struct ShaderParameterCommit<T*>
 			uint8_t* pData = GlobalCBuffer->GetRawData(Offset);
 			for (uint32_t i = 0; i < Param->GetElementSize(); ++i)
 			{
-				*(reinterpret_cast<T*>(pData + HLSL_ARRAY_STRIDE)) = pValue[i]; 
+				*(reinterpret_cast<T*>(pData + i * HLSL_ARRAY_STRIDE)) = pValue[i]; 
 			}
 	
 			GlobalCBuffer->MakeDirty();

@@ -23,22 +23,36 @@
       <State name="AddressV" value="Wrap"/>
   </Sampler>
 
-  <!-- Effect techniques -->
-  <Technique name="VSM">
-	  <Pass name="p0">
-		  <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
-		  <PixelShader file="ShadowMapGen" entry="ShadowMapVSM">
-		    <Macro name="VSM"/>
-		  </PixelShader>
-	  </Pass>
-  </Technique>
-
-  <!-- pission disc PCF-->
+  <Sampler name="PCFSampler">
+    <State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+    <State name="AddressU" value="Border"/>
+    <State name="AddressV" value="Border"/>
+    <State name="AddressW" value="Border"/>
+    <State name="BorderColor" r="1" g="1" b="1" a="1"/>
+    <State name="ComparisonFunc" value="Less"/>
+  </Sampler>
+  
+  <!-- Possion disc PCF-->
   <Technique name="PCF">
 	  <Pass name="p0">
       <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
 	  </Pass>
   </Technique>
+
+  <!-- 
+  <Technique name="VSM">
+    <Pass name="p0">
+      <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+      <PixelShader file="ShadowMapGen" entry="ShadowMapVSM"/>
+    </Pass>
+  </Technique>
+  
+  <Technique name="EVSM">
+    <Pass name="p0">
+      <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+      <PixelShader file="ShadowMapGen" entry="ShadowMapEVSM"/>
+    </Pass>
+  </Technique>-->
   
   <Technique name="DepthPre">
     <Pass name="p0">
@@ -63,7 +77,9 @@
   <Technique name="DirectionalLighting">
     <Pass name="p0">
       <VertexShader file="Model" entry="ModelVS"/>
-      <PixelShader file="ForwardLighting" entry="DirectionalLightingPS"/>
+      <PixelShader file="ForwardLighting" entry="DirectionalLightingPS">
+        <Macro name="PCF"/>
+      </PixelShader>
       <!--<State name="FillMode" value="WireFrame"/>-->
     </Pass>
   </Technique>

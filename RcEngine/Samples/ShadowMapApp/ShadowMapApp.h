@@ -24,6 +24,7 @@ protected:
 
 private:
 
+	int mFramePerSecond;
 	RenderDevice* mDevice;
 	shared_ptr<Camera> mMainCamera;
 	shared_ptr<RenderPath> mRenderPath;

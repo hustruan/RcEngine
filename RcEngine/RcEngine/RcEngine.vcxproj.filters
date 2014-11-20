@@ -43,9 +43,6 @@
     <Filter Include="Asset\Material">
       <UniqueIdentifier>{2f127fa8-5ee8-4f16-9313-c41678db02ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Asset\HLSL\DeepGBufferRadiosity">
-      <UniqueIdentifier>{7b69f9ca-7aed-4fe1-b09c-1825aeb3d011}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CompileConfig.h">
@@ -569,6 +566,9 @@
     <ClCompile Include="Graphics\Font.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\pfm.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Math\BoundingBox.inl">
@@ -637,9 +637,6 @@
     <None Include="..\Media\Effect\GLSL\GBuffer.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
-    <None Include="..\Media\Effect\GLSL\ToneMap.glsl">
-      <Filter>Asset\GLSL</Filter>
-    </None>
     <None Include="..\Media\Effect\GLSL\DebugView.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
@@ -668,6 +665,12 @@
       <Filter>Asset\GLSL</Filter>
     </None>
     <None Include="..\Media\Effect\GLSL\ShadowMapBlur.glsl">
+      <Filter>Asset\GLSL</Filter>
+    </None>
+    <None Include="..\Media\Effect\GLSL\PSSM.glsl">
+      <Filter>Asset\GLSL</Filter>
+    </None>
+    <None Include="..\Media\Effect\GLSL\HDR.glsl">
       <Filter>Asset\GLSL</Filter>
     </None>
   </ItemGroup>
@@ -702,16 +705,10 @@
     <FxCompile Include="..\Media\Effect\HLSL\PSSM.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\RenderCascadeScene.hlsl">
-      <Filter>Asset\HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\ShadowMapGen.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\GBuffer.hlsl">
-      <Filter>Asset\HLSL</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\ToneMap.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DebugView.hlsl">
@@ -729,13 +726,16 @@
     <FxCompile Include="..\Media\Effect\HLSL\Font.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\GBuffer.hlsl">
-      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\ReconstructCSZ.hlsl">
-      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
-    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\ShadowMapBlur.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\HDR.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\PCF.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\VSM.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
   </ItemGroup>
@@ -753,9 +753,6 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\AlphaTest.effect.xml">
-      <Filter>Asset\Effect</Filter>
-    </Xml>
-    <Xml Include="..\Media\Effect\HDRToneMap.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\DebugView.effect.xml">
@@ -782,10 +779,11 @@
     <Xml Include="..\Media\Effect\FontOutline.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\LambertianOnly.hlsl">
-      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
-    </Text>
+    <Xml Include="..\Media\Effect\ShadowMapBlur.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\HDR.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

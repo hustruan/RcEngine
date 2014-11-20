@@ -21,6 +21,9 @@ RcEngine is a graphics engine implemented in C++,  inspired by OGRE and [KlayGE]
 
 ###Samples:
 
+**Tile Based Deferred Shading**
+![](https://github.com/hustruan/RcEngine/blob/master/RcEngine/Samples/RenderPathApp.png)
+
 **GUI**
 ![](https://github.com/hustruan/RcEngine/blob/master/RcEngine/Samples/GUIApp.png)
 

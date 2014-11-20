@@ -28,7 +28,7 @@ public:
          * to this bucket is that 3D objects will not be rendered correctly
          * due to lack of depth testing.
          */
-        BucketBackground,
+        BucketBackground = 1UL << 0,
 
 		 /**
          * The renderer will try to find the optimal order for rendering all 
@@ -36,7 +36,7 @@ public:
          * You should use this mode for most normal objects, except transparent
          * ones, as it could give a nice performance boost to your application.
          */
-        BucketOpaque,
+        BucketOpaque = 1UL << 1,
         
         /**
          * This is the mode you should use for object with
@@ -46,7 +46,7 @@ public:
          * using Opaque) through the transparent parts of the newly drawn
          * object. 
          */
-        BucketTransparent,
+        BucketTransparent = 1UL << 2,
         
             
         /**
@@ -56,7 +56,7 @@ public:
          * also objects that do not write to the depth buffer such as
          * particle emitters.
          */
-        BucketTranslucent,
+        BucketTranslucent = 1UL << 3,
         
         /**
          * This is a special mode, for drawing 2D object
@@ -66,7 +66,13 @@ public:
          * the resolution of the screen rendered to. Any spatials
          * outside of that range are culled.
          */
-        BucketOverlay, 
+        BucketOverlay = 1UL << 4, 
+
+		
+		/**
+		 * All bucket
+		 */
+		BucketAll = BucketBackground | BucketOpaque | BucketTransparent | BucketTranslucent | BucketOverlay
 	};
 
 public:
@@ -80,7 +86,9 @@ public:
 
 	void AddToQueue(RenderQueueItem item, Bucket bucket);
 	void ClearAllQueue();
-	void ClearQueue(Bucket bucket);
+	void ClearQueues(uint32_t bucketFlags);
+
+	void SwapRenderBucket(RenderBucket& bucket, Bucket type);
 
 public:
 	std::map<Bucket, RenderBucket*> mRenderBuckets;

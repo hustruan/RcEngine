@@ -338,7 +338,7 @@ uint32_t D3D11Mapping::Mapping( uint32_t bufferCreateFlags )
 {
 	uint32_t bindFlag = 0;
 
-	if (bufferCreateFlags & BufferCreate_Uniform)
+	if (bufferCreateFlags & BufferCreate_Constant)
 	{
 		bindFlag = D3D11_BIND_CONSTANT_BUFFER;
 	}

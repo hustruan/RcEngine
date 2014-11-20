@@ -108,7 +108,7 @@ D3D11SamplerState::D3D11SamplerState( const SamplerStateDesc& desc )
 	samplerDesc.BorderColor[3] =  mDesc.BorderColor[3];
 
 	samplerDesc.ComparisonFunc = D3D11Mapping::Mapping(mDesc.ComparisonFunc);
-	samplerDesc.Filter = D3D11Mapping::Mapping(mDesc.Filter);
+	samplerDesc.Filter = D3D11Mapping::Mapping(mDesc.Filter, mDesc.CompareSampler);
 
 	samplerDesc.MinLOD = mDesc.MinLOD;
 	samplerDesc.MaxLOD = mDesc.MaxLOD;

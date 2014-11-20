@@ -30,7 +30,8 @@
 #include <Math/MathUtil.h>
 
 ShadowMapApp::ShadowMapApp( const String& config )
-	: Application(config)
+	: Application(config),
+	  mFramePerSecond(0)
 {
 
 }
@@ -62,7 +63,7 @@ void ShadowMapApp::Initialize()
 
 	mCameraControler = std::make_shared<Test::FPSCameraControler>(); 
 	mCameraControler->AttachCamera(*mMainCamera);
-	mCameraControler->SetMoveSpeed(100.0f);
+	mCameraControler->SetMoveSpeed(300.0f);
 	mCameraControler->SetMoveInertia(true);
 }
 
@@ -88,6 +89,9 @@ void ShadowMapApp::Update( float deltaTime )
 {
 	CalculateFrameRate();
 	mCameraControler->Update(deltaTime);
+
+	String title = " FPS: " + std::to_string(mFramePerSecond);
+	mMainWindow->SetTitle(title);
 }
 
 void ShadowMapApp::Render()
@@ -98,13 +102,22 @@ void ShadowMapApp::Render()
 
 void ShadowMapApp::CalculateFrameRate()
 {
-	
+	static int frameCount = 0;
+	static float baseTime = 0;
+
+	frameCount++;
+
+	if (mTimer.GetGameTime()-baseTime >= 1.0f)
+	{ 
+		mFramePerSecond = frameCount;
+		frameCount = 0;
+		baseTime += 1.0f;
+	}
 }
 
 void ShadowMapApp::WindowResize( uint32_t width, uint32_t height )
 {
 	mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)width/(float)height, 1.0f, 3000.0f );
-
 	mRenderPath->OnWindowResize(width, height);
 }
 

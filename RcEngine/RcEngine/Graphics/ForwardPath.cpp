@@ -32,7 +32,7 @@ void ForwardPlusPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	RenderFactory* factory = mDevice->GetRenderFactory();
 	ResourceManager& resMan = ResourceManager::GetSingleton();
 
-	mToneMapEffect = resMan.GetResourceByName<Effect>(RT_Effect, "HDRToneMap.effect.xml", "General");
+	mToneMapEffect = resMan.GetResourceByName<Effect>(RT_Effect, "HDR.effect.xml", "General");
 	mTiledLightCullEfffect = resMan.GetResourceByName<Effect>(RT_Effect, "TiledLightCull.effect.xml", "General");
 	mTileLightCullTech = mTiledLightCullEfffect->GetTechniqueByName("TiledLightCull");
 
@@ -94,6 +94,7 @@ void ForwardPlusPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mTiledLightCullEfffect->GetParameterByName("RWLightListRange")->SetValue(mTilePointLightsRangeUAV);
 
 	mToneMapEffect->GetParameterByName("HDRBuffer")->SetValue(mHDRBuffer->GetShaderResourceView());	
+	//mToneMapEffect->GetParameterByName("DepthBuffer")->SetValue(mDepthStencilBuffer->GetShaderResourceView());	
 }
 
 
@@ -112,7 +113,7 @@ void ForwardPlusPath::RenderScene()
 	mDevice->BindFrameBuffer(screenFB);
 	screenFB->Clear(CF_Color | CF_Depth, ColorRGBA(1, 0, 1, 1), 1.0, 0);
 
-	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("ToneMap");
+	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("CopyColor");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
 
 	screenFB->SwapBuffers();
@@ -124,7 +125,7 @@ void ForwardPlusPath::DepthPrePass()
 	mDepthStencilView->ClearDepthStencil(1.0f, 0);
 
 	// Todo: update render queue with render bucket filter
-	mSceneMan->UpdateRenderQueue(*mCamera, RO_None);   
+	//mSceneMan->UpdateRenderQueue(mCamera, RO_None, );   
 
 	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 

@@ -15,7 +15,7 @@ D3D11Buffer::D3D11Buffer( uint32_t bufferSize, uint32_t accessHint, uint32_t fla
 	desc.ByteWidth = bufferSize;
 	D3D11Mapping::Mapping(accessHint, desc.Usage, desc.CPUAccessFlags);
 
-	if (mCreateFlags & BufferCreate_Uniform)		desc.BindFlags |= D3D11_BIND_CONSTANT_BUFFER;
+	if (mCreateFlags & BufferCreate_Constant)		desc.BindFlags |= D3D11_BIND_CONSTANT_BUFFER;
 	if (mCreateFlags & BufferCreate_Index)			desc.BindFlags |= D3D11_BIND_INDEX_BUFFER;
 	if (mCreateFlags & BufferCreate_Vertex)			desc.BindFlags |= D3D11_BIND_VERTEX_BUFFER;
 	if (mCreateFlags & BufferCreate_StreamOutput)	desc.BindFlags |= D3D11_BIND_STREAM_OUTPUT;

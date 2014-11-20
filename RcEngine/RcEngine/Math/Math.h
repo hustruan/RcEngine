@@ -17,7 +17,6 @@ template <typename Real>
 class Math
 {
 public:
-	
 	// Common constants.
 	static const Real EPSILON;
 	static const Real ZERO_TOLERANCE;
@@ -43,16 +42,20 @@ public:
 };
 
 template <typename Real>
-Real Clamp( Real val, Real min, Real max )
+inline Real Clamp( Real val, Real min, Real max )
 {
 	if (val < min)	return min;
 	if (val > max)  return max;
 	return val;
 }
 
+template <typename T>
+inline T Lerp(const T& a, const T& b, float t)
+{
+	return a + (b - a) * t;
+}
 
 typedef Math<float> Mathf;
-
 
 //------------------------------------------------------------------------
 template<> const float Math<float>::EPSILON = FLT_EPSILON;
@@ -77,8 +80,6 @@ template<> const double Math<double>::INV_PI = 1.0/Math<double>::PI;
 template<> const double Math<double>::INV_TWO_PI = 1.0/Math<double>::TWO_PI;
 template<> const double Math<double>::DEG_TO_RAD = Math<double>::PI/180.0;
 template<> const double Math<double>::RAD_TO_DEG = 180.0/Math<double>::PI;
-
-
 
 }
 

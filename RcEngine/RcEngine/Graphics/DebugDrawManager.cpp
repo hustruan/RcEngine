@@ -33,6 +33,7 @@ void DebugDrawManager::OnGraphicsInitialize()
 
 	BuildShpereOperation(mSphereRop, 1.0f);
 	BuildBoxOperation(mBoxRop);
+	BuildFrustumOperation(mFrustumRop);
 
 	mDebugShapeEffect = resMan.GetResourceByName<Effect>(RT_Effect, "DebugView.effect.xml", "General");
 }
@@ -152,6 +153,44 @@ void DebugDrawManager::DrawSkeleton( const float4x4& transform, shared_ptr<Skele
 	mDebugShapeEffect->GetParameterByName("ViewProj")->SetValue(viewCamera->GetEngineViewProjMatrix());
 
 	device->Draw(mDebugShapeEffect->GetTechniqueByIndex(1), mSkeletonRopMap[skeleton]);
+}
+
+void DebugDrawManager::DrawFrustum( const Frustumf& frustum, const ColorRGBA& color, bool depthEnabled /*= true*/ )
+{
+	shared_ptr<GraphicsBuffer> vertexBuffer = mFrustumRop.VertexStreams.front();
+
+	float3* pData = (float3*)vertexBuffer->Map(0, MAP_ALL_BUFFER, RMA_Write_Discard);
+
+	pData[0] = frustum.Corner[0];
+	pData[1] = frustum.Corner[1];
+	pData[2] = frustum.Corner[5];
+	pData[3] = frustum.Corner[4];
+	pData[4] = frustum.Corner[2];
+	pData[5] = frustum.Corner[3];
+	pData[6] = frustum.Corner[7];
+	pData[7] = frustum.Corner[6];
+
+	vertexBuffer->UnMap();
+
+	RenderDevice* device = Environment::GetSingleton().GetRenderDevice();
+	shared_ptr<Camera> viewCamera = device->GetScreenFrameBuffer()->GetCamera();
+
+
+	mDebugShapeEffect->GetParameterByName("World")->SetValue(float4x4::Identity());
+
+	float3 vColor(color[0], color[1], color[2]);
+	mDebugShapeEffect->GetParameterByName("Color")->SetValue(vColor);
+
+	mDebugShapeEffect->GetParameterByName("ViewProj")->SetValue(viewCamera->GetEngineViewProjMatrix());
+
+	if (depthEnabled)
+	{
+		device->Draw(mDebugShapeEffect->GetTechniqueByIndex(0), mFrustumRop);
+	}
+	else
+	{
+		device->Draw(mDebugShapeEffect->GetTechniqueByIndex(1), mFrustumRop);
+	}	
 }
 
 }

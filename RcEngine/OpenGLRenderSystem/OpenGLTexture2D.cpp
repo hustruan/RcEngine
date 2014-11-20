@@ -9,10 +9,20 @@ namespace RcEngine {
 OpenGLTexture2D::OpenGLTexture2D( PixelFormat format, uint32_t arraySize, uint32_t numMipMaps, uint32_t width, uint32_t height, uint32_t sampleCount, uint32_t sampleQuality, uint32_t accessHint, uint32_t flags, ElementInitData* initData )
 	: OpenGLTexture(TT_Texture2D, format, arraySize, numMipMaps, sampleCount, sampleQuality, accessHint, flags)
 {
-	// numMipMap == 0, will generate mipmap levels automatically
-	mMipLevels = (numMipMaps > 0) ? numMipMaps : Texture::CalculateMipmapLevels((std::max)(width, height));
 	mWidth = width;
 	mHeight = height;
+
+	// Generate mipmaps if enable
+	if (mCreateFlags & TexCreate_GenerateMipmaps)
+	{
+		// numMipMap == 0, will generate mipmap levels automatically
+		assert(numMipMaps == 0);
+		mMipLevels = Texture::CalculateMipmapLevels((std::max)(width, height));
+	}
+	else
+	{
+		mMipLevels = numMipMaps;
+	}
 
 	// OpenGL Texture target type
 	if (sampleCount <= 1)
@@ -241,12 +251,30 @@ void* OpenGLTexture2D::Map2D( uint32_t arrayIndex, uint32_t level, ResourceMapAc
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, mPixelBufferID);
 			glBufferData(GL_PIXEL_PACK_BUFFER, imageSize, NULL, bufferUsage);
 			
-			glBindTexture(mTextureTarget, mTextureOGL);
-			if (PixelFormatUtils::IsCompressed(mFormat))
-				glGetCompressedTexImage(mTextureTarget, level, NULL);
+			if (GLEW_ARB_get_texture_sub_image) // OpenGL 4.5
+			{
+				if (PixelFormatUtils::IsCompressed(mFormat))
+				{
+					glGetCompressedTextureSubImage(mTextureOGL, level, 0, 0, arrayIndex, 
+						levelWidth, levelHeight, 1, imageSize, NULL);
+				}
+				else
+				{
+					glGetTextureSubImage(mTextureOGL, level, 0, 0, arrayIndex,
+						levelWidth, levelHeight, 1, externFormat, formatType, imageSize, NULL);
+				}
+			}
 			else
-				glGetTexImage(mTextureTarget, level, externFormat, formatType, NULL);
+			{
+				assert(arrayIndex == 0);
 
+				glBindTexture(mTextureTarget, mTextureOGL);
+				if (PixelFormatUtils::IsCompressed(mFormat))
+					glGetCompressedTexImage(mTextureTarget, level, NULL);
+				else
+					glGetTexImage(mTextureTarget, level, externFormat, formatType, NULL);
+			}
+			
 			pMappedData =  glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, imageSize, mapUsage);
 		}
 		break;

@@ -1,5 +1,5 @@
 [[Vertex=DirectionalVSMain]]
-#version 330
+
 uniform mat4 InvViewProj;
 
 out gl_PerVertex {
@@ -207,13 +207,4 @@ void main()
 	final += vec3(0.1, 0.1, 0.1) * diffuseAlbedo;
 
 	oFragColor = vec4(final, 1.0);
-}
-
-[[Fragment=CopyDepthPSMain]]
-
-uniform sampler2D DepthBuffer;
-
-void main()
-{
-	gl_FragDepth = texelFetch(DepthBuffer, ivec2(gl_FragCoord.xy), 0).r;
 }

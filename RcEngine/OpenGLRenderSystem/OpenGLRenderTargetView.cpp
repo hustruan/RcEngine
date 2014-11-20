@@ -27,19 +27,19 @@ void OpenGLRenderTargetView2D::OnAttach(FrameBuffer& fb, Attachment attr)
 
 	OpenGLTexture* pTextureOGL = static_cast_checked<OpenGLTexture*>(mTexture.get());
 
-	if (GLEW_EXT_direct_state_access)
-	{
-		if (pTextureOGL->GetTextureTarget() == GL_TEXTURE_2D)
-		{
-			//glNamedFramebufferTextureEXT(mFrameBufferOGL, attachment, pTextureOGL->GetTextureOGL(), mLevel);
-			glNamedFramebufferTexture2DEXT(mFrameBufferOGL, attachment, GL_TEXTURE_2D, pTextureOGL->GetTextureOGL(), mLevel);
-		}
-		else 
-		{
-			glNamedFramebufferTextureLayerEXT(mFrameBufferOGL, attachment, pTextureOGL->GetTextureOGL(), mLevel, mArrIndex);
-		}
-	}
-	else
+	//if (GLEW_EXT_direct_state_access)
+	//{
+	//	if (pTextureOGL->GetTextureTarget() == GL_TEXTURE_2D)
+	//	{
+	//		//glNamedFramebufferTextureEXT(mFrameBufferOGL, attachment, pTextureOGL->GetTextureOGL(), mLevel);
+	//		glNamedFramebufferTexture2DEXT(mFrameBufferOGL, attachment, GL_TEXTURE_2D, pTextureOGL->GetTextureOGL(), mLevel);
+	//	}
+	//	else 
+	//	{
+	//		glNamedFramebufferTextureLayerEXT(mFrameBufferOGL, attachment, pTextureOGL->GetTextureOGL(), mLevel, mArrIndex);
+	//	}
+	//}
+	//else
 	{
 		GLuint oldFBO = gOpenGLDevice->GetCurrentFBO();
 
@@ -66,19 +66,19 @@ void OpenGLRenderTargetView2D::OnDetach(FrameBuffer& fb, Attachment attr)
 	OpenGLRenderView::OnDetach(fb, attr);
 
 	GLenum attachment = GL_COLOR_ATTACHMENT0 + (attr - ATT_Color0);
-	if (GLEW_EXT_direct_state_access)
-	{
-		if (mTexture->GetTextureArraySize() <= 1)
-		{
-			//glNamedFramebufferTextureEXT(mFrameBufferOGL, attachment, 0, 0);
-			glNamedFramebufferTexture2DEXT(mFrameBufferOGL, attachment, GL_TEXTURE_2D, 0, 0);
-		}
-		else 
-		{
-			glNamedFramebufferTextureLayerEXT(mFrameBufferOGL, attachment, 0, 0, 0);
-		}
-	}
-	else
+	//if (GLEW_EXT_direct_state_access)
+	//{
+	//	if (mTexture->GetTextureArraySize() <= 1)
+	//	{
+	//		//glNamedFramebufferTextureEXT(mFrameBufferOGL, attachment, 0, 0);
+	//		glNamedFramebufferTexture2DEXT(mFrameBufferOGL, attachment, GL_TEXTURE_2D, 0, 0);
+	//	}
+	//	else 
+	//	{
+	//		glNamedFramebufferTextureLayerEXT(mFrameBufferOGL, attachment, 0, 0, 0);
+	//	}
+	//}
+	//else
 	{
 		GLuint oldFBO = gOpenGLDevice->GetCurrentFBO();
 

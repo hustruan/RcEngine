@@ -24,22 +24,22 @@ public:
 	Entity( const String& name, const shared_ptr<Mesh>& mesh );
 	~Entity();
 	
-	const BoundingBoxf& GetWorldBoundingBox() const;
 	const BoundingBoxf& GetLocalBoundingBox() const;
+	
+	const BoundingBoxf& GetWorldBoundingBox() const override;
+	void OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& cam, RenderOrder order, uint32_t buckterFilter, uint32_t filterIgnore ) override;
 
-	const shared_ptr<Mesh>& GetMesh() const							{ return mMesh; }
+	inline const shared_ptr<Mesh>& GetMesh() const							{ return mMesh; }
 
-	uint32_t GetNumSubEntities() const								{ return mSubEntityList.size(); }
+	inline uint32_t GetNumSubEntities() const								{ return mSubEntityList.size(); }
 
-	SubEntity* GetSubEntity( uint32_t index ) const					{ return mSubEntityList[index]; }
+	inline SubEntity* GetSubEntity( uint32_t index ) const					{ return mSubEntityList[index]; }
 
 	bool HasSkeleton() const;
 	shared_ptr<Skeleton> GetSkeleton();
 
 	bool HasSkeletonAnimation() const;
 	AnimationPlayer* GetAnimationPlayer();
-
-	void OnUpdateRenderQueue(RenderQueue* renderQueue, const Camera& cam, RenderOrder order);
 
 	// Create a SceneNode take bone as parent
 	BoneSceneNode* CreateBoneSceneNode(const String& nodeName, const String& boneName);
@@ -48,8 +48,8 @@ protected:
 	void Initialize();
 	void UpdateAnimation();
 
-	void OnAttach( SceneNode* node );
-	void OnDetach( SceneNode* node );
+	void OnAttach( SceneNode* node ) override;
+	void OnDetach( SceneNode* node ) override;
 
 public:
 	static SceneObject* FactoryFunc(const String& name, const NameValuePairList* params = 0);

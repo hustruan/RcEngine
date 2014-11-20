@@ -10,7 +10,10 @@ static const BoundingBoxf UnDefineBoundingBox;
 
 
 SceneObject::SceneObject( const String& name, SceneObejctType type, bool renderable /*= false*/ )
-	: mName(name), mType(type), mRenderable(renderable), mParentNode(nullptr), mVisible(true)
+	: mName(name),
+	  mType(type),
+	  mParentNode(nullptr), 
+	  mFlags(0)
 {
 
 }
@@ -45,11 +48,18 @@ void SceneObject::OnDetach( SceneNode* node )
 	mParentNode = nullptr;
 }
 
-void SceneObject::OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& cam, RenderOrder order )
+void SceneObject::OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& cam, RenderOrder order, uint32_t buckets, uint32_t filterIgnore )
 {
 
 }
 
+void SceneObject::SetActive( bool bActive )
+{
+	if (bActive) 
+		mFlags &= ~Inactive;
+	else 
+		mFlags |= Inactive;
+}
 
 
 }

@@ -16,8 +16,8 @@ int main()
 	ExportLog::SetLogLevel( 1 );
 	ExportLog::EnableLogging( TRUE );
 
-	g_ExportSettings.ExportSkeleton = false;
-	g_ExportSettings.MergeWithSameMaterial = false;
+	//g_ExportSettings.ExportSkeleton = true;
+	g_ExportSettings.MergeWithSameMaterial = true;
 	g_ExportSettings.MergeScene = true;
 	g_ExportSettings.SwapWindOrder = true;
 
@@ -28,11 +28,11 @@ int main()
 	////fbxProcesser.BuildAndSaveOBJ();
 	//fbxProcesser.BuildAndSaveMaterial();
 
+
 	fbxProcesser.Initialize();
 
-	if (fbxProcesser.LoadScene("../../Media/Mesh/Sponza/Sponza.FBX"))
+	if (fbxProcesser.LoadScene("../../Media/Mesh/ShuangMaCheng/Castle.FBX"))
 	{
-
 		fbxProcesser.ProcessScene();
 		fbxProcesser.BuildAndSaveBinary();
 		fbxProcesser.BuildAndSaveMaterial();

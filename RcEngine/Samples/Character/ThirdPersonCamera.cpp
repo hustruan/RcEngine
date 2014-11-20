@@ -7,7 +7,7 @@
 ThirdPersonCamera::ThirdPersonCamera( SinbadCharacterController* characterController, shared_ptr<Camera> camera )
 	: mController(characterController),
 	  mCamera(camera),
-	  mDistance(25),
+	  mDistance(30),
 	  mCameraHeight(2)
 {
 	float3 characterPosition = mController->GetCharacterPosition();

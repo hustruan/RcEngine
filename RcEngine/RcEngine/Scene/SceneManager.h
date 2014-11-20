@@ -69,24 +69,28 @@ public:
 	 */
 	void UpdateSceneGraph(float delta);
 
+	void UpdateLightQueue(const Camera& cam);
+
 	/**
 	 * Update render queue, and remove scene node outside of the camera frustum.
 	 */
-	void UpdateRenderQueue(const Camera& cam, RenderOrder order);
-	void UpdateBackgroundQueue(const Camera& cam);
-	void UpdateOverlayQueue();
-	void UpdateLightQueue(const Camera& cam);
+	void UpdateRenderQueue(shared_ptr<Camera> camera, RenderOrder order, uint32_t renderBuckets, uint32_t filterIgnore);
 	
+	void UpdateOverlayQueue();
+
 	RenderQueue& GetRenderQueue()						{ return mRenderQueue; }
+	const RenderQueue& GetRenderQueue() const			{ return mRenderQueue; }
 
 	// Return lights affect current view frustum
 	LightQueue& GetLightQueue()							{ return mLightQueue; }
+	const LightQueue& GetLightQueue() const				{ return mLightQueue; }
 	
 	AnimationController* GetAnimationController() const;
 
 	// Create SpriteBatch with effect. NULL for default sprite effect
 	SpriteBatch* CreateSpriteBatch();
 	SpriteBatch* CreateSpriteBatch(const shared_ptr<Effect>& effect);
+	void DestrySpriteBatch(SpriteBatch* batch);
 
 protected:
 	void ClearScene();

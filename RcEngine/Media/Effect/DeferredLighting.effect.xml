@@ -6,17 +6,6 @@
   <AutoBinding name="LightFalloff" semantic="LightFalloff" type="float3"/>
   <AutoBinding name="LightFalloff" semantic="LightFalloff" type="float3"/>      
 
-  <Technique name="CopyDepth">
-    <Pass name="p0">
-      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
-      <PixelShader file="DeferredLighting" entry="CopyDepthPSMain"/>
-      <State name="DepthEnable" value="true"/>
-      <State name="DepthFunc" value="Always"/>
-      <State name="DepthWriteMask" value="true"/>
-      <State name="ColorWriteMask" index="0" r="false" g="false" b="false" a="false"/>
-    </Pass>
-  </Technique>
-  
   <Technique name="DirectionalLighting">
     <Pass name="p0">
       <VertexShader file="DeferredLighting" entry="DirectionalVSMain"/>

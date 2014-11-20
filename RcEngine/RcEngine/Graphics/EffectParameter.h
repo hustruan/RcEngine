@@ -19,20 +19,25 @@ public:
 
 	inline const String& GetName() const							{ return mName; }
 	inline uint32_t GetBufferSize() const							{ return mBufferSize; }
-	inline shared_ptr<GraphicsBuffer> GetBuffer() const				{ return mConstantBuffer; }
+	
 	inline uint32_t GetNumVariables() const							{ return mBufferVariable.size(); }
 	inline EffectParameter* GetVariable(uint32_t index) const		{ return mBufferVariable.at(index); }
 	
+	inline bool IsDirty() const										{ return mDirty; }
 	inline void MakeDirty()											{ mDirty = true; }
 	inline void ClearDirty()										{ mDirty = false; }
 	inline uint8_t* GetRawData(uint32_t offset) const				{ return mBackingStore + offset; }
-
-	void UpdateBuffer();
+	
 	void SetRawValue(const void* pData, uint32_t offset, uint32_t count);
 	void GetRawValue(void *pData, uint32_t offset, uint32_t count);
 
+	// Set internal buffer, this will make mBackingStore invalid.
+	void SetBuffer(const shared_ptr<GraphicsBuffer>& buffer);
+	inline const shared_ptr<GraphicsBuffer>& GetBuffer() const		{ return mConstantBuffer; }
+	
 public_internal:
 	void AddVariable(EffectParameter* parameter, uint32_t offset); 
+	void UpdateBuffer();
 
 protected:
 	String mName;
@@ -148,7 +153,7 @@ protected:
 
 	uint32_t mElementSize;					// For non-array type, always 0.
 	uint32_t mOffset;						// Offset in parent constant buffer
-	EffectConstantBuffer* mUniformBuffer;   // Constant buffer this variable belong to
+	EffectConstantBuffer* mConstantBuffer;   // Constant buffer this variable belong to
 
 	friend class Effect;
 };
@@ -168,9 +173,9 @@ public:
 			mValue = value;
 			
 			// Update data in uniform buffer
-			if (mUniformBuffer)
+			if (mConstantBuffer)
 			{
-				*(reinterpret_cast<T*>(mUniformBuffer->GetRawData(mOffset))) = mValue;
+				*(reinterpret_cast<T*>(mConstantBuffer->GetRawData(mOffset))) = mValue;
 			}
 
 			MakeDirty();
@@ -179,6 +184,35 @@ public:
 
 protected:
 	T mValue;
+};
+
+// For boolean type
+template<>
+class _ApiExport EffectParameterNumberic<bool> : public EffectParameter
+{
+public:
+	EffectParameterNumberic(const String& name, EffectParameterType type, EffectConstantBuffer* pCB = nullptr) 
+		: EffectParameter(name, type, pCB) {}
+
+	void GetValue(bool& value) const { value = mValue; }
+	void SetValue(const bool& value)
+	{
+		if (value != mValue)
+		{
+			mValue = value;
+
+			// Update data in uniform buffer
+			if (mConstantBuffer)
+			{
+				*(reinterpret_cast<int*>(mConstantBuffer->GetRawData(mOffset))) = mValue ? 1 : 0;
+			}
+
+			MakeDirty();
+		}
+	}
+
+protected:
+	bool mValue;
 };
 
 template< typename T >
@@ -216,9 +250,9 @@ public:
 			memcpy(mValue, value, sizeof(T) * count);
 			
 			// Update data in constant buffer
-			if (mUniformBuffer)
+			if (mConstantBuffer)
 			{
-				uint8_t* pData = mUniformBuffer->GetRawData(mOffset);
+				uint8_t* pData = mConstantBuffer->GetRawData(mOffset);
 
 				if (mArrayStrides == sizeof(T))
 					memcpy(pData, mValue, sizeof(T) * count);
@@ -257,10 +291,10 @@ public:
 			mValue = value;
 
 			// Update data in constant buffer
-			if (mUniformBuffer)
+			if (mConstantBuffer)
 			{
 				// Column-major matrix in shader 
-				*(reinterpret_cast<float4x4*>(mUniformBuffer->GetRawData(mOffset))) = mValue.Transpose();		
+				*(reinterpret_cast<float4x4*>(mConstantBuffer->GetRawData(mOffset))) = mValue.Transpose();		
 			}
 
 			MakeDirty();
@@ -296,7 +330,7 @@ public:
 	{
 		assert(count <= mElementSize);
 
-		if (mUniformBuffer)
+		if (mConstantBuffer)
 		{
 			assert(mMatrixStride == sizeof(float4));
 			assert(count <= mElementSize);
@@ -305,7 +339,7 @@ public:
 			 * two choice. Transpose every matrix before sending to ConstantBuffer, or use row_major 
 			 * qualifier in shader language.
 			 */
-			float4x4* pMatrix = reinterpret_cast<float4x4*>( mUniformBuffer->GetRawData(mOffset) );
+			float4x4* pMatrix = reinterpret_cast<float4x4*>( mConstantBuffer->GetRawData(mOffset) );
 			for (uint32_t i = 0; i < count; ++i)
 				pMatrix[i] = value[i].Transpose();		
 		}

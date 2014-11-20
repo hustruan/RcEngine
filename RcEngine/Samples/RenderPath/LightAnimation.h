@@ -1,44 +1,39 @@
 #ifndef LightAnimation_h__
 #define LightAnimation_h__
 
-#include <vector>
 #include <cmath>
 #include <random>
-#include <Math/Vector.h>
+#include <vector>
+#include <unordered_map>
 #include <Scene/Light.h>
 
 using namespace RcEngine;
 
 class LightAnimation
 {
-public:
-	struct LightParam
+	enum LightAnimationType
 	{
-		float2 LightAttenuation;
+		AnimStatic = 0, 
+		AnimLine,
+		AnimCircle,
+		AnimEllipse,
+		AnimCount
+	};
 
-		// For animation
-		float Radius;
+	struct LineAnimatedLight
+	{
+		int LineIndex;
+		int FloorIndex;
+		Light* Light;
+	};
+
+	struct EllipseAnimatedLight
+	{
+		float EllipseWidth, EllipseHeight; // ∂Ã°¢≥§÷·
 		float Angle;
 		float Height;
 		float AnimationSpeed;
-
 		Light* Light;
-
-		//Light() {}
-
-		//// Directional
-		//Light(const float3& color, const float3& direction)
-		//	: LightType(LT_DirectionalLigt), LightColor(color), LightDirection(direction) {}
-
-		//// Point
-		//Light(const float3& color, const float3& position, float attenuationBegin, float attenuationEnd)
-		//	: LightType(LT_PointLight), LightColor(color), LightPosition(position), LightAttenuation(attenuationBegin, attenuationEnd) {}
-	
-		//// Spot
-		//Light(const float3& color, const float3& position, const float3& direction, 
-		//	float innerAngle, float outAngle, float spotFalloff, float attenuationBegin, float attenuationEnd)
-		//	: LightType(LT_SpotLight), LightColor(color), LightPosition(position), LightDirection(direction),
-		//	  SpotFalloff(cosf(innerAngle), cosf(outAngle), spotFalloff), LightAttenuation(attenuationBegin, attenuationEnd) {}
 	};
 
 public:
@@ -46,21 +41,25 @@ public:
 	~LightAnimation();
 
 	void Move(float elapsedTime);
-
-	void RandonPointLight(int numLight);
-
-	void AddPointLight(const float3& position);
-
-	//void RecordLight(const CFirstPersonCamera& camera, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	void SaveLights(const String& filename);
-	void LoadLights(const String& filename);
-
-public:
-	std::vector<LightParam> mLights;
+	void SetupLights();
+	uint32_t GetNumLights() const { return mNumTotalLights; }
 
 private:
-	float mTotalTime;
+	void CreateLightsWithAnimLine();
+	void CreateLightsWithAnimStatic();
+	void CreateLightsWithAnimEllipse();
+
+	void MoveAnimLine(float elapsedTime);
+	void MoveAnimStatic(float elapsedTime);
+	void MoveAnimEllipse(float elapsedTime);
+
+
+	void DebugDrawLights();
+
+private:
+	uint32_t mNumTotalLights;
+	std::vector<LineAnimatedLight> mLineAnimatedLights;
+	std::vector<EllipseAnimatedLight> mEllipseAnimatedLights;
 };
 
 

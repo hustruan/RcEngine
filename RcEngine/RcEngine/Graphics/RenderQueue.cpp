@@ -80,9 +80,19 @@ void RenderQueue::ClearAllQueue()
 	}
 }
 
-void RenderQueue::ClearQueue( Bucket bucket )
+void RenderQueue::ClearQueues( uint32_t bucketFlags )
 {
-	mRenderBuckets[bucket]->clear();
+	if (bucketFlags & BucketBackground)		mRenderBuckets[BucketBackground]->clear();
+	if (bucketFlags & BucketOpaque)			mRenderBuckets[BucketOpaque]->clear();
+	if (bucketFlags & BucketTransparent)	mRenderBuckets[BucketTransparent]->clear();
+	if (bucketFlags & BucketTranslucent)	mRenderBuckets[BucketTranslucent]->clear();
+	if (bucketFlags & BucketOverlay)		mRenderBuckets[BucketOverlay]->clear();
+}
+
+void RenderQueue::SwapRenderBucket( RenderBucket& bucket, Bucket type )
+{
+	assert( mRenderBuckets.count(type) );
+	mRenderBuckets[type]->swap(bucket);
 }
 
 

@@ -16,22 +16,45 @@
 
   <AutoBinding name="CameraOrigin" semantic="CameraPosition" type="float3"/>
 
-  <!-- Effect techniques -->
-  <Technique name="VSM">
-	  <Pass name="p0">
-		  <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
-		  <PixelShader file="ShadowMapGen" entry="ShadowMapVSM">
-		    <Macro name="VSM"/>
-		  </PixelShader>
-	  </Pass>
+  <!-- SamplerState will used in this Effect -->
+  <Sampler name="MaterialSampler">
+    <State name="Filter" value="Min_Mag_Mip_Linear"/>
+    <State name="AddressU" value="Wrap"/>
+    <State name="AddressV" value="Wrap"/>
+  </Sampler>
+  
+  <Sampler name="PCFSampler">
+    <State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+    <State name="AddressU" value="Clamp"/>
+    <State name="AddressV" value="Clamp"/>
+    <State name="AddressW" value="Clamp"/>
+    <State name="BorderColor" r="1" g="1" b="1" a="1"/>
+    <State name="ComparisonFunc" value="Less"/>
+  </Sampler>
+
+  <!-- Possion disc PCF-->
+  <Technique name="PCF">
+    <Pass name="p0">
+      <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+      <PixelShader file="ShadowMapGen" entry="ShadowMapAlphaPCF"/>
+    </Pass>
   </Technique>
 
-  <!-- pission disc PCF-->
-  <Technique name="PCF">
-	  <Pass name="p0">
+  <!-- 
+  <Technique name="VSM">
+    <Pass name="p0">
       <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
-	  </Pass>
+      <PixelShader file="ShadowMapGen" entry="ShadowMapVSM"/>
+    </Pass>
   </Technique>
+  
+  <Technique name="EVSM">
+    <Pass name="p0">
+      <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+      <PixelShader file="ShadowMapGen" entry="ShadowMapEVSM"/>
+    </Pass>
+  </Technique>-->
+  
   
   <Technique name="DepthPre">
     <Pass name="p0">
@@ -56,8 +79,10 @@
   <Technique name="DirectionalLighting">
     <Pass name="p0">
       <VertexShader file="Model" entry="ModelVS"/>
-      <PixelShader file="ForwardLighting" entry="DirectionalLightingPS"/>
-	  <State name="CullMode" value="None"/>
+      <PixelShader file="ForwardLighting" entry="DirectionalLightingPS">
+        <Macro name="PCF"/>
+      </PixelShader>
+	    <State name="CullMode" value="None"/>
 	  <!--<State name="FillMode" value="WireFrame"/>-->
     </Pass>
   </Technique>

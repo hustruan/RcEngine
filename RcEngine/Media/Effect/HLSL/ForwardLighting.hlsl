@@ -1,10 +1,21 @@
 #include "ModelVertexFactory.hlsl"
 #include "ModelMaterialFactory.hlsl"
 #include "LightingUtil.hlsl"
+#include "PSSM.hlsl"
 
 float3 LightColor;
 float4 LightDir;
 float3 CameraOrigin;
+
+bool ShadowEnabled;
+
+static const float3 vCascadeColorsMultiplier[4] = {
+
+    float3 ( 1.5, 0.0, 0.0 ),
+    float3 ( 0.0, 1.5, 0.0 ),
+    float3 ( 0.0, 0.0, 1.5 ),
+    float3 ( 1.5, 1.5, 0.0 )
+};
 
 void DirectionalLightingPS(in VSOutput input,
 						   out float4 oFragColor : SV_Target0 ) 
@@ -29,14 +40,21 @@ void DirectionalLightingPS(in VSOutput input,
     if (NdotL > 0.0)
     {
 		float normTerm = (material.Shininess + 2.0) / 8.0;
-        float fresnel = CalculateFresnel(material.SpecularAlbedo, L, H);
-        final = (material.DiffuseAlbedo + normTerm * CalculateSpecular(N, H, material.Shininess) * fresnel) * LightColor * NdotL;
+        float3 fresnel = CalculateFresnel(material.SpecularAlbedo, L, H);
+        final = (material.DiffuseAlbedo /*+ normTerm * CalculateSpecular(N, H, material.Shininess) * fresnel*/) * LightColor * NdotL;
     }
+
+	if (ShadowEnabled)
+	{
+		int iCascadeSelected = 0;
+		float percentLit = EvalCascadeShadow(input.PosWS, iCascadeSelected);
+		final *= percentLit; 
+		//final = final * vCascadeColorsMultiplier[iCascadeSelected];
+	}
     
 	// Ambient 
-	final += material.DiffuseAlbedo * 0.15;
+	final += material.DiffuseAlbedo * 0.3;
 
-	final = pow(final, 1.0 / 2.2);
+	//oFragColor = float4(material.DiffuseAlbedo, final.r);
     oFragColor = float4(final, 1.0);
-
 }

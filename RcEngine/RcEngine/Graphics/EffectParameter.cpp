@@ -19,7 +19,7 @@ _declspec(selectany) unsigned int g_TimerRolloverCount = 0x80000000;
 EffectParameter::EffectParameter( const String& name, EffectParameterType type, EffectConstantBuffer* pCB)
 	: mParameterType(type), 
 	  mParameterName(name), 
-	  mUniformBuffer(pCB),
+	  mConstantBuffer(pCB),
 	  mElementSize(0),
 	  mOffset(0),
 	  mLastModifiedTime(0),
@@ -139,26 +139,28 @@ void EffectParameter::IncrementTimeStamp()
 
 void EffectParameter::SetConstantBuffer( EffectConstantBuffer* cbuffer, uint32_t offset )
 {
-	assert(mUniformBuffer == nullptr);
-	mUniformBuffer = cbuffer;
+	assert(mConstantBuffer == nullptr);
+	mConstantBuffer = cbuffer;
 	mOffset = offset;
 }
 
 void EffectParameter::MakeDirty()
 {
 	IncrementTimeStamp();
-	if (mUniformBuffer)
-		mUniformBuffer->MakeDirty();
+	if (mConstantBuffer)
+		mConstantBuffer->MakeDirty();
 }
 
 //----------------------------------------------------------------------------------------
 EffectConstantBuffer::EffectConstantBuffer( const String& name, uint32_t bufferSize )
-	: mName(name), mBufferSize(bufferSize)
+	: mName(name),
+	  mBufferSize(bufferSize),
+	  mDirty(true)
 {
 	mBackingStore = new uint8_t[bufferSize];
 
 	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
-	mConstantBuffer = factory->CreateUniformBuffer(bufferSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Uniform, NULL);
+	mConstantBuffer = factory->CreateConstantBuffer(bufferSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Constant, NULL);
 }
 
 EffectConstantBuffer::~EffectConstantBuffer()
@@ -220,6 +222,17 @@ void EffectConstantBuffer::GetRawValue( void *pData, uint32_t offset, uint32_t c
 	memcpy(pData, mBackingStore + offset, count);
 }
 
+void EffectConstantBuffer::SetBuffer( const shared_ptr<GraphicsBuffer>& buffer )
+{
+	if (buffer != mConstantBuffer)
+	{
+		if (buffer->GetBufferSize() != mConstantBuffer->GetBufferSize() &&
+			buffer->GetCreateFlags() != mConstantBuffer->GetCreateFlags() )
+			ENGINE_EXCEPT(Exception::ERR_INVALID_PARAMS, "Constant Buffer Does't Match!", "EffectConstantBuffer::SetBuffer");
 
+		mConstantBuffer = buffer;
+		mDirty = false;
+	}
+}
 
 } // Namespace RcEngine

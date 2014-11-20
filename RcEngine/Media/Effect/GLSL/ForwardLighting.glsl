@@ -2,10 +2,19 @@
 
 #include "/ModelMaterialFactory.glsl"
 #include "/LightingUtil.glsl"
+#include "/PSSM.glsl"
 
 uniform vec4 LightDir;
 uniform vec3 LightColor;
 uniform vec3 CameraOrigin;
+uniform bool ShadowEnabled;
+
+const vec3 vCascadeColorsMultiplier[4] = vec3[4](
+    vec3 ( 1.5, 0.0, 0.0 ),
+    vec3 ( 0.0, 1.5, 0.0 ),
+    vec3 ( 0.0, 0.0, 1.5 ),
+    vec3 ( 1.5, 1.5, 0.0 )
+);
 
 // shader input
 in vec4 oPosWS;
@@ -41,16 +50,24 @@ void main()
     if (NdotL > 0.0)
     {	
 		float normTerm = (material.Shininess + 2.0) / 8.0;
-        float fresnel = CalculateFresnel(material.SpecularAlbedo, L, H);
+        vec3 fresnel = CalculateFresnel(material.SpecularAlbedo, L, H);
 
 		// Diffuse + Specular
         final = (material.DiffuseAlbedo + normTerm * CalculateSpecular(N, H, material.Shininess) * fresnel) * LightColor * NdotL;
 	}
 
+	if (ShadowEnabled)
+	{
+		int iCascadeSelected = 0;
+        float percentLit = EvalCascadeShadow(oPosWS, iCascadeSelected);
+		final *= percentLit; 
+		final = final  * max(1.0, percentLit);
+		final = final * vCascadeColorsMultiplier[iCascadeSelected];
+	}
+	
 	// Ambient
 	final += material.DiffuseAlbedo * 0.1;
 
+	//final = pow(final, vec3(1.0 / 2.2));
 	oFragColor = vec4(final, 1.0);
-
-   // oFragColor = vec4(LightColor * NdotL, final.r);
 }

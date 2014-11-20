@@ -44,7 +44,7 @@ shared_ptr<GraphicsBuffer> OpenGLFactory::CreateIndexBuffer( uint32_t buffreSize
 		new OpenGLBuffer(buffreSize, accessHint, createFlags, GL_ELEMENT_ARRAY_BUFFER, initData) );
 }
 
-shared_ptr<GraphicsBuffer> OpenGLFactory::CreateUniformBuffer( uint32_t buffreSize, uint32_t accessHint, uint32_t createFlags,ElementInitData* initData )
+shared_ptr<GraphicsBuffer> OpenGLFactory::CreateConstantBuffer( uint32_t buffreSize, uint32_t accessHint, uint32_t createFlags,ElementInitData* initData )
 {
 	return std::shared_ptr<OpenGLBuffer>(
 		new OpenGLBuffer(buffreSize, accessHint, createFlags, GL_UNIFORM_BUFFER, initData) );

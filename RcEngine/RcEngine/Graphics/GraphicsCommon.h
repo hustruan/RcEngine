@@ -15,7 +15,7 @@ enum BufferCreateFlag
 {
 	BufferCreate_Vertex					= 1UL << 0,
 	BufferCreate_Index					= 1UL << 1,
-	BufferCreate_Uniform				= 1UL << 2,
+	BufferCreate_Constant				= 1UL << 2,
 	BufferCreate_StreamOutput			= 1UL << 3,
 	BufferCreate_Texture                = 1UL << 4,
 	BufferCreate_Structured				= 1UL << 5,

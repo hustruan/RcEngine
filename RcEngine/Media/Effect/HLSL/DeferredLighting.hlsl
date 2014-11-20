@@ -9,6 +9,7 @@ cbuffer PerLight{
 	float4 LightDir;		// w dimension is spot light outer cone cos angle
 	float3 LightColor;
 	float3 LightFalloff; 
+
 };
 
 float3 CameraOrigin;
@@ -213,11 +214,4 @@ void DeferredShadingPSMain(
 	final += float3(0.1, 0.1, 0.1) * diffuseAlbedo;
 
 	oFragColor = float4(final, 1.0);
-}
-
-//-------------------------------------------------------------------------------------------
-// Copy Depth Buffer
-float CopyDepthPSMain(in float4 iFragCoord  : SV_POSITION) : SV_Depth
-{
-	return DepthBuffer.Load(int3(iFragCoord.xy, 0));
 }

@@ -1,115 +1,69 @@
-	
 #define MAX_CASCADE_COUNT 4
 	
-Texture2DArray CascadeShadowTex;
-SamplerState ShadowSampler;
+Texture2DArray CascadeShadowMap;
 
-int NumCascades;
-float4x4 ShadowView;
-float4 CascadeScale[MAX_CASCADE_COUNT];   // Shadow projection info
-float4 CascadeOffset[MAX_CASCADE_COUNT];	
-float2 BorderPaddingMinMax;				 // For map based selection, this keep pixels in valid range.
-float CascadeBlendArea;  				 // Amount to overlap when blending between cascades.
+#if defined(PCF)
+	#include "PCF.hlsl"
+#elif defined(VSM)
+	#include "VSM"
+#elif defined(EVSM)
+	#include "EVSM.hlsl"
+#endif
 
-/**
- * Calculate blend weight for cascade boundary pixels.
- * @param blendArea, blend width.
- * @param blendBandLocation, current pixel's location in blend band.
- * @param cascadeBlendWeight, calculated blend weight, [1, 0] -> [width, 0].
- */ 
-void CalculateBlendAmountForMap(in float2 CascadeShadowTexCoord, in float blendArea, inout float blendBandLocation, out float cascadeBlendWeight)
+cbuffer CSM
 {
-	float2 distanceToOne = float2(1.0 - CascadeShadowTexCoord.x, 1.0 - CascadeShadowTexCoord.y);
-    blendBandLocation = min(CascadeShadowTexCoord.x, CascadeShadowTexCoord.y);
-    blendBandLocation = min( blendBandLocation, min(distanceToOne.x, distanceToOne.y) );
-    cascadeBlendWeight = blendBandLocation / blendArea;
-}
+	// Light View
+	float4x4 LightView;
 
-float ChebyshevUpperBound(float2 moments, float depth, float minVariance)
+	// Light Projection
+	float4 CascadeScale[MAX_CASCADE_COUNT];  
+	float4 CascadeOffset[MAX_CASCADE_COUNT];	 
+
+	float2 BorderPaddingMinMax;				 // For map based selection, this keep pixels in valid range.
+	float CascadeBlendArea;  				 // Amount to overlap when blending between cascades.
+	float InvShadowMapSize;
+	
+	int NumCascades;
+};
+
+float EvalCascadeShadow(float4 positionWorldSpace, out int selectCascade)
 {
-	float mean = moments.x;
-	float measSquared = moments.y;
+	float percentLit = 1.0;
+	float4 cascadeShadowTexCoord = 0.0;
 	
-	float p = float(depth <= mean);
-	
-	float variance = max(minVariance, measSquared - mean*mean);
-	float d = depth - mean;
-	float pmax = variance / (variance + d * d);
-	
-	 // To combat light-bleeding, experiment with raising p_max to some power
-     // (Try values from 0.1 to 100.0, if you like.)	
-	return pow( max(p, pmax), 5.0 );
-}
-
-float CalculateVarianceShadow(in float4 CascadeShadowTexCoord, in float4 posShadowViewSpace, in int iCascade)
-{
-	float4 CascadeShadowTexCoordDDX = ddx(posShadowViewSpace) * CascadeScale[iCascade];
-	float4 CascadeShadowTexCoordDDY = ddy(posShadowViewSpace) * CascadeScale[iCascade];
-	
-	float2 moments = CascadeShadowTex.SampleGrad(ShadowSampler, CascadeShadowTexCoord.xyz, CascadeShadowTexCoordDDX.xy, CascadeShadowTexCoordDDY.xy).rg;
-
-	return ChebyshevUpperBound(moments, CascadeShadowTexCoord.w, 0.0001);
-}
-
-float CalculateVarianceShadowWrong(in float4 CascadeShadowTexCoord, in float4 posShadowViewSpace, in int iCascade)
-{
-	float2 moments = CascadeShadowTex.Sample(ShadowSampler, CascadeShadowTexCoord.xyz).rg;
-	return ChebyshevUpperBound(moments, CascadeShadowTexCoord.w, 0.0001);
-}
-
-float EvalCascadeShadow(in float4 posWorldSpace, out int selectCascade)
-{
-	float percentLit = 0.0;
-
-	float4 CascadeShadowTexCoord = (float4)0.0;
-	float4 CascadeShadowTexCoordBlend = (float4)0.0;
-	
-	// Compute view space position of shadow
-	float4 posShadowVS = mul(posWorldSpace, ShadowView);
+	float4 positionLightSpace = mul(positionWorldSpace, LightView);
 		
 	int iCascadeSelected = 0;
 	int cascadeFound = 0;
 	for( int iCascade = 0; iCascade < NumCascades && cascadeFound == 0; ++iCascade ) 
 	{
-		CascadeShadowTexCoord = posShadowVS * CascadeScale[iCascade] + CascadeOffset[iCascade];		
-		CascadeShadowTexCoord.xy = CascadeShadowTexCoord.xy * 0.5 + 0.5; // Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
-			
-		if ( min( CascadeShadowTexCoord.x, CascadeShadowTexCoord.y ) > BorderPaddingMinMax.x && 
-             max( CascadeShadowTexCoord.x, CascadeShadowTexCoord.y ) < BorderPaddingMinMax.y )
+		cascadeShadowTexCoord = positionLightSpace * CascadeScale[iCascade] + CascadeOffset[iCascade];		
+
+		if ( min( cascadeShadowTexCoord.x, cascadeShadowTexCoord.y ) > BorderPaddingMinMax.x && 
+             max( cascadeShadowTexCoord.x, cascadeShadowTexCoord.y ) < BorderPaddingMinMax.y )
         { 
             iCascadeSelected = iCascade;   
             cascadeFound = 1; 
         }		
 	}
-		
-	// Store selected cascade index in z
-	CascadeShadowTexCoord.w = CascadeShadowTexCoord.z;
-	CascadeShadowTexCoord.z = (float)iCascadeSelected;
+
+	// Store selected cascade index in w
+	cascadeShadowTexCoord.w = (float)iCascadeSelected;
 	
-	percentLit = CalculateVarianceShadow(CascadeShadowTexCoord,  posShadowVS, iCascadeSelected);	
-	
-	/*
-	// Blend between cascades
-	int iNextCascadeIndex = min ( NumCascades - 1, iCascadeSelected + 1 ); 
-	CascadeShadowTexCoordBlend = posShadowVS * CascadeScale[iNextCascadeIndex] + CascadeOffset[iNextCascadeIndex];
-	CascadeShadowTexCoordBlend.xy = CascadeShadowTexCoordBlend.xy * 0.5 + 0.5; // Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
-	CascadeShadowTexCoordBlend.w = CascadeShadowTexCoordBlend.z;
-	CascadeShadowTexCoordBlend.z = float(iNextCascadeIndex);
-		
-	// Calculate cascade blend
-	float cascadeBlendWeight = 1.0f;
-	float blendBandLocation = 1.0f;
-		
-	CalculateBlendAmountForMap(CascadeShadowTexCoord.xy, CascadeBlendArea, blendBandLocation, cascadeBlendWeight);
-	if (blendBandLocation < CascadeBlendArea)
+#if defined(PCF)	
 	{
-		float percentLitBlend = CalculateVarianceShadow(CascadeShadowTexCoordBlend, posShadowVS, iNextCascadeIndex);
-			
-		// Blend the two calculated shadows by the blend amount.
-        percentLit = mix(percentLitBlend, percentLit, cascadeBlendWeight); 
-	}	
-	*/
-	
+		percentLit = EvalPossionPCF(CascadeShadowMap, cascadeShadowTexCoord, InvShadowMapSize * ShadowFilterSize);
+	}
+#elif defined(VSM)
+	{
+		percentLit = EvalVSM(CascadeShadowMap, cascadeShadowTexCoord);
+	}
+#elif defined(EVSM)
+	{
+
+	}
+#endif
+
 	selectCascade = iCascadeSelected;
 	return percentLit;
 }

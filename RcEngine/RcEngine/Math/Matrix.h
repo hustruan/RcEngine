@@ -14,7 +14,7 @@ public:
 
 public:
 	Matrix4();
-	Matrix4(const Real* rhs);
+	explicit Matrix4(const Real* rhs);
 	Matrix4(const Matrix4& rhs);
 	
 	Matrix4(Real f11, Real f12, Real f13, Real f14,

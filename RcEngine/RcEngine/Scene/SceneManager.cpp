@@ -197,26 +197,37 @@ void SceneManager::UpdateSceneGraph( float delta )
 	GetRootSceneNode()->Update();
 }
 
-void SceneManager::UpdateRenderQueue(const Camera& cam, RenderOrder order)
+void SceneManager::UpdateRenderQueue( shared_ptr<Camera> camera, RenderOrder order, uint32_t buckterFilter, uint32_t filterIgnore )
 {
-	mRenderQueue.ClearQueue(RenderQueue::BucketOpaque); 
-	mRenderQueue.ClearQueue(RenderQueue::BucketTransparent);
-	mRenderQueue.ClearQueue(RenderQueue::BucketTranslucent);	// Particles
+	mRenderQueue.ClearQueues(buckterFilter);
 
-	GetRootSceneNode()->OnUpdateRenderQueues(cam, order);
-}
-
-void SceneManager::UpdateBackgroundQueue( const Camera& cam )
-{
-	mRenderQueue.ClearQueue(RenderQueue::BucketBackground); 
-
-	// Update skynode same with camera positon, add sky box to render queue
-	if (mSkyBox)
+	if (buckterFilter & RenderQueue::BucketOverlay)
 	{
-		mSkyBox->SetPosition( cam.GetPosition() );
-		mRenderQueue.AddToQueue( RenderQueueItem(mSkyBox, 0), RenderQueue::BucketBackground);
+		for (SpriteBatch* batch : mSpriteBatchs)
+			batch->OnUpdateRenderQueue( mRenderQueue );
 	}
+	
+	if (buckterFilter & RenderQueue::BucketBackground)
+	{
+		// Update skynode same with camera positon, add sky box to render queue
+		if (mSkyBox)
+		{
+			mSkyBox->SetPosition( camera->GetPosition() );
+			mRenderQueue.AddToQueue( RenderQueueItem(mSkyBox, 0), RenderQueue::BucketBackground);
+		}
+	}
+
+	if (buckterFilter & (~(RenderQueue::BucketOverlay | RenderQueue::BucketBackground)))
+		GetRootSceneNode()->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);	
 }
+
+void SceneManager::UpdateOverlayQueue()
+{
+	mRenderQueue.ClearQueues(RenderQueue::BucketOverlay);
+	for (SpriteBatch* batch : mSpriteBatchs)
+		batch->OnUpdateRenderQueue( mRenderQueue );
+}
+
 
 void SceneManager::UpdateLightQueue( const Camera& cam )
 {
@@ -246,27 +257,6 @@ void SceneManager::UpdateLightQueue( const Camera& cam )
 	std::sort(mLightQueue.begin(), mLightQueue.end(), [](Light* lhs, Light* rhs) { return lhs->GetLightType() < rhs->GetLightType(); });
 }
 
-void SceneManager::UpdateOverlayQueue()
-{
-	mRenderQueue.ClearQueue(RenderQueue::BucketOverlay);
-
-	for (SpriteBatch* batch : mSpriteBatchs)
-		batch->OnUpdateRenderQueue( mRenderQueue );
-
-	//for (Sprite* sprite : mSprites)
-	//{
-	//	if (sprite->Empty() == false)
-	//	{
-	//		RenderQueueItem item;
-	//		item.Renderable = sprite;
-
-	//		// ignore render order, only handle state change order
-	//		item.SortKey = (float)sprite->GetMaterial()->GetEffect()->GetResourceHandle();
-	//		.AddToQueue(item, RenderQueue::BucketOverlay);
-	//	}
-	//}
-}
-
 SpriteBatch* SceneManager::CreateSpriteBatch( const shared_ptr<Effect>& effect )
 {
 	SpriteBatch* batch = new SpriteBatch(effect);
@@ -279,6 +269,16 @@ SpriteBatch* SceneManager::CreateSpriteBatch()
 	SpriteBatch* batch = new SpriteBatch();
 	mSpriteBatchs.push_back(batch);
 	return batch;
+}
+
+void SceneManager::DestrySpriteBatch( SpriteBatch* batch )
+{
+	auto it = std::find(mSpriteBatchs.begin(), mSpriteBatchs.end(), batch);
+	if (it != mSpriteBatchs.end())
+	{
+		delete batch;
+		mSpriteBatchs.erase(it);
+	}
 }
 
 

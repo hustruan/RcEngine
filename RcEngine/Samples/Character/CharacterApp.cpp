@@ -28,7 +28,10 @@
 #include <Math/MathUtil.h>
 #include <Core/Profiler.h>
 #include <Core/XMLDom.h>
+#include <Math/Frustum.h>
 #include <fstream>
+
+String gTitle;
 
 CharacterApp::CharacterApp( const String& config )
 	: Application(config), 
@@ -46,7 +49,7 @@ void CharacterApp::Initialize()
 {
 	mCamera = std::make_shared<Camera>();
 	mCamera->CreateLookAt(float3(3.405924, 22.548273, -31.670168), float3(3.326280, 22.028830, -30.819384), float3(-0.048415, 0.854505, 0.517183));
-	mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 3000.0f );
+	mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 1500.0f );
 
 	/*mCameraControler = new RcEngine::Test::FPSCameraControler;
 	mCameraControler->AttachCamera(*mCamera);
@@ -58,6 +61,9 @@ void CharacterApp::Initialize()
 
 	DebugDrawManager::Initialize();
 	DebugDrawManager::GetSingleton().OnGraphicsInitialize();
+
+	gTitle = (mAppSettings.RHDeviceType == RD_OpenGL) ? "OpenGL Application" : "Direct3D11 Application";
+	mMainWindow->SetTitle(gTitle);	
 }
 
 void CharacterApp::LoadContent()
@@ -72,8 +78,9 @@ void CharacterApp::LoadContent()
 	screenFB->SetCamera(mCamera);
 
 	Light* mDirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
-	mDirLight->SetDirection(float3(0, -1, 0.5));
+	mDirLight->SetDirection(float3(0, -1.0, 1.0));
 	mDirLight->SetLightColor(float3(1, 1, 1));
+	mDirLight->SetShadowCascades(4);
 	mDirLight->SetCastShadow(true);
 	sceneMan->GetRootSceneNode()->AttachObject(mDirLight);
 
@@ -86,7 +93,8 @@ void CharacterApp::LoadContent()
 	}
 
 	//Entity* arena = sceneMan->CreateEntity("Arena", "./Sinbad/Floor.mesh",  "Custom");
-	//sceneMan->GetRootSceneNode()->AttachObject(arena);
+	//SceneNode* citySceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Floor", float3(0, 18.5f, 0));
+	//citySceneNode->AttachObject(arena);
 
 	mSinbadController = new SinbadCharacterController(mCamera);
 	mThirdPersonCamera = new ThirdPersonCamera(mSinbadController, mCamera);
@@ -117,24 +125,22 @@ void CharacterApp::Update( float deltaTime )
 
 	//mCameraControler->Update(deltaTime);
 
+	//if ( InputSystem::GetSingleton().KeyPress(KC_P) )
+	//{
+	//	auto target = mCamera->GetLookAt();
+	//	auto eye = mCamera->GetPosition();
+	//	auto up = mCamera->GetUp();
 
-	if ( InputSystem::GetSingleton().KeyPress(KC_P) )
-	{
-		auto target = mCamera->GetLookAt();
-		auto eye = mCamera->GetPosition();
-		auto up = mCamera->GetUp();
+	//	FILE* f = fopen("E:/camera.txt", "w");
+	//	fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
+	//		eye[0], eye[1], eye[2], 
+	//		target[0], target[1], target[2],
+	//		up[0], up[1], up[2]);
+	//	fclose(f);
+	//}
 
-		FILE* f = fopen("E:/camera.txt", "w");
-		fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
-			eye[0], eye[1], eye[2], 
-			target[0], target[1], target[2],
-			up[0], up[1], up[2]);
-		fclose(f);
-	}
-
-	char buffer[255];
-	std::sprintf(buffer, "FPS: %d", mFramePerSecond);
-	mMainWindow->SetTitle(buffer);
+	String title = gTitle + " FPS: " + std::to_string(mFramePerSecond);
+	mMainWindow->SetTitle(title);
 }
 
 void CharacterApp::Render()

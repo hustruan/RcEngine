@@ -2,7 +2,7 @@
 #define CascadedShadowMap_h__
 
 #include <Core/Prerequisites.h>
-#include <Graphics/FrameBuffer.h>
+#include <Graphics/RenderOperation.h>
 #include <Math/Matrix.h>
 
 namespace RcEngine {
@@ -10,13 +10,20 @@ namespace RcEngine {
 #define MAX_CASCADES 4
 #define SHADOW_MAP_SIZE 1024
 #define SHADOW_MAP_BLUR_KERNEL_SIZE 5
-
-#define SHADOW_MAP_VSM
+#define MAX_POSSION_SAMPLES 24
 
 class RenderDevice;
 
 class _ApiExport CascadedShadowMap
 {
+public:
+	enum ShadowMapFilter
+	{
+		PossionDiskPCF,
+		VSM,
+		EVSM
+	};
+
 public:
 	CascadedShadowMap(RenderDevice* device);
 	virtual ~CascadedShadowMap() {}
@@ -27,6 +34,8 @@ public:
 
 private:
 	void UpdateShadowMapStorage(const Light& light);
+
+	void CreatePossionDiskSamples();
 
 private:	
 	RenderDevice* mDevice;
@@ -48,9 +57,13 @@ private:
 	shared_ptr<Effect> mBlurEffect;
 
 	// FSQuad
-	shared_ptr<RenderOperation> mFSQuadShape;
+	RenderOperation mFSQuadRop;
 
 public:
+
+	ShadowMapFilter mShadowMapFilter;
+	String mShadowMapTech;
+
 	shared_ptr<Texture> mShadowDepth;
 	shared_ptr<Texture> mShadowTexture;
 	
@@ -58,9 +71,11 @@ public:
 	shared_ptr<SamplerState> mPCFSampleState;
 	shared_ptr<SamplerState> mVSMSampleState;
 
-
 	// Light view matrix
-	float4x4 mShadowView; 
+	float4x4 mLightViewMatrix; 
+
+	// Map [-1, 1]x[-1, 1] -> [0, 1]x[0, 1]
+	float4x4 mShadowTexCoordNormMatrix;
 	
 	// Light ortho projection scale and offset 
 	std::vector<float4> mShadowCascadeScale;
@@ -72,6 +87,12 @@ public:
 
 	bool mMoveLightTexelSize;
 	float mCascadeBlendArea;
+
+	// PCF 
+	uint32_t mNumPossionSamples;
+	float mShadowFilterSize;
+	float mShadowBias;	
+	shared_ptr<GraphicsBuffer> mPossionSamplesCBuffer;
 };
 
 

@@ -29,10 +29,10 @@ shared_ptr<GraphicsBuffer> D3D11Factory::CreateIndexBuffer( uint32_t buffreSize,
 		new D3D11Buffer(buffreSize, accessHint, (BufferCreate_Index | createFlags), 0, initData) );
 }
 
-shared_ptr<GraphicsBuffer> D3D11Factory::CreateUniformBuffer( uint32_t buffreSize, uint32_t accessHint, uint32_t createFlags,ElementInitData* initData )
+shared_ptr<GraphicsBuffer> D3D11Factory::CreateConstantBuffer( uint32_t buffreSize, uint32_t accessHint, uint32_t createFlags,ElementInitData* initData )
 {
 	return shared_ptr<GraphicsBuffer>(
-		new D3D11Buffer(buffreSize, accessHint, (BufferCreate_Uniform | createFlags), 0, initData) );
+		new D3D11Buffer(buffreSize, accessHint, (BufferCreate_Constant | createFlags), 0, initData) );
 }
 
 shared_ptr<GraphicsBuffer> D3D11Factory::CreateTextureBuffer( PixelFormat format, uint32_t elementCount, uint32_t accessHint, uint32_t createFlags, ElementInitData* initData )

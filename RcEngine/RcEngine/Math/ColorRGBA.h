@@ -11,7 +11,7 @@ class _ApiExport ColorRGBA
 public:
 	ColorRGBA ();  // initial values (0,0,0,0)
 	ColorRGBA (float fR, float fG, float fB, float fA);
-	ColorRGBA (const float* tuple);
+	explicit ColorRGBA (const float* tuple);
 	ColorRGBA (const ColorRGBA& rhs);
 		
 	// assignment

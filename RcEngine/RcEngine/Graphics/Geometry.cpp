@@ -193,4 +193,67 @@ void BuildBoxOperation( RenderOperation& oOperation )
 	oOperation.VertexDecl = factory->CreateVertexDeclaration(vdsc, 1);
 }
 
+void BuildFullscreenTriangle( RenderOperation& oOperation )
+{
+	oOperation.SetVertexRange(0, 3);
+	oOperation.PrimitiveType = PT_Triangle_List;
+}
+
+void BuildFrustumOperation( RenderOperation& oOperation )
+{
+	RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
+
+	float3 vertices[] =
+	{
+		float3( -1.0f,  1.0f, -1.0f ),
+		float3(  1.0f,  1.0f, -1.0f ),
+		float3(  1.0f,  1.0f,  1.0f ),
+		float3( -1.0f,  1.0f,  1.0f ),
+		float3( -1.0f, -1.0f, -1.0f ),
+		float3(  1.0f, -1.0f, -1.0f ),
+		float3(  1.0f, -1.0f,  1.0f ),
+		float3( -1.0f, -1.0f,  1.0f ),
+	};
+
+	uint16_t indices[] =
+	{
+		3,1,0,
+		2,1,3,
+
+		0,5,4,
+		1,5,0,
+
+		3,4,7,
+		0,4,3,
+
+		1,6,5,
+		2,6,1,
+
+		2,7,6,
+		3,7,2,
+
+		6,4,5,
+		7,4,6,
+	};
+
+
+	ElementInitData vInit;
+	vInit.pData = vertices;
+	vInit.rowPitch = sizeof(vertices);
+	oOperation.BindVertexStream(0, factory->CreateVertexBuffer(sizeof(vertices), EAH_GPU_Read | EAH_CPU_Write, BufferCreate_Vertex, &vInit));
+
+	ElementInitData iInit;
+	iInit.pData = indices;
+	iInit.rowPitch = sizeof(indices);
+	oOperation.BindIndexStream(factory->CreateIndexBuffer(sizeof(indices), EAH_GPU_Read | EAH_CPU_Write, BufferCreate_Index, &iInit), IBT_Bit16);
+
+	oOperation.PrimitiveType = PT_Triangle_List;
+	oOperation.IndexCount = ARRAY_SIZE(indices);
+
+	VertexElement vdsc[] = {
+		VertexElement(0, VEF_Float3,  VEU_Position, 0),
+	};
+	oOperation.VertexDecl = factory->CreateVertexDeclaration(vdsc, 1);
+}
+
 }
