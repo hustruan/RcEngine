@@ -4,6 +4,11 @@
 #include <Core/Exception.h>
 #include <Input/InputEvent.h>
 #include <Input/InputSystem.h>
+#include <d3d11.h>
+
+#pragma comment(lib, "D3D11.lib")
+#pragma comment(lib, "D3DCompiler.lib")
+#pragma comment(lib, "dxguid.lib")
 
 #if defined(RcWindows)
 
