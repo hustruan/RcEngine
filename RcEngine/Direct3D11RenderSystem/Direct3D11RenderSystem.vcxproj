@@ -98,6 +98,7 @@
     <ClInclude Include="D3D11Module.h" />
     <ClInclude Include="D3D11RenderWindow.h" />
     <ClInclude Include="D3D11Shader.h" />
+    <ClInclude Include="D3D11HBAO.h" />
     <ClInclude Include="D3D11State.h" />
     <ClInclude Include="D3D11VertexDeclaration.h" />
     <ClInclude Include="D3D11View.h" />
@@ -114,6 +115,7 @@
     <ClCompile Include="D3D11RenderWindow.cpp" />
     <ClCompile Include="D3D11Shader.cpp" />
     <ClCompile Include="D3D11ShaderPipeline.cpp" />
+    <ClCompile Include="D3D11HBAO.cpp" />
     <ClCompile Include="D3D11State.cpp" />
     <ClCompile Include="D3D11Texture.cpp" />
     <ClCompile Include="D3D11Texture1D.cpp" />

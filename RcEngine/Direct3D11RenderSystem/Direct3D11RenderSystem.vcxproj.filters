@@ -56,6 +56,9 @@
     <ClInclude Include="D3D11Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11HBAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D11Texture1D.cpp">
@@ -116,6 +119,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D3D11ShaderPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11HBAO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

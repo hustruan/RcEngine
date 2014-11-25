@@ -274,6 +274,21 @@ void DeepGBufferRadiosity::RenderLambertianOnly()
 	}
 }
 
+void DeepGBufferRadiosity::OnGraphicsInit(const shared_ptr<Camera>& camera)
+{
+
+}
+
+void DeepGBufferRadiosity::OnWindowResize(uint32_t width, uint32_t height)
+{
+
+}
+
+void DeepGBufferRadiosity::RenderScene()
+{
+
+}
+
 
 
 }

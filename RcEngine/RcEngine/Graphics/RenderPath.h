@@ -13,6 +13,8 @@ namespace RcEngine {
 
 class CascadedShadowMap;
 class RenderDevice;
+class AmbientOcclusion;
+class SSAO;
 
 class _ApiExport RenderPath
 {
@@ -43,7 +45,7 @@ class _ApiExport ForwardPath : public RenderPath
 {
 public:
 	ForwardPath();
-	virtual ~ForwardPath() {}
+	virtual ~ForwardPath();
 
 	virtual void OnGraphicsInit(const shared_ptr<Camera>& camera);
 	virtual void OnWindowResize(uint32_t width, uint32_t height);
@@ -68,7 +70,7 @@ class _ApiExport DeferredPath : public RenderPath
 {
 public:
 	DeferredPath();
-	virtual ~DeferredPath() {}
+	virtual ~DeferredPath();
 
 	virtual void OnGraphicsInit(const shared_ptr<Camera>& camera);
 	virtual void OnWindowResize(uint32_t width, uint32_t height);
@@ -76,13 +78,13 @@ public:
 
 	shared_ptr<Effect> GetDeferredEffect() const { return mDeferredEffect; } 
 	CascadedShadowMap* GetShadowManager() const  { return mShadowMan; }
+	AmbientOcclusion* GetAmbientOcclusion() const { return mAmbientOcclusion; }
 
 protected:
 
 	void CreateBuffers(uint32_t width, uint32_t height);
 
 	void GenereateGBuffer();
-	void ComputeSSAO();
 	void DeferredLighting(); // Lighting pass
 	void DeferredShading();  // Shading pass
 	void PostProcess();
@@ -95,6 +97,8 @@ protected:
 protected:
 
 	CascadedShadowMap* mShadowMan;
+	AmbientOcclusion* mAmbientOcclusion;
+	shared_ptr<SSAO> mSSAO;
 
 	// Normal + Specular Shininess,  Albedo + Specular Intensity
 	shared_ptr<Texture> mGBuffer[2];

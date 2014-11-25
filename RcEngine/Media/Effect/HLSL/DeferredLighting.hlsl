@@ -210,7 +210,7 @@ void DeferredShadingPSMain(
 	
 	float3 final = 0;
 
-	final =  diffueLight * diffuseAlbedo + ((shininess + 2.0) / 8.0) * fresnelTerm * specularLight;
+	final =  diffueLight * diffuseAlbedo ; //+ ((shininess + 2.0) / 8.0) * fresnelTerm * specularLight;
 	final += float3(0.1, 0.1, 0.1) * diffuseAlbedo;
 
 	oFragColor = float4(final, 1.0);

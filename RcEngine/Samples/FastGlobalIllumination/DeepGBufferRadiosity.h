@@ -145,6 +145,10 @@ public:
 	DeepGBufferRadiosity(void);
 	~DeepGBufferRadiosity(void);
 
+	void OnGraphicsInit(const shared_ptr<Camera>& camera);
+	void OnWindowResize(uint32_t width, uint32_t height);
+	void RenderScene();
+
 private:
 	void CreateBuffers(uint32_t width, uint32_t height);
 	void RenderLambertianOnly();

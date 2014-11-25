@@ -14,7 +14,7 @@ public:
 	~Image();
 
 	bool LoadImageFromDDS(const String& filename);
-	void SaveImageToFile(const String& filename);
+	void SaveImageToFile(const String& filename, int layer = 0, int level = 0);
 	void SaveLinearDepthToFile(const String& filename, float projM33, float projM43);
 
 	inline uint32_t GetWidth() const		{ assert(mValid); return mWidth; }
@@ -33,10 +33,11 @@ public:
 	const void* GetLevel(uint32_t level, uint32_t layer = 0, CubeMapFace face = CMF_PositiveX) const;
 	void* GetLevel(uint32_t level, uint32_t layer = 0, CubeMapFace face = CMF_PositiveX);
 
-private:
-	void Clear();
 	bool CopyImageFromTexture(const shared_ptr<Texture>& texture);
 
+private:
+	void Clear();
+	
 private:
 
 	TextureType mType;

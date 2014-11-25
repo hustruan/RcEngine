@@ -324,6 +324,9 @@
     <ClInclude Include="Graphics\AmbientOcclusion.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="GUI\UIAll.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Exception.cpp">
@@ -744,6 +747,15 @@
     <FxCompile Include="..\Media\Effect\HLSL\VSM.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusion.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ReconstructCSZ.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusionBlur.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -789,6 +801,9 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\HDR.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\AmbientOcclusion.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

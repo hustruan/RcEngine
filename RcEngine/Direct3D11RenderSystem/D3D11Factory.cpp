@@ -7,6 +7,7 @@
 #include "D3D11Shader.h"
 #include "D3D11State.h"
 #include "D3D11VertexDeclaration.h"
+#include "D3D11HBAO.h"
 #include <Core/Exception.h>
 
 namespace RcEngine {
@@ -195,6 +196,11 @@ shared_ptr<VertexDeclaration> D3D11Factory::CreateVertexDeclaration( VertexEleme
 shared_ptr<FrameBuffer> D3D11Factory::CreateFrameBuffer( uint32_t width, uint32_t height )
 {
 	return shared_ptr<FrameBuffer>( new D3D11FrameBuffer(width, height) );
+}
+
+shared_ptr<AmbientOcclusion::HBAOImpl> D3D11Factory::CreateHBAO(uint32_t aoWidth, uint32_t aoHeight)
+{
+	return shared_ptr<D3D11HBAOImpl>( new D3D11HBAOImpl(aoWidth, aoHeight) );
 }
 
 

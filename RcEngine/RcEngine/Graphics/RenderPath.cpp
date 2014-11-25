@@ -12,6 +12,7 @@
 #include <Graphics/RenderOperation.h>
 #include <Graphics/CascadedShadowMap.h>
 #include <Graphics/DebugDrawManager.h>
+#include <Graphics/AmbientOcclusion.h>
 #include <MainApp/Application.h>
 #include <MainApp/Window.h>
 #include <Scene/SceneManager.h>
@@ -57,9 +58,15 @@ void RenderPath::DrawOverlays()
 
 //----------------------------------------------------------------------------------------------
 ForwardPath::ForwardPath()
-	: RenderPath()
+	: RenderPath(),
+	  mShadowMan(NULL)
 {
 
+}
+
+ForwardPath::~ForwardPath()
+{
+	SAFE_DELETE(mShadowMan);
 }
 
 void ForwardPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
@@ -145,13 +152,23 @@ void ForwardPath::RenderScene()
 	}
 }
 
+
+
 //--------------------------------------------------------------------------------------------
 DeferredPath::DeferredPath()
 	: RenderPath(),
 	  mVisualLights(false),
-	  mVisualLightsWireframe(false)
+	  mVisualLightsWireframe(false),
+	  mShadowMan(NULL),
+	  mAmbientOcclusion(NULL)
 {
 
+}
+
+DeferredPath::~DeferredPath()
+{
+	SAFE_DELETE(mShadowMan);
+	SAFE_DELETE(mAmbientOcclusion);
 }
 
 void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
@@ -183,6 +200,10 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mGBufferFB->SetCamera(camera);
 	mLightAccumulateFB->SetCamera(camera);
 	mHDRFB->SetCamera(camera);
+
+	//-------------------------
+	mAmbientOcclusion = new AmbientOcclusion(mDevice, SSAO_HBAO, windowWidth, windowHeight);
+	mShadowMan = new CascadedShadowMap(mDevice);
 }
 
 void DeferredPath::CreateBuffers( uint32_t windowWidth, uint32_t windowHeight )
@@ -283,6 +304,9 @@ void DeferredPath::OnWindowResize( uint32_t windowWidth, uint32_t windowHeight )
 void DeferredPath::RenderScene()
 {
 	GenereateGBuffer();
+
+	return;
+
 	DeferredLighting();
 	DeferredShading();
 
@@ -340,6 +364,8 @@ void DeferredPath::GenereateGBuffer()
 	// Todo: update render queue with render bucket filter
 	mSceneMan->UpdateRenderQueue(mCamera, RO_None, RenderQueue::BucketAll, 0);   
 
+	auto aabb = mSceneMan->GetRootSceneNode()->GetWorldBoundingBox();
+
 	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
@@ -347,16 +373,14 @@ void DeferredPath::GenereateGBuffer()
 		renderItem.Renderable->Render();
 	}
 
-	if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
-	{
-		mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer0.pfm", mGBuffer[0]);
-		mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer1.tga", mGBuffer[1]);
-	}
-}
+	if (mAmbientOcclusion)
+		mAmbientOcclusion->Apply(*mCamera, mDepthStencilBuffer);
 
-void DeferredPath::ComputeSSAO()
-{
-
+	//if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
+	//{
+	//	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer0.pfm", mGBuffer[0]);
+	//	mDevice->GetRenderFactory()->SaveTextureToFile("E:/GBuffer1.tga", mGBuffer[1]);
+	//}
 }
 
 void DeferredPath::DeferredLighting()
@@ -449,7 +473,7 @@ void DeferredPath::PostProcess()
 	mDevice->BindFrameBuffer(screenFB);
 	screenFB->Clear(CF_Color | CF_Depth, ColorRGBA::Black, 1.0, 0);
 
-	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("CopyDepthColor");
+	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("CopyColorDepth");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
 }
 

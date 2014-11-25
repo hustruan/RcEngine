@@ -249,7 +249,7 @@ shared_ptr<Texture> RenderFactory::LoadTextureFromFile( const String& filename )
 	ENGINE_EXCEPT(Exception::ERR_INVALID_PARAMS, "Internal Error", "RenderFactory::LoadTextureFromFile");
 }
 
-void RenderFactory::SaveTextureToFile( const String& filename, const shared_ptr<Texture>& texture )
+void RenderFactory::SaveTextureToFile(const String& filename, const shared_ptr<Texture>& texture)
 {
 	String path, name, ext;
 	PathUtil::SplitPath(filename, path, name, ext);

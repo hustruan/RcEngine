@@ -5,6 +5,7 @@
 #include <Graphics/GraphicsCommon.h>
 #include <Graphics/PixelFormat.h>
 #include <Graphics/RenderState.h>
+#include <Graphics/AmbientOcclusion.h>
 
 namespace RcEngine {
 
@@ -14,6 +15,7 @@ class UnorderedAccessView;
 struct ElementInitData;
 struct ShaderMacro;
 struct VertexElement;
+
 
 class _ApiExport RenderFactory
 {
@@ -137,6 +139,8 @@ public:
 	virtual shared_ptr<RenderView> CreateDepthStencilView(const shared_ptr<Texture>& texture, uint32_t arrayIndex, uint32_t level, uint32_t flags = 0) = 0;
 	virtual shared_ptr<RenderView> CreateRenderTargetView2D(const shared_ptr<Texture>& texture, uint32_t arrayIndex, uint32_t level) = 0;
 	virtual shared_ptr<RenderView> CreateRenderTargetViewArray(const shared_ptr<Texture>& texture, uint32_t level) = 0;
+
+	virtual shared_ptr<AmbientOcclusion::HBAOImpl> CreateHBAO(uint32_t aoWidth, uint32_t aoHeight) = 0; 
 
 protected:
 	virtual shared_ptr<BlendState> CreateBlendStateImpl(const BlendStateDesc& desc) = 0;

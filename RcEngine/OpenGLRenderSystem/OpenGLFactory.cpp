@@ -6,6 +6,7 @@
 #include "OpenGLShader.h"
 #include "OpenGLFrameBuffer.h"
 #include "OpenGLVertexDeclaration.h"
+#include "OpenGLHBAO.h"
 #include <Core/Exception.h>
 #include <Graphics/RenderState.h>
 #include "pfm.h"
@@ -183,6 +184,11 @@ shared_ptr<ShaderPipeline> OpenGLFactory::CreateShaderPipeline( Effect& effect )
 shared_ptr<FrameBuffer> OpenGLFactory::CreateFrameBuffer( uint32_t width, uint32_t height )
 {
 	return std::make_shared<OpenGLFrameBuffer>(width, height);
+}
+
+shared_ptr<AmbientOcclusion::HBAOImpl> OpenGLFactory::CreateHBAO(uint32_t aoWidth, uint32_t aoHeight)
+{
+	return std::make_shared<OpenGLHBAOImpl>(aoWidth, aoHeight);
 }
 
 //shared_ptr<Texture> OpenGLRenderFactory::CreateTextureFromFile( const std::string& texFileName, uint32_t accessHint )

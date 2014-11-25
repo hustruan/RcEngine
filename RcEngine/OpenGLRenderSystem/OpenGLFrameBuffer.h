@@ -30,7 +30,7 @@ class _OpenGLExport OpenGLRenderView : public RenderView
 public:
 	OpenGLRenderView(const shared_ptr<Texture>& texture);
 	virtual ~OpenGLRenderView();
-
+	
 	virtual void ClearColor(const ColorRGBA& clr);
 	virtual void ClearDepth(float depth);
 	virtual void ClearStencil(uint32_t stencil);

@@ -70,6 +70,7 @@
     <ClInclude Include="GUI\ScrollBar.h" />
     <ClInclude Include="GUI\Slider.h" />
     <ClInclude Include="GUI\TextEdit.h" />
+    <ClInclude Include="GUI\UIAll.h" />
     <ClInclude Include="GUI\UIElement.h" />
     <ClInclude Include="GUI\UIManager.h" />
     <ClInclude Include="GUI\UIWindow.h" />
@@ -227,6 +228,13 @@
     <None Include="Math\Vector.inl" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusion.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusionBlur.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DebugView.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -291,6 +299,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ReconstructCSZ.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\VSM.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -314,6 +325,7 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\AlphaTest.effect.xml" />
+    <Xml Include="..\Media\Effect\AmbientOcclusion.effect.xml" />
     <Xml Include="..\Media\Effect\Compute.effect.xml" />
     <Xml Include="..\Media\Effect\DebugView.effect.xml" />
     <Xml Include="..\Media\Effect\DeferredLighting.effect.xml">

@@ -24,10 +24,13 @@ void ShadowMapVS(VSInput input,
 }
 
 // PCF
+
 void ShadowMapAlphaPCF(in float2 iTex : TEXCOORD0)
 {
+#if defined(_AlphaTest)
 	float4 tap = DiffuseMap.Sample(MaterialSampler, iTex);
 	if( tap.a < 0.01 ) discard;
+#endif
 }
 
 

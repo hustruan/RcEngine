@@ -1,6 +1,6 @@
 
 // Total number of direct samples to take at each pixel
-#define NUM_SAMPLES (11)
+#define NUM_SAMPLES (9)
 
 // If using depth mip levels, the log of the maximum pixel offset before we need to switch to a lower 
 // miplevel to maintain reasonable spatial locality in the cache
@@ -32,7 +32,7 @@ cbuffer AOParams
 	// World space sample radius
 	float Radius	;
 	float Radius2   ;
-	float InvRadius ;
+	float InvRadius2 ;
 
 	/** Bias to avoid AO in smooth corners, e.g., 0.01m */
 	float Bias	    ;
@@ -56,10 +56,10 @@ float fallOffFunction(float vv, float vn, float epsilon)
 {
     // A: From the HPG12 paper
     // Note large epsilon to avoid overdarkening within cracks
-    // return float(vv < Radius2) * max((vn - Bias) / (epsilon + vv), 0.0) * Radius2 * 0.6;
+    return float(vv < Radius2) * max((vn - Bias) / (epsilon + vv), 0.0) * Radius2 * 0.6;
 
     // B: Smoother transition to zero (lowers contrast, smoothing out corners). [Recommended]
-    float f = max(Radius2 - vv, 0.0); return f * f * f * max((vn - Bias) / (epsilon + vv), 0.0);
+    //float f = Radius2 - vv; return f * f * f * max((vn - Bias) / (epsilon + vv), 0.0);
 
     // C: Medium contrast (which looks better at high radii), no division.  Note that the 
     // contribution still falls off with Radius2^2, but we've adjusted the rate in a way that is
@@ -78,7 +78,8 @@ float aoValueFromPositionsAndNormal(float3 C, float3 n_C, float3 Q)
     float vv = dot(v, v);
     float vn = dot(v, n_C);
     const float epsilon = 0.001;
-    return fallOffFunction(vv, vn, epsilon);
+   
+	return fallOffFunction(vv, vn, epsilon);
 }
 
 /** Returns a unit vector and a screen-space radius for the tap on a unit disk (the caller should scale by the actual disk radius) */
@@ -97,12 +98,8 @@ float3 getOffsetPosition(int2 ssC, float2 unitOffset, float ssR)
 {
 	// Derivation:
 	//  mipLevel = floor(log(ssR / MAX_OFFSET));
-#   ifdef GL_EXT_gpu_shader5
-        int mipLevel = clamp(findMSB(int(ssR)) - LOG_MAX_OFFSET, 0, MAX_MIP_LEVEL);
-#   else
-        int mipLevel = clamp(int(floor(log2(ssR))) - LOG_MAX_OFFSET, 0, MAX_MIP_LEVEL);
-#   endif
 
+	int mipLevel = clamp(int(floor(log2(ssR))) - LOG_MAX_OFFSET, 0, MAX_MIP_LEVEL);
 	int2 ssP = int2(ssR*unitOffset) + ssC;
 
 	float3 P;
@@ -167,15 +164,14 @@ void AlchemyAmbientObsurance(in float4 iFragCoord : SV_Position,
     
     // Choose the screen-space sample radius
     // proportional to the projected area of the sphere
-    float ssDiskRadius = -ProjScale * Radius / C.z;
+    float ssDiskRadius = ProjScale * Radius / C.z;
 	
-	 float sum = 0.0;
+	float sum = 0.0;
     for (int i = 0; i < NUM_SAMPLES; ++i)
-	{
-            sum += sampleAO(ssC, C, n_C, ssDiskRadius, i, randomPatternRotationAngle);
-    }
+		sum += sampleAO(ssC, C, n_C, ssDiskRadius, i, randomPatternRotationAngle);
 
-    float A = max(0.0, 1.0 - sum * IntensityDivR6 * (5.0 / NUM_SAMPLES));
+    	
+	float A = max(0.0, 1.0 - sum * IntensityDivR6 * (5.0 / NUM_SAMPLES));
 
     // Anti-tone map to reduce contrast and drag dark region farther
     // (x^0.2 + 1.2 * x^4)/2.2
@@ -185,5 +181,10 @@ void AlchemyAmbientObsurance(in float4 iFragCoord : SV_Position,
     //A = randomPatternRotationAngle / (2 * 3.141592653589);
     //A = mod(A, 1.0);
 
-    oVisibility = A;
+	oVisibility = A;
+	//oVisibility = min(0, A) + ssDiskRadius;
+	
+	//int mipLevel = 1;
+	//float z = CameraSpaceZBuffer.Load(int3(ssC >> mipLevel, mipLevel)).r;
+	//oVisibility = min(A, 0) + z / 3000.0f;
 }
