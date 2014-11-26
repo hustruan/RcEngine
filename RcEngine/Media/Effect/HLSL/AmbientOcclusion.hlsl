@@ -137,8 +137,9 @@ float sampleAO(int2 ssC, float3 C, float3 n_C, float ssDiskRadius, int tapIndex,
     return aoValueFromPositionsAndNormal(C, n_C, Q);
 }
 
-void AlchemyAmbientObsurance(in float4 iFragCoord : SV_Position,
-							 out float oVisibility : SV_Target0)
+void AlchemyAmbientObsurance(in float2 iTex			: TEXCOORD0,
+							 in float4 iFragCoord   : SV_Position,
+							 out float oVisibility  : SV_Target0)
 {
 	int2 ssC = int2(iFragCoord.xy);
 

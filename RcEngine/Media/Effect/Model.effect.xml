@@ -2,6 +2,8 @@
 
   <!-- Effect parameter which has Semantic -->
   <AutoBinding name="World" semantic="WorldMatrix" type="float4x4"/>
+  <AutoBinding name="View" semantic="ViewMatrix" type="float4x4"/>
+  <AutoBinding name="Projection" semantic="ProjectionMatrix" type="float4x4"/>
   <AutoBinding name="ViewProj" semantic="ViewProjectionMatrix" type="float4x4"/>
   <AutoBinding name="DiffuseMap" semantic="DiffuseMaterialMap" type="texture2d"/>
   <AutoBinding name="SpecularMap" semantic="SpecularMaterialMap" type="texture2d"/>
@@ -63,8 +65,8 @@
 
   <Technique name="GBuffer">
 	  <Pass name="p0">
-		  <VertexShader file="Model" entry="ModelVS"/>
-		  <PixelShader file="GBuffer" entry="GBufferPS"/>
+      <VertexShader file="Model" entry="ModelVS"/>
+      <PixelShader file="GBuffer" entry="GBufferPS"/>
 		  <State name="StencilEnable" value="true"/>
 		  <State name="FrontStencilRef" value="1"/>
 		  <State name="FrontStencilFunc" value="Always"/>
@@ -74,6 +76,22 @@
 	  </Pass>
   </Technique>
 
+  <Technique name="DeepGBuffer">
+    <Pass name="p0">
+      <VertexShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferPS"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="PeeledDeepGBuffer">
+    <Pass name="p0">
+      <VertexShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferPS">
+        <Macro name="USE_DEPTH_PEEL"/>
+      </PixelShader>
+    </Pass>
+  </Technique>
+  
   <Technique name="DirectionalLighting">
     <Pass name="p0">
       <VertexShader file="Model" entry="ModelVS"/>

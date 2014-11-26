@@ -3,8 +3,10 @@
 
 #include <Core/Prerequisites.h>
 #include <Graphics/GraphicsCommon.h>
+#include <Graphics/RenderOperation.h>
 #include <Math/ColorRGBA.h>
 #include <Math/Matrix.h>
+
 
 #define MaxSamplerCout 16
 
@@ -41,11 +43,16 @@ public:
 	void BindShaderPipeline(const shared_ptr<ShaderPipeline>& pipeline);
 
 	void Draw(const EffectTechnique* technique, const RenderOperation& operation);
-
+	
+	// Draw a full screen triangle without Vertex/Index buffer
+	void DrawFSTriangle(const EffectTechnique* technique);
 
 protected:
 	virtual void DoDraw(const EffectTechnique* technique, const RenderOperation& operation) = 0;
 	virtual void DoBindShaderPipeline(const shared_ptr<ShaderPipeline>& pipeline) = 0;
+
+private:
+	RenderOperation mFSTriangleROP;
 
 protected:
 	RenderFactory* mRenderFactory;

@@ -19,6 +19,7 @@ public:
 	void SetCurrentTechnique(uint32_t index);
 	void SetCurrentTechnique(const String& techName);					
 	
+	inline const String& GetEffectName() const								{ return mEffectName; }
 	inline EffectTechnique* GetCurrentTechnique() const 					{ return mCurrTechnique; }
 	inline uint32_t GetNumTechniques() const								{ return mTechniques.size(); }
 						

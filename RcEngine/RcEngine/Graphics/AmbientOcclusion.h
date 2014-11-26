@@ -100,7 +100,6 @@ private:
 	shared_ptr<RenderView> mBlurRTV;
 
 	shared_ptr<Effect> mAmbientOcclusionEffect;
-	RenderOperation mFullscreenTrangleROP;
 
 	shared_ptr<HBAOImpl> mHBAOImpl;
 

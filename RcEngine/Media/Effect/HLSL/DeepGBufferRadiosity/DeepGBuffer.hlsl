@@ -1,4 +1,3 @@
-// vertex shader input
 struct VSInput 
 {
 	float3 Pos 		 	 : POSITION;
@@ -37,7 +36,7 @@ cbuffer cbObjectChanges
 	float4x4 World;
 };
 
-cbuffer cbCameraChange : register( b0 )
+cbuffer cbCameraChange
 {
     float4x4 View;
 	float4x4 PrevView;
@@ -47,7 +46,7 @@ cbuffer cbCameraChange : register( b0 )
 // vertex shader
 VSOutput GBufferVS(VSInput input)
 {
-	VSOutput output = (VSOutput)0;
+	VSOutput output;
 	
 	float3 normal = normalize( mul(input.Normal, (float3x3)World) );
 	
@@ -79,16 +78,13 @@ VSOutput GBufferVS(VSInput input)
 // Pixel Shader
 #include "../ModelMaterialFactory.hlsl"
 
-// Clip sapce to screen space transform
-float4x4 ProjectionToScreenMatrix;
-
 #ifdef USE_DEPTH_PEEL
-
-	Texture2D<float> PrevDepthBuffer;
-	float3    ClipInfo;
+	Texture2D PrevDepthBuffer;
+	float2 ClipInfo;
 	float MinZSeparation;
-
 #endif 
+
+float4x4 ProjectionToScreenMatrix; 	// Clip sapce to screen space transform
 
 // pixel shader
 void GBufferPS(in VSOutput input,
@@ -98,13 +94,12 @@ void GBufferPS(in VSOutput input,
 			   out float2 oSSVelocity : SV_Target3)
 {
 #ifdef USE_DEPTH_PEEL // Second Layer with minimum separation
-	
-	float oldDepth = PrevDepthBuffer.Load(int3(input.Position.xy, 0));
-	float oldZ = ClipInfo.x / (oldDepth * ClipInfo.y + ClipInfo.z);
+	int2 fragCoord = int2(input.Position.xy);
+	float oldDepth = PrevDepthBuffer.Load(int3(fragCoord, 0)).r;
+	float oldZ = ClipInfo.y / (oldDepth - ClipInfo.x);
 	float currZ = input.PosCS.z;
-	if (currZ <= oldZ + MinZSeparation)
+	if (currZ <= oldZ + MinZSeparation) 
 		discard;
-
 #endif
 
 	Material material;
@@ -138,8 +133,8 @@ void GBufferPS(in VSOutput input,
         float4 ssPositions = float4(temp.xy, accurateHomogeneousFragCoord.xy) / float4(temp.ww, accurateHomogeneousFragCoord.ww);
         oSSVelocity = ssPositions.zw - ssPositions.xy;
 	}
-			
-	oLambertain = float4(material.DiffuseAlbedo, 0.0);
+	
+	oLambertain = float4(material.DiffuseAlbedo, 1.0);
 	oGlossy = float4(material.SpecularAlbedo, material.Shininess / 255.0);
-	oNormal = float4(normal, 0.0); 
+	oNormal = float4(normal * 0.5 + 0.5, 0.0); 
 }

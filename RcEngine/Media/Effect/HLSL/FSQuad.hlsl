@@ -1,8 +1,15 @@
-Texture2D ColorMap;
-SamplerState LinearSampler;
+Texture2D SourceMap;
 
-float4 PSMain(in float2 iTex : TEXCOORD0) : SV_Target0
+void BlitColor(in float2 iTex	    : TEXCOORD0,
+			   in float4 iFragCoord : SV_Position,
+			  out float4 oFragColor : SV_Target0)
 {
-	float4 final = ColorMap.Sample(LinearSampler, iTex);
-	return final;
+	oFragColor = SourceMap.Load(int3(iFragCoord.xy, 0));
+}
+
+void BlitDepth(in float2 iTex	    : TEXCOORD0,
+			   in float4 iFragCoord : SV_Position,
+			  out float  oFragDepth : SV_Depth)
+{
+	oFragDepth = SourceMap.Load(int3(iFragCoord.xy, 0)).r;
 }

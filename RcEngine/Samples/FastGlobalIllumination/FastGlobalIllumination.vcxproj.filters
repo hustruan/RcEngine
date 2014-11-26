@@ -18,9 +18,18 @@
     <ClInclude Include="DeepGBufferRadiosity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DeepGBufferRadiositySettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeepGBufferRadiosity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeepGBufferRadiosityApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DeepGBufferRadiositySettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

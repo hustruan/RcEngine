@@ -54,7 +54,6 @@ AmbientOcclusion::AmbientOcclusion(RenderDevice* device, SSAO_Method aoMethod, u
 
 	}
 
-	BuildFullscreenTriangle(mFullscreenTrangleROP);
 	mAmbientOcclusionEffect = ResourceManager::GetSingleton().GetResourceByName<Effect>(RT_Effect, "AmbientOcclusion.effect.xml", "General");
 
 	mAmbientOcclusionPanel = new AmbientOcclusionPanel(*this);
@@ -99,7 +98,7 @@ void AmbientOcclusion::GenerateCameraSpaceDepth(const Camera& viewCamera, const 
 	mAmbientOcclusionEffect->GetParameterByName("ClipInfo")->SetValue(float2(proj.M33, proj.M43));
 
 	EffectTechnique* cszTech = mAmbientOcclusionEffect->GetTechniqueByName("ResconstructeCSZ");
-	mDevice->Draw(cszTech, mFullscreenTrangleROP);
+	mDevice->DrawFSTriangle(cszTech);
 	mCameraSpaceDepthBuffer->BuildMipMap();
 
 	// Build mipmap
@@ -151,7 +150,7 @@ void AmbientOcclusion::RenderAlchemy(const Camera& viewCamera, const shared_ptr<
 	mAmbientOcclusionEffect->GetParameterByName("IntensityDivR6")->SetValue(invRadius6);
 
 	EffectTechnique* aoTech = mAmbientOcclusionEffect->GetTechniqueByName("SSAO");
-	mDevice->Draw(aoTech, mFullscreenTrangleROP);
+	mDevice->DrawFSTriangle(aoTech);
 	//mDevice->GetRenderFactory()->SaveTextureToFile("E:/ao.pfm", mAmbientOcclusionBuffer);
 }
 
@@ -178,7 +177,7 @@ void AmbientOcclusion::BlurAmbientObscurance(const shared_ptr<Texture>& aoBuffer
 	mAmbientOcclusionEffect->GetParameterByName("Source")->SetValue(mAmbientOcclusionBuffer->GetShaderResourceView());
 	mAmbientOcclusionEffect->GetParameterByName("CSZBuffer")->SetValue(mCameraSpaceDepthBuffer->GetShaderResourceView());
 	mAmbientOcclusionEffect->GetParameterByName("BlurAxis")->SetValue(int2(1, 0));
-	mDevice->Draw(blurTech, mFullscreenTrangleROP);
+	mDevice->DrawFSTriangle(blurTech);
 
 
 	mFrameBuffer->AttachRTV(ATT_Color0, mAmbientOcclusionRTV);
@@ -187,7 +186,7 @@ void AmbientOcclusion::BlurAmbientObscurance(const shared_ptr<Texture>& aoBuffer
 
 	mAmbientOcclusionEffect->GetParameterByName("Source")->SetValue(mBlurBuffer->GetShaderResourceView());
 	mAmbientOcclusionEffect->GetParameterByName("BlurAxis")->SetValue(int2(0, 1));
-	mDevice->Draw(blurTech, mFullscreenTrangleROP);
+	mDevice->DrawFSTriangle(blurTech);
 }
 
 void AmbientOcclusion::Apply(const Camera& viewCamera, const shared_ptr<Texture>& zBuffer)
@@ -231,7 +230,7 @@ void AmbientOcclusion::Visualize(const shared_ptr<ShaderResourceView>& aoSRV)
 	mAmbientOcclusionEffect->GetParameterByName("DepthBuffer")->SetValue(aoSRV);
 
 	EffectTechnique* aoTech = mAmbientOcclusionEffect->GetTechniqueByName("CopyColor");
-	mDevice->Draw(aoTech, mFullscreenTrangleROP);
+	mDevice->DrawFSTriangle(aoTech);
 }
 
 //////////////////////////////////////////////////////////////////////////

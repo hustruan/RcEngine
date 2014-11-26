@@ -35,6 +35,7 @@ private:
 	RenderOperation mBoneRop;
 	RenderOperation mLineRop;
 	RenderOperation mFrustumRop;
+	RenderOperation mFullscreenTriangleROP;
 	
 	std::map<shared_ptr<Skeleton>, RenderOperation> mSkeletonRopMap;
 };

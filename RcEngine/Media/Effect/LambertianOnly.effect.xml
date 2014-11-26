@@ -1,6 +1,6 @@
-<Effect name="FSQuad">
+<Effect name="LambertianOnly">
 
-  <Technique name="BlitColor">
+  <Technique name="SingleScatteredDL">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
       <PixelShader file="FSQuad" entry="BlitColor"/>
@@ -8,13 +8,12 @@
     </Pass>
   </Technique>
   
-  <Technique name="BlitDepth">
+  <Technique name="MultipleScatteredDL">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
-      <PixelShader file="FSQuad" entry="BlitDepth"/>
+      <PixelShader file="FSQuad" entry="BlitColor"/>
       <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>
 
 </Effect>
-
