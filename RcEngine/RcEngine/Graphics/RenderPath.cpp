@@ -202,7 +202,7 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mHDRFB->SetCamera(camera);
 
 	//-------------------------
-	mAmbientOcclusion = new AmbientOcclusion(mDevice, SSAO_HBAO, windowWidth, windowHeight);
+	mAmbientOcclusion = new AmbientOcclusion(mDevice, SSAO_Alchemy, windowWidth, windowHeight);
 	mShadowMan = new CascadedShadowMap(mDevice);
 }
 
