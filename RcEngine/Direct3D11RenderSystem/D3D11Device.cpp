@@ -383,6 +383,9 @@ void D3D11Device::DoDraw( const EffectTechnique* technique, const RenderOperatio
 			pass->EndPass();
 		}
 	}
+
+	static ID3D11ShaderResourceView* nullSRV[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }; 
+	DeviceContextD3D11->PSSetShaderResources(0, 8, nullSRV);
 }
 
 void D3D11Device::DispatchCompute( const EffectTechnique* technique, uint32_t threadGroupCountX, uint32_t threadGroupCountY, uint32_t threadGroupCounZ )

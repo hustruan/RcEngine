@@ -63,7 +63,7 @@ protected:
 		mRenderPath->OnGraphicsInit(mMainCamera);
 
 		mMainCamera->CreateLookAt(float3(-18.415079, 5.102501, 0.825465), float3(-17.415262, 5.120544, 0.831733));
-		mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.5f, 3000.0f );
+		mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.5f, 300.0f );
 
 		mCameraControler = std::make_shared<Test::FPSCameraControler>(); 
 		mCameraControler->AttachCamera(*mMainCamera);

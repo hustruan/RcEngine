@@ -32,6 +32,8 @@ struct DeepGBufferRadiositySettings
     /** Set to true to drastically increase performance by increasing cache efficiency, at the expense of accuracy */
     bool                        UseMipMaps;
 
+	/** If true, store input and output color buffers at half precision. This will just about halve bandwidth at the cost a accuracy. Default is false */
+	bool						UseHalfPrecisionColors;
 
 
     /** Default is to step in 2-pixel intervals. This constant can be increased while R decreases to improve
@@ -70,9 +72,6 @@ struct DeepGBufferRadiositySettings
         the resulting buffer into AmbientOcclusion.
     */
     float                       DepthPeelSeparationHint;
-
-    /** Compute DeepGBufferRadiosity for the second layer */
-    bool                        ComputePeeledLayer;
 
 
     /** 
@@ -114,8 +113,13 @@ struct DeepGBufferRadiositySettings
 
 	DeepGBufferRadiositySettings()
 		: Enabled(true),
+		  Radius(1.0f),
 		  UseDepthPeelBuffer(true),
-		  DepthPeelSeparationHint(0.5f)
+		  UseHalfPrecisionColors(true),
+		  DepthPeelSeparationHint(0.5f),
+		  PropagationDamping(0.1f),
+		  UnsaturatedBoost(1.0f),
+		  SaturatedBoost(1.0f)
 	{
 	}
 };

@@ -1,0 +1,35 @@
+<Effect name="ResconstructCSZ">
+
+  <Technique name="CSZOnly">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/ReconstructCSZ" entry="ReconstructCSZ">
+        <Macro name="USE_DEPTH_PEEL" value="0"/>
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="2CSZ">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/ReconstructCSZ" entry="ReconstructCSZ">
+        <Macro name="USE_DEPTH_PEEL" value="1"/>
+        <Macro name="USE_OCT16" value="0"/>
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="2CSZNormal">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/ReconstructCSZ" entry="ReconstructCSZ">
+        <Macro name="USE_DEPTH_PEEL" value="1"/>
+        <Macro name="USE_OCT16" value="1"/>
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+</Effect>

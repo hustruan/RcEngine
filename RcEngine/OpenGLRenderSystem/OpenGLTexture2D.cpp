@@ -11,17 +11,17 @@ OpenGLTexture2D::OpenGLTexture2D( PixelFormat format, uint32_t arraySize, uint32
 {
 	mWidth = width;
 	mHeight = height;
+	mMipLevels = numMipMaps;
 
 	// Generate mipmaps if enable
 	if (mCreateFlags & TexCreate_GenerateMipmaps)
 	{
 		// numMipMap == 0, will generate mipmap levels automatically
-		assert(numMipMaps == 0);
-		mMipLevels = Texture::CalculateMipmapLevels((std::max)(width, height));
-	}
-	else
-	{
-		mMipLevels = numMipMaps;
+		if (mMipLevels == 0)
+		{
+			// May defer it to DeviceContext::GenerateMips called.
+			mMipLevels = Texture::CalculateMipmapLevels((std::max)(width, height));
+		}
 	}
 
 	// OpenGL Texture target type
