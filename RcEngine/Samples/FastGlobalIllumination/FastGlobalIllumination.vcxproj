@@ -83,9 +83,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DeepGBufferRadiosity.h" />
+    <ClInclude Include="DeepGBufferRadiositySettings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeepGBufferRadiosity.cpp" />
+    <ClCompile Include="DeepGBufferRadiosityApp.cpp" />
+    <ClCompile Include="DeepGBufferRadiositySettings.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

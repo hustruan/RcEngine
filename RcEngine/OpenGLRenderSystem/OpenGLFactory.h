@@ -106,6 +106,8 @@ public:
 	virtual shared_ptr<RenderView> CreateDepthStencilView(const shared_ptr<Texture>& texture, uint32_t arrayIndex, uint32_t level, uint32_t flags = 0);
 	virtual shared_ptr<RenderView> CreateRenderTargetViewArray(const shared_ptr<Texture>& texture, uint32_t level);
 
+	virtual shared_ptr<AmbientOcclusion::HBAOImpl> CreateHBAO(uint32_t aoWidth, uint32_t aoHeight);
+
 protected:
 	virtual shared_ptr<BlendState> CreateBlendStateImpl(const BlendStateDesc& desc);
 	virtual shared_ptr<SamplerState> CreateSamplerStateImpl(const SamplerStateDesc& desc);

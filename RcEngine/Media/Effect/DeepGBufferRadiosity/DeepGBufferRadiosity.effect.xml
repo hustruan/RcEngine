@@ -1,0 +1,32 @@
+<Effect name="DeepGBufferRadiosity">
+
+  <Technique name="GBufferRadiosity">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBufferRadiosity" entry="DeepGBufferRadiosity">
+        <Macro name="USE_DEPTH_PEEL" value="0"/>
+      </PixelShader>
+    </Pass>
+  </Technique>
+  
+  <Technique name="DeepGBufferRadiosity">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBufferRadiosity" entry="DeepGBufferRadiosity">
+        <Macro name="USE_DEPTH_PEEL" value="1"/>
+        <Macro name="USE_OCT16" value="0"/>
+      </PixelShader>
+    </Pass>
+  </Technique>
+
+  <Technique name="DeepGBufferRadiosityOCT16">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBufferRadiosity" entry="DeepGBufferRadiosity">
+        <Macro name="USE_DEPTH_PEEL" value="1"/>
+        <Macro name="USE_OCT16" value="1"/>
+      </PixelShader>
+    </Pass>
+  </Technique>
+    
+</Effect>

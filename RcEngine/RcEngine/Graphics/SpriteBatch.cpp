@@ -323,14 +323,14 @@ void Sprite::ResizeGeometryBuffers( size_t numVertex, size_t numIndex )
 
 	if (!mIndexBuffer)
 	{
-		mIndexBuffer = factory->CreateVertexBuffer(ibSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+		mIndexBuffer = factory->CreateVertexBuffer(ibSize, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Index, NULL);
 	}
 	else 
 	{
 		uint32_t currIBSize = mIndexBuffer->GetBufferSize();
 		if (currIBSize < ibSize)
 		{
-			mIndexBuffer = factory->CreateIndexBuffer(currIBSize * 2, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Vertex, NULL);
+			mIndexBuffer = factory->CreateIndexBuffer(currIBSize * 2, EAH_CPU_Write | EAH_GPU_Read, BufferCreate_Index, NULL);
 			mRenderOperation->BindIndexStream(mIndexBuffer, IBT_Bit16);
 		}
 	}

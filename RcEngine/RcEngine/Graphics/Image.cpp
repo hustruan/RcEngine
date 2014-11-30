@@ -85,7 +85,7 @@ bool Image::CopyImageFromTexture( const shared_ptr<Texture>& texture )
 	mLevels= texture->GetMipLevels();
 	mLayers = texture->GetTextureArraySize();
 
-	uint32_t totalSize;
+	uint32_t totalSize = 0;
 	uint8_t* pImageData;
 
 	// Compute total size
@@ -95,7 +95,14 @@ bool Image::CopyImageFromTexture( const shared_ptr<Texture>& texture )
 	}
 	else
 	{
-		totalSize = mWidth * mHeight * mLevels * mLayers * PixelFormatUtils::GetNumElemBytes(mFormat);
+		for (uint32_t level = 0; level < mLevels; ++level)
+		{
+			uint32_t levelWidth = (std::max)(1U, mWidth>>level) ;
+			uint32_t levelHeight = (std::max)(1U, mHeight>>level);
+
+			totalSize += levelWidth * levelHeight * mLayers * PixelFormatUtils::GetNumElemBytes(mFormat);
+		}
+
 
 		if (mType == TT_TextureCube)
 			totalSize *= 6;
@@ -274,13 +281,15 @@ float Float16ToFloat( uint16_t fltInt16 )
 
 }
 
-void Image::SaveImageToFile( const String& filename )
+void Image::SaveImageToFile( const String& filename, int layer, int level)
 {
+	int index = layer * mLevels + level;
+	uint32_t w = mWidth >> level, h = mHeight >> level;
+
 	if (mFormat == PF_RGBA8_UNORM)
 	{
-		uint8_t* pixel = (uint8_t*)mSurfaces.front().pData;
-		uint32_t w = mWidth, h = mHeight;
-
+		uint8_t* pixel = (uint8_t*)mSurfaces.at(index).pData;
+		
 		vector<Pixel32> imageData(w*h);
 		
 		if (Application::msApp->GetAppSettings().RHDeviceType != RD_Direct3D11)
@@ -320,9 +329,7 @@ void Image::SaveImageToFile( const String& filename )
 	}
 	else if (mFormat == PF_RGBA32F)
 	{		
-		float* pixel = (float*)mSurfaces.front().pData;
-
-		uint32_t w = mWidth, h = mHeight;
+		float* pixel = (float*)mSurfaces.at(index).pData;
 
 		vector<float> temp;
 		temp.resize(w * h * 3);
@@ -363,9 +370,7 @@ void Image::SaveImageToFile( const String& filename )
 	}
 	else if (mFormat == PF_RGBA16F)
 	{
-		uint16_t* pixel = (uint16_t*)mSurfaces.front().pData;
-
-		uint32_t w = mWidth, h = mHeight;
+		uint16_t* pixel = (uint16_t*)mSurfaces.at(index).pData;
 
 		vector<float> temp;
 		temp.resize(w * h * 3);
@@ -406,9 +411,7 @@ void Image::SaveImageToFile( const String& filename )
 	}
 	else if (mFormat == PF_D24S8)
 	{
-		uint32_t* pixel = (uint32_t*)mSurfaces.front().pData;
-
-		uint32_t w = mWidth, h = mHeight;
+		uint32_t* pixel = (uint32_t*)mSurfaces.at(index).pData;
 
 		vector<float> temp;
 		temp.resize(w * h);
@@ -453,11 +456,9 @@ void Image::SaveImageToFile( const String& filename )
 
 		WritePfm(filename.c_str(), w, h, 1, &temp[0]);
 	}
-	else if (mFormat == PF_D32F)
+	else if (mFormat == PF_D32F || PF_R32F)
 	{
-		float* pixel = (float*)mSurfaces.front().pData;
-
-		uint32_t w = mWidth, h = mHeight;
+		float* pixel = (float*)mSurfaces.at(index).pData;
 
 		vector<float> temp;
 		temp.resize(w * h);
@@ -484,9 +485,7 @@ void Image::SaveImageToFile( const String& filename )
 	}
 	else if (mFormat == PF_RG32F)
 	{		
-		float* pixel = (float*)mSurfaces.front().pData;
-
-		uint32_t w = mWidth, h = mHeight;
+		float* pixel = (float*)mSurfaces.at(index).pData;
 
 		vector<float> temp;
 		temp.resize(w * h * 3);

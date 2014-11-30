@@ -1,0 +1,25 @@
+<Effect name="FSQuad">
+
+  <Sampler name="LinearSampler">
+    <State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+    <State name="AddressU" value="Wrap"/>
+    <State name="AddressV" value="Wrap"/>
+  </Sampler>
+  
+  <Technique name="BlitColor">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="MipmapMinify" entry="BlitColor"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="Minify">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="MipmapMinify" entry="Minify"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+</Effect>

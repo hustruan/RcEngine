@@ -1,18 +1,28 @@
 <Effect name="FSQuad">
 
-  <!-- SamplerState will used in this Effect 
-  <Sampler name="LinearSampler">
-    <State name="Filter" value="Min_Mag_Mip_Linear"/>
-    <State name="AddressU" value="Wrap"/>
-    <State name="AddressV" value="Wrap"/>
-  </Sampler>-->
-
-  <Technique name="CopyDepth">
+  <Technique name="BlitColor">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
-      <PixelShader file="FSQuad" entry="PSMain"/>
+      <PixelShader file="FSQuad" entry="BlitColor"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+  
+  <Technique name="BlitDepth">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="FSQuad" entry="BlitDepth"/>
+      <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>
 
+  <Technique name="Minify">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="MipmapMinify" entry="Minify"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+  
 </Effect>
 

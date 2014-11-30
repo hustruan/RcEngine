@@ -43,6 +43,9 @@
     <Filter Include="Asset\Material">
       <UniqueIdentifier>{2f127fa8-5ee8-4f16-9313-c41678db02ea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Asset\HLSL\DeepGBufferRadiosity">
+      <UniqueIdentifier>{aa9a8abf-69e4-4302-a34a-db5c895d535b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\CompileConfig.h">
@@ -323,6 +326,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\AmbientOcclusion.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\UIAll.h">
+      <Filter>GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -744,6 +750,27 @@
     <FxCompile Include="..\Media\Effect\HLSL\VSM.hlsl">
       <Filter>Asset\HLSL</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusion.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\ReconstructCSZ.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusionBlur.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBuffer.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\LambertianOnly.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBufferRadiosity.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\ReconstructCSZ.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -789,6 +816,15 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\HDR.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\AmbientOcclusion.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\LambertianOnly.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

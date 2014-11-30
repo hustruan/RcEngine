@@ -26,10 +26,10 @@
 #include <Scene/Light.h>
 #include <Math/MathUtil.h>
 #include <Graphics/Image.h>
-#include <Core/Profiler.h>
-#include "LightAnimation.h"
 
 using namespace RcEngine;
+
+#define MAX_MIP_LEVEL 5
 
 class MeshTestApp : public Application
 {
@@ -56,17 +56,17 @@ protected:
 		RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
-		mCamera = std::make_shared<Camera>();
+		const int width = mMainWindow->GetWidth();
+		const int height = mMainWindow->GetHeight();
 
+		mFrameBuffer = factory->CreateFrameBuffer(width, height);
+		mRTBuffer = factory->CreateTexture2D(width, height, PF_RGBA32F, 1, MAX_MIP_LEVEL, 1, 0,
+			EAH_GPU_Read | EAH_GPU_Write, TexCreate_ShaderResource | TexCreate_RenderTarget , NULL);
 
-		//auto effect = resMan.GetResourceByName<Effect>(RT_Effect, "Tessellation.effect.xml", "General");
-		//auto params = effect->GetParameters();
-		
-		//mRenderPath = std::make_shared<ForwardPlusPath>();
-		//mRenderPath = std::make_shared<TiledDeferredPath>();
-		mRenderPath = std::make_shared<DeferredPath>();
-		//mRenderPath = std::make_shared<ForwardPath>();
-		mRenderPath->OnGraphicsInit(mCamera);
+		for (int i = 0; i < MAX_MIP_LEVEL; ++i)
+			mRenderViews.push_back(factory->CreateRenderTargetView2D(mRTBuffer, 0, i));
+
+		mMipLevel = 0;
 	}
 
 	void LoadContent()
@@ -75,162 +75,10 @@ protected:
 		ResourceManager& resMan = ResourceManager::GetSingleton();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
-		mCamera->CreateLookAt(float3(390.786041, 937.110046, -29.037870), float3(390.414764, 936.181519, -29.036587), float3(-0.928517, 0.371277, 0.003209));
-		//mCamera->CreateLookAt(float3(336.220490, 102.889084, -36.352245), float3(335.260254, 102.820068, -36.081718), float3(-0.066430, 0.997616, 0.018715));
-		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
-
-		Entity* sponzaEntity = sceneMan->CreateEntity("Sponza", "Sponza.mesh",  "Custom");
-		SceneNode* sponzaNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sponza");
-		sponzaNode->SetPosition(float3(0, 0, 0));
-		sponzaNode->SetScale(0.45f);
-		sponzaNode->AttachObject(sponzaEntity);
-
-		//mCamera->CreateLookAt(float3(9.772805, 230.538498, 287.610077), float3(9.744802, 229.937454, 286.811340), float3(-0.021059, 0.799220, -0.600669));
-		/*mCamera->CreateLookAt(float3(-162.300583, 239.233307, 206.451996), float3(-161.861069, 238.546051, 205.873627), float3(0.415819, 0.726417, -0.547186));
-		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
-
-		auto entity = sceneMan->CreateEntity("Ground", "./Geo/Ground.mesh",  "Custom");
-		auto sceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Ground");
-		sceneNode->SetScale(float3(2.5,2.5,2.5));
-		sceneNode->SetPosition(float3(0, 0, 0));
-		sceneNode->AttachObject(entity);
-
-		entity = sceneMan->CreateEntity("Nanosuit", "./Nanosuit/Nanosuit.mesh",  "Custom");
-		sceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Nanosuit");
-		sceneNode->SetScale(float3(5,5,5));
-		sceneNode->SetPosition(float3(0,0,0));
-		sceneNode->AttachObject(entity);*/
-
-		/*std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
-		start = std::chrono::high_resolution_clock::now();
-
-		ENGINE_PUSH_CPU_PROFIER("Load Texture");
-
-		ENGINE_POP_CPU_PROFIER("Load Texture");
-		end = std::chrono::high_resolution_clock::now();
-
-		std::chrono::duration<double> elapsed_seconds = end-start;
-		std::time_t end_time = std::chrono::high_resolution_clock::to_time_t(end);
-		std::cout << "finished computation at " << std::ctime(&end_time) << "elapsed time: " << elapsed_seconds.count() << "s\n";
-
-		ENGINE_DUMP_PROFILERS();*/
-
-		//ENGINE_PUSH_CPU_PROFIER("test");
-		//ENGINE_DUMP_PROFILERS();
-
-		/*auto entity = sceneMan->CreateEntity("Dude", "./Dude/dude.mesh",  "Custom");
-		auto sceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Dude");
-		sceneNode->SetScale(float3(0.5, 0.5, 0.5));
-		sceneNode->SetPosition(float3(50,0,0));
-		sceneNode->AttachObject(entity);
-
-		AnimationPlayer* animPlayer = entity->GetAnimationPlayer();
-		AnimationState* takeClip = animPlayer->GetClip("Take 001");
-		takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-		animPlayer->PlayClip("Take 001");*/
-
-		mCameraControler = new RcEngine::Test::FPSCameraControler;
-		mCameraControler->AttachCamera(*mCamera);
-		mCameraControler->SetMoveSpeed(100.0f);
-		mCameraControler->SetMoveInertia(true);
-
-		// Set as default camera
-		auto screenFB = Environment::GetSingleton().GetRenderDevice()->GetScreenFrameBuffer();
-		screenFB->SetCamera(mCamera);
-
-		SetupLights();
+		mBlitEffect = resMan.GetResourceByName<Effect>(RT_Effect, "MipmapGen.effect.xml", "General");	
+		mTexture = resMan.GetResourceByName<TextureResource>(RT_Texture, "StrechXY3.dds", "General")->GetTexture();
 	}
 
-	void SetupLights()
-	{
-		SceneManager& sceneMan = *Environment::GetSingleton().GetSceneManager();
-
-		Light* mDirLight = sceneMan.CreateLight("Sun", LT_DirectionalLight);
-		mDirLight->SetDirection(float3(00, -1, 0.5));
-		mDirLight->SetLightColor(float3(1, 1, 1));
-		mDirLight->SetCastShadow(false);
-		sceneMan.GetRootSceneNode()->AttachObject(mDirLight);
-
-		/*Light* mPointLight = sceneMan.CreateLight("Point", LT_PointLight);
-		mPointLight->SetLightColor(float3(0, 1, 0));
-		mPointLight->SetRange(100.0f);
-		mPointLight->SetAttenuation(1.0f, 0.0f);
-		mPointLight->SetCastShadow(false);
-		mPointLight->SetPosition(float3(0, 50, 35));
-		sceneMan.GetRootSceneNode()->AttachObject(mPointLight);*/
-
-		/*Light* spotLight = sceneMan.CreateLight("Spot", LT_SpotLight);
-		spotLight->SetDirection(float3(0, -1.5, -1));
-		spotLight->SetLightColor(float3(1, 0, 1));
-		spotLight->SetRange(300.0);
-		spotLight->SetPosition(float3(0.0f, 150.0f, 100.0f));
-		spotLight->SetAttenuation(1.0f, 0.0f);
-		spotLight->SetSpotAngle(Mathf::ToRadian(10), Mathf::ToRadian(60));
-		spotLight->SetCastShadow(false);
-		spotLight->SetSpotlightNearClip(10);
-		sceneMan.GetRootSceneNode()->AttachObject(spotLight);*/
-
-//////////////////////////////////////////////////////////////////////////
-		Light* mPointLight;
-		
-		mPointLight = sceneMan.CreateLight("Point", LT_PointLight);
-		mPointLight->SetLightColor(float3(1.69, 1, 0));
-		mPointLight->SetRange(80.0f);
-		mPointLight->SetAttenuation(1.0f, 0.0f);
-		//mPointLight->SetAttenuation(7.0f, 3.0f, 4.0f);
-		mPointLight->SetCastShadow(false);
-		mPointLight->SetPosition(float3(550, 81, -18));
-		sceneMan.GetRootSceneNode()->AttachObject(mPointLight);
-
-		//mPointLight = sceneMan.CreateLight("Point", LT_PointLight);
-		//mPointLight->SetLightColor(float3(0.85, 1, 0.67));
-		//mPointLight->SetRange(90.0f);
-		//mPointLight->SetAttenuation(9.0f, 3.0f, 8.0f);
-		//mPointLight->SetCastShadow(false);
-		//mPointLight->SetPosition(float3(105, 59, -48));
-		//sceneMan.GetRootSceneNode()->AttachObject(mPointLight);
-
-		/*Light* mSpotLight = sceneMan.CreateLight("Spot", LT_SpotLight);
-		mSpotLight->SetLightColor(float3(0, 1, 0));
-		mSpotLight->SetRange(250.0f);
-		mSpotLight->SetPosition(float3(-442, 80, -16));
-		mSpotLight->SetDirection(float3(-1, 0, 0));
-		mSpotLight->SetAttenuation(1.0f, 0.0f);
-		mSpotLight->SetSpotAngle(Mathf::ToRadian(30), Mathf::ToRadian(40));
-		sceneMan.GetRootSceneNode()->AttachObject(mSpotLight);
-
-		{
-			float3 direction = Normalize(float3(-111.5f, 398.1f, 3.6f) - float3(-111.1, 380.1, 73.4));
-			for (int i = 0; i < 4; ++i)
-			{
-				Light* spotLight = sceneMan.CreateLight("Spot" + std::to_string(i), LT_SpotLight);
-				spotLight->SetLightColor(float3(1, 1, 0));
-				spotLight->SetRange(150);
-				spotLight->SetPosition(float3(-278.2f + i * 166.5f, 398.1f, 3.6f));
-				spotLight->SetDirection(direction);
-				spotLight->SetAttenuation(1.0f, 0.0f);
-				spotLight->SetSpotAngle(Mathf::ToRadian(10), Mathf::ToRadian(40));
-				sceneMan.GetRootSceneNode()->AttachObject(spotLight);
-			}
-
-			direction = Normalize(float3(-111.5f, 398.1f, 35.7f) - float3(-111.1, 380.1, -111.3));
-			for (int i = 0; i < 4; ++i)
-			{
-				Light* spotLight = sceneMan.CreateLight("Spot", LT_SpotLight);
-				spotLight->SetLightColor(float3(0, 1, 1));
-				spotLight->SetRange(150);
-				spotLight->SetPosition(float3(-278.2f + i * 166.5f, 398.1f, -35.7f));
-				spotLight->SetDirection(direction);
-				spotLight->SetAttenuation(1.0f, 0.0f);
-				spotLight->SetSpotAngle(Mathf::ToRadian(10), Mathf::ToRadian(40));
-				sceneMan.GetRootSceneNode()->AttachObject(spotLight);
-			}
-		}*/
-
-		mLightAnimation.LoadLights("E:/lights.txt");
-
-		std::cout << sceneMan.GetSceneLights().size() << std::endl;
-	}
 
 	void UnloadContent()
 	{
@@ -240,31 +88,19 @@ protected:
 	void Update(float deltaTime)
 	{
 		CalculateFrameRate();
-		mCameraControler->Update(deltaTime);
 
-		if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
-		{
-			auto target = mCamera->GetLookAt();
-			auto eye = mCamera->GetPosition();
-			auto up = mCamera->GetUp();
-			
-			FILE* f = fopen("E:/camera.txt", "w");
-			fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
-				eye[0], eye[1], eye[2], 
-				target[0], target[1], target[2],
-				up[0], up[1], up[2]);
-			fclose(f);
-		}
-
-		if ( InputSystem::GetSingleton().KeyPress(KC_Space) )
-		{
-			auto lightPrePass = static_pointer_cast_checked<DeferredPath>(mRenderPath);
-			lightPrePass->mVisualLightsWireframe = !lightPrePass->mVisualLightsWireframe;
-		}
-
-		char buffer[255];
-		std::sprintf(buffer, "FPS: %d", mFramePerSecond);
-		mMainWindow->SetTitle(buffer);
+		if (InputSystem::GetSingleton().KeyPress(KC_0))
+			mMipLevel = 0;
+		else if (InputSystem::GetSingleton().KeyPress(KC_1))
+			mMipLevel = 1;
+		else if (InputSystem::GetSingleton().KeyPress(KC_2))
+			mMipLevel = 2;
+		else if (InputSystem::GetSingleton().KeyPress(KC_3))
+			mMipLevel = 3;
+		else if (InputSystem::GetSingleton().KeyPress(KC_4))
+			mMipLevel = 4;
+		else if (InputSystem::GetSingleton().KeyPress(KC_5))
+			mMipLevel = 5;
 	}
 
 	void Render()
@@ -272,7 +108,47 @@ protected:
 		RenderDevice* device = Environment::GetSingleton().GetRenderDevice();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
-		mRenderPath->RenderScene();
+		mFrameBuffer->AttachRTV(ATT_Color0, mRenderViews.front());
+		device->BindFrameBuffer(mFrameBuffer);
+
+		mBlitEffect->GetParameterByName("MipLevel")->SetValue(0);
+		mBlitEffect->GetParameterByName("SourceMap")->SetValue(mTexture->GetShaderResourceView());
+		device->DrawFSTriangle(mBlitEffect->GetTechniqueByName("BlitColor"));
+		//mRTBuffer->BuildMipMap();
+
+		////////////////////////////////////////////////////
+#if 1
+		uint32_t width = mMainWindow->GetWidth();
+		uint32_t height = mMainWindow->GetHeight();
+
+		mBlitEffect->GetParameterByName("SourceMap")->SetValue(mRTBuffer->GetShaderResourceView());
+
+		for (int i = 1; i < MAX_MIP_LEVEL; ++i)
+		{
+			uint32_t levelWidth = std::max(1U,width >> 1);
+			uint32_t levelHeight = std::max(1U, height >> 1);
+
+			mFrameBuffer->Resize(levelWidth, levelHeight);
+			mFrameBuffer->AttachRTV(ATT_Color0, mRenderViews[i]);
+			device->BindFrameBuffer(mFrameBuffer);
+
+			mBlitEffect->GetParameterByName("PreviousMIP")->SetValue(int3(i-1, width, height));
+			device->DrawFSTriangle(mBlitEffect->GetTechniqueByName("Minify"));
+
+			width = levelWidth;
+			height = levelHeight;
+		}
+#endif
+
+		////////////////////////////////////////////////////
+		auto screenFB = device->GetScreenFrameBuffer();
+		device->BindFrameBuffer(screenFB);
+
+		mBlitEffect->GetParameterByName("MipLevel")->SetValue(mMipLevel);
+		mBlitEffect->GetParameterByName("SourceMap")->SetValue(mRTBuffer->GetShaderResourceView());
+		device->DrawFSTriangle(mBlitEffect->GetTechniqueByName("BlitColor"));
+
+		screenFB->SwapBuffers();
 	}
 
 	void CalculateFrameRate()
@@ -292,30 +168,23 @@ protected:
 
 	void WindowResize(uint32_t width, uint32_t height)
 	{
-		mRenderPath->OnWindowResize(width, height);
+	
 	}
 
 protected:
 	int mFramePerSecond;
+	shared_ptr<FrameBuffer> mFrameBuffer;
+	shared_ptr<Texture> mRTBuffer;
+	vector<shared_ptr<RenderView> > mRenderViews;
 
-	shared_ptr<Effect> mFSQuadEffect;
+	int mMipLevel;
 	shared_ptr<Texture> mTexture;
-	RenderOperation mFSQuad;
-	shared_ptr<Camera> mCamera;
-	
-	shared_ptr<RenderPath> mRenderPath;
-
-	LightAnimation mLightAnimation;
-	
-	Test::FPSCameraControler* mCameraControler;
+	shared_ptr<Effect> mBlitEffect;
 };
 
 
 int main()
 {
-	//Image img;
-	//img.LoadFromDDS("E:/Engines/RcEngine/Media/Mesh/Geo/sand_diffuse.dds");
-
 
 	MeshTestApp app("../Config.xml");
 	app.Create();

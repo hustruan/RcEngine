@@ -1,66 +1,28 @@
-Texture2D ColorBuffer;
-Texture2D NormalBuffer;
-Texture2D<float> DepthBuffer;
+Texture2D DepthBuffer;
+float2 ClipInfo;
+int PreviousMIPLevel;
 
-#ifdef USE_PEELED_BUFFERS
-	Texture2D PeeledColorBuffer;
-	Texture2D PeeledNormalBuffer;
-	Texture2D<float> PeeledDepthBuffer;
-#endif 
-
-float3 ClipInfo;
-
-// Shader Output
-struct PSOutput
+void ReconstructCSZ(in float2 oTex	    : TEXCOORD0, 
+					in float4 iFragCoord : SV_Position,
+					out float oCSZDepth : SV_Target0)
 {
-	float3 Color	: SV_Target0;
-	float4 Normal   : SV_Target1;
-
-#ifdef USE_PEELED_BUFFERS
-	float2 CameraSpaceZ : SV_Target2;
-	float3 PeeledColor	: SV_Target3;
-
-	#ifndef USE_OCT16
-		float4 PeeledNormal : SV_Target4;	
-	#endif 
-#else 
-	float CameraSpaceZ  : SV_Target2;
-#endif
-};
-
-float ComputeCameraSpaceZ(float z, float3 clip)
-{
-	return 	clip.x / ( z * clip.y + clip.z);
+	float z = DepthBuffer.Load(int3(iFragCoord.xy, 0)).r;
+	oCSZDepth = ClipInfo.y / ( z - ClipInfo.x);
 }
 
-PSOutput ReconstructCSZ(in float2 oTex	    : TEXCOORD0, 
-						in float4 iFragCoord : SV_Position)
+void CSZMinify(in float4 iFragCoord : SV_Position, out float oCSZLevel : SV_Target0)
 {
-	PSOutput output;
+	int2 ssP = int2(iFragCoord.xy);
 	
-	int3 ssp = int3(iFragCoord.xy, 0);
-
-	output.Color = ColorBuffer.Load(ssp).rgb;
-
-#ifdef USE_PEELED_BUFFERS
-
-	output.PeeledColor = PeeledColorBuffer.Load(ssp).rgb;
-	output.CameraSpaceZ = float2( ComputeCameraSpaceZ(DepthBuffer.Load(ssp), ClipInfo),
-								  ComputeCameraSpaceZ(PeeledDepthBuffer.Load(ssp), ClipInfo) );
-
-	#ifdef USE_OCT16
-		// Combine two normals
-	#else
-		output.Normal = NormalBuffer.Load(ssp);
-		output.PeeledNormal = PeeledNormalBuffer.Load(ssp);
-	#endif 
-	
-#else
-	
-	output.CameraSpaceZ = ComputeCameraSpaceZ(DepthBuffer.Load(ssp), ClipInfo);
-	output.Normal = NormalBuffer.Load(ssp);
-
-#endif
-
-	return output;
+	// Rotated grid subsampling to avoid XY directional bias or Z precision bias while downsampling
+	//oCSZLevel = DepthBuffer.Load(int3(ssP * 2 + int2((ssP.y & 1) ^ 1, (ssP.x & 1) ^ 1), PreviousMIPLevel)).r;
+	oCSZLevel = DepthBuffer.Load(int3(ssP, 0)).r;
 }
+
+float4 CopyColor(in float2 oTex		  : TEXCOORD0,
+			     in float4 iFragCoord : SV_Position) : SV_Target0
+{
+	float z = DepthBuffer.Load(int3(iFragCoord.xy, 0)).r;
+	return float4(z, z, z, 1.0);
+}
+

@@ -13,7 +13,8 @@ D3D11Texture2D::D3D11Texture2D( PixelFormat format, uint32_t arraySize, uint32_t
 {
 	mWidth = width;
 	mHeight = height;
-	
+	mMipLevels = numMipMaps;
+
 	D3D11_TEXTURE2D_DESC texDesc;
 	ZeroMemory(&texDesc, sizeof(texDesc));
 	texDesc.Width = mWidth;
@@ -30,23 +31,19 @@ D3D11Texture2D::D3D11Texture2D( PixelFormat format, uint32_t arraySize, uint32_t
 	}
 	else
 		texDesc.Format = D3D11Mapping::Mapping(format);
-
+	
 	// Generate mipmaps if enable
 	if (mCreateFlags & TexCreate_GenerateMipmaps)
 	{
 		texDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		
-		assert(numMipMaps == 0);
-
-		// May defer it to DeviceContext::GenerateMips called.
-		mMipLevels = Texture::CalculateMipmapLevels((std::max)(width, height));
-		texDesc.MipLevels = mMipLevels;
+		if (mMipLevels == 0)
+		{
+			// May defer it to DeviceContext::GenerateMips called.
+			mMipLevels = Texture::CalculateMipmapLevels((std::max)(width, height));
+		}
 	}
-	else
-	{
-		mMipLevels = numMipMaps;
-		texDesc.MipLevels = mMipLevels;
-	}
+	texDesc.MipLevels = mMipLevels;
 
 	if (mCreateFlags & TexCreate_UAV)				texDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 	if (mCreateFlags & TexCreate_ShaderResource)	texDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
@@ -256,7 +253,6 @@ void D3D11Texture2D::Unmap2D( uint32_t arrayIndex, uint32_t level )
 	{
 		deviceContextD3D11->Unmap(TextureD3D11, subResource);
 	}
-
 }
 
 

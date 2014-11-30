@@ -1,0 +1,29 @@
+<Effect name="LambertianOnly">
+
+  <Sampler name="RadiositySampler">
+    <State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+    <State name="AddressU" value="Clamp"/>
+    <State name="AddressV" value="Clamp"/>
+  </Sampler>
+  
+  <Technique name="SingleScatteredDL">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/LambertianOnly" entry="LambertianOnly">
+        <Macro name="USE_INDIRECT" value="0" />
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+  
+  <Technique name="MultipleScatteredDL">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/LambertianOnly" entry="LambertianOnly">
+        <Macro name="USE_INDIRECT" value="1" />
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+</Effect>

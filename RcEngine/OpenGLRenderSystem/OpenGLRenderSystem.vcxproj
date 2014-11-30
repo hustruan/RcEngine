@@ -93,6 +93,7 @@
     <ClCompile Include="OpenGLGraphicCommon.cpp" />
     <ClCompile Include="OpenGLDevice.cpp" />
     <ClCompile Include="OpenGLFactory.cpp" />
+    <ClCompile Include="OpenGLHBAO.cpp" />
     <ClCompile Include="OpenGLModule.cpp" />
     <ClCompile Include="OpenGLRenderTargetView.cpp" />
     <ClCompile Include="OpenGLRenderWindow.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="OpenGLBuffer.h" />
     <ClInclude Include="OpenGLFrameBuffer.h" />
     <ClInclude Include="OpenGLGraphicCommon.h" />
+    <ClInclude Include="OpenGLHBAO.h" />
     <ClInclude Include="OpenGLPrerequisites.h" />
     <ClInclude Include="OpenGLDevice.h" />
     <ClInclude Include="OpenGLFactory.h" />

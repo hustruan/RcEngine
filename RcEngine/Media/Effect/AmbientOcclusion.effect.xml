@@ -1,0 +1,43 @@
+<Effect name="AmbientOcclusion">
+
+  <Technique name="ResconstructeCSZ">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="ReconstructCSZ" entry="ReconstructCSZ"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="CSZMinify">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="ReconstructCSZ" entry="CSZMinify"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+  
+  <Technique name="SSAO">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="AmbientOcclusion" entry="AlchemyAmbientObsurance"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="Blur">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="AmbientOcclusionBlur" entry="Blur"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="CopyColor">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="ReconstructCSZ" entry="CopyColor"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+  
+</Effect>

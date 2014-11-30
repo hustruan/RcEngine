@@ -47,7 +47,7 @@ protected:
 	virtual void OnDetach(FrameBuffer& fb, Attachment attr) = 0;
 
 protected:
-	shared_ptr<Texture> mTexture;  // Keep a reference of texture, keep it alive, never use it
+	shared_ptr<Texture> mTexture;  // Keep a reference of texture to keep it alive 
 };
 
 //////////////////////////////////////////////////////////////////////////

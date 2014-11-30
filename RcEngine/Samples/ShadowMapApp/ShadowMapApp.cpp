@@ -28,6 +28,7 @@
 #include <IO/FileSystem.h>
 #include <Core/Environment.h>
 #include <Math/MathUtil.h>
+#include <Graphics/AmbientOcclusion.h>
 
 ShadowMapApp::ShadowMapApp( const String& config )
 	: Application(config),
@@ -52,18 +53,18 @@ void ShadowMapApp::Initialize()
 	mDevice->GetScreenFrameBuffer()->SetCamera(mMainCamera);
 
 	// Create render path
-	mRenderPath = std::make_shared<ForwardPath>();
+	mRenderPath = std::make_shared<DeferredPath>();
 	mRenderPath->OnGraphicsInit(mMainCamera);
 
 	// FPS camera controller
-	//mMainCamera->CreateLookAt(float3(-137.0, 97.3, 82.0), float3(-136.5, 96.8, 81.3), float3(0.3, 0.9, -0.4));
-
-	mMainCamera->CreateLookAt(float3(0, 20, 0), float3(1, 20, 0));
-	mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
+	//mMainCamera->CreateLookAt(float3(-129.696564, 97.300003, 0.699008), float3(-128.703964, 97.207588, 0.777768), float3(0.092125, 0.995721, 0.007309));
+	mMainCamera->CreateLookAt(float3(-18.415079, 5.102501, 0.825465), float3(-17.415262, 5.120544, 0.831733));
+	
+	mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.5f, 3000.0f );
 
 	mCameraControler = std::make_shared<Test::FPSCameraControler>(); 
 	mCameraControler->AttachCamera(*mMainCamera);
-	mCameraControler->SetMoveSpeed(300.0f);
+	mCameraControler->SetMoveSpeed(30.0f);
 	mCameraControler->SetMoveInertia(true);
 }
 
@@ -82,13 +83,32 @@ void ShadowMapApp::LoadContent()
 
 	// Load Sponza
 	Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");
-	sceneMan->GetRootSceneNode()->AttachObject(sponzaEnt);
+	SceneNode* sponzaNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sponza");
+
+	sponzaNode->SetScale(float3(0.05, 0.05, 0.05));
+	//sponzaNode->SetWorldPosition(float3(-30, 325.0, 20));
+	sponzaNode->AttachObject(sponzaEnt);
 }
 
 void ShadowMapApp::Update( float deltaTime )
 {
 	CalculateFrameRate();
 	mCameraControler->Update(deltaTime);
+
+	if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
+	{
+		auto target = mMainCamera->GetLookAt();
+		auto eye = mMainCamera->GetPosition();
+		auto up = mMainCamera->GetUp();
+
+		FILE* f = fopen("E:/camera.txt", "w");
+		fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
+			eye[0], eye[1], eye[2], 
+			target[0], target[1], target[2],
+			up[0], up[1], up[2]);
+		fclose(f);
+	}
+
 
 	String title = " FPS: " + std::to_string(mFramePerSecond);
 	mMainWindow->SetTitle(title);
@@ -97,6 +117,18 @@ void ShadowMapApp::Update( float deltaTime )
 void ShadowMapApp::Render()
 {
 	mRenderPath->RenderScene();
+
+	// Update overlays
+	UIManager& uiMan = UIManager::GetSingleton();
+	uiMan.Render();
+
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+	sceneMan->UpdateOverlayQueue();
+
+	RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
+	for (const RenderQueueItem& renderItem : guiBucket) 
+		renderItem.Renderable->Render();
+
 	mDevice->GetScreenFrameBuffer()->SwapBuffers();
 }
 

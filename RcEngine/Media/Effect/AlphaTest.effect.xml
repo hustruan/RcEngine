@@ -2,6 +2,8 @@
 
   <!-- Effect parameter which has Semantic -->
   <AutoBinding name="World" semantic="WorldMatrix" type="float4x4"/>
+  <AutoBinding name="View" semantic="ViewMatrix" type="float4x4"/>
+  <AutoBinding name="Projection" semantic="ProjectionMatrix" type="float4x4"/>
   <AutoBinding name="ViewProj" semantic="ViewProjectionMatrix" type="float4x4"/>
   <AutoBinding name="DiffuseMap" semantic="DiffuseMaterialMap" type="texture2d"/>
   <AutoBinding name="SpecularMap" semantic="SpecularMaterialMap" type="texture2d"/>
@@ -37,6 +39,7 @@
     <Pass name="p0">
       <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
       <PixelShader file="ShadowMapGen" entry="ShadowMapAlphaPCF"/>
+      <State name="CullMode" value="None"/>
     </Pass>
   </Technique>
 
@@ -60,6 +63,7 @@
     <Pass name="p0">
       <VertexShader file="Model" entry="ModelVS"/>
       <State name="ColorWriteMask" index="0" r="false" g="false" b="false" a="false"/>
+      <State name="CullMode" value="None"/>
     </Pass>
   </Technique>
 
@@ -73,9 +77,28 @@
 		  <State name="FrontStencilFailOp" value="Keep"/>
 		  <State name="FrontStencilDepthFailOp" value="Keep"/>
 		  <State name="FrontStencilPassOp" value="Replace"/>
+      <State name="CullMode" value="None"/>
 	  </Pass>
   </Technique>
 
+  <Technique name="DeepGBuffer">
+    <Pass name="p0">
+      <VertexShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferPS"/>
+      <State name="CullMode" value="None"/>
+    </Pass>
+  </Technique>
+
+  <Technique name="PeeledDeepGBuffer">
+    <Pass name="p0">
+      <VertexShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferPS">
+        <Macro name="USE_DEPTH_PEEL"/>
+      </PixelShader>
+      <State name="CullMode" value="None"/>
+    </Pass>
+  </Technique>
+  
   <Technique name="DirectionalLighting">
     <Pass name="p0">
       <VertexShader file="Model" entry="ModelVS"/>

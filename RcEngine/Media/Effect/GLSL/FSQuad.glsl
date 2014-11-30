@@ -1,32 +1,21 @@
-[[Vertex=VSMain]]
+[[Fragment=BlitColor]]
+uniform sampler2D SourceMap;
 
-in vec2 iPos;
-in vec2 iTex;
-
-out vec2 oTex;
-
-out gl_PerVertex
-{
-    vec4 gl_Position;
-};
+layout (location = 0) in vec2 iTex;
+layout (location = 0) out vec4 oFragColor;
 
 void main()
 {
-	oTex = iTex;
-	gl_Position = vec4(iPos, 0.0, 1.0);
+	oFragColor = texelFetch(SourceMap, ivec2(gl_FragCoord.xy), 0);
 }
 
-[[Fragment=PSMain]]
-#pragma ColorMap : LinearSampler
+[[Fragment=BlitDepth]]
+uniform sampler2D SourceMap;
 
-uniform sampler2D ColorMap;
-
-in vec2 oTex;
-
-out vec4 oFragColor;
+layout (location = 0) in vec2 iTex;
 
 void main()
 {
-	oFragColor = texture(ColorMap, oTex);
+	gl_FragDepth = texelFetch(SourceMap, ivec2(gl_FragCoord.xy), 0).r;
 }
 

@@ -1,5 +1,6 @@
 #include "D3D11GraphicCommon.h"
 #include <Core/Exception.h>
+#include <Core/Loger.h>
 
 namespace RcEngine {
 
@@ -180,7 +181,10 @@ DXGI_FORMAT D3D11Mapping::Mapping( PixelFormat inPixelFormat )
 	assert(count == PF_Count);
 
 	if (d3d11Format[inPixelFormat] == DXGI_FORMAT_UNKNOWN)
+	{
+		EngineLogger::LogError("D3D11Mapping: Unsupported format in D3D11!");
 		ENGINE_EXCEPT(Exception::ERR_INVALID_PARAMS, "Unsupported format in D3D11", "D3D11Mapping::Mapping");
+	}
 
 	return d3d11Format[inPixelFormat];
 }

@@ -14,8 +14,6 @@ RenderDevice::RenderDevice(  )
 	  mCurrentBlendFactor(ColorRGBA::Black),
 	  mCurrentSampleMask(0)
 {
-
-
 	Environment::GetSingleton().mRenderDevice = this;
 }
 
@@ -55,6 +53,17 @@ void RenderDevice::BindShaderPipeline( const shared_ptr<ShaderPipeline>& pipelin
 void RenderDevice::Draw( const EffectTechnique* technique, const RenderOperation& operation )
 {
 	DoDraw(technique, operation);
+}
+
+void RenderDevice::DrawFSTriangle(const EffectTechnique* technique)
+{
+	if (mFSTriangleROP.VertexCount != 3)
+	{
+		mFSTriangleROP.SetVertexRange(0, 3);
+		mFSTriangleROP.PrimitiveType = PT_Triangle_List;
+	}
+
+	Draw(technique, mFSTriangleROP);
 }
 
 }
