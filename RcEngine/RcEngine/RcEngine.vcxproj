@@ -53,6 +53,7 @@
     <ClInclude Include="Graphics\Skeleton.h" />
     <ClInclude Include="Graphics\Sky.h" />
     <ClInclude Include="Graphics\SpriteBatch.h" />
+    <ClInclude Include="Graphics\AmbientOcclusion.h" />
     <ClInclude Include="Graphics\TextureResource.h" />
     <ClInclude Include="Graphics\VertexDeclaration.h" />
     <ClInclude Include="GUI\Button.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="Graphics\Skeleton.cpp" />
     <ClCompile Include="Graphics\Sky.cpp" />
     <ClCompile Include="Graphics\SpriteBatch.cpp" />
+    <ClCompile Include="Graphics\AmbientOcclusion.cpp" />
     <ClCompile Include="Graphics\TextureResource.cpp" />
     <ClCompile Include="Graphics\VertexDeclaration.cpp" />
     <ClCompile Include="GUI\Button.cpp" />
@@ -225,6 +227,7 @@
     <None Include="Math\Vector.inl" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Media\Effect\HLSL\AmbientOcclusion.hlsl" />
     <FxCompile Include="..\Media\Effect\HLSL\DebugView.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

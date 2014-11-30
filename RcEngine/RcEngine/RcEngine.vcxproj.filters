@@ -321,6 +321,9 @@
     <ClInclude Include="Graphics\Font.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\AmbientOcclusion.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Exception.cpp">
@@ -567,6 +570,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\pfm.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\AmbientOcclusion.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
