@@ -25,6 +25,8 @@ void D3D11VertexDeclaration::CreateInputLayout( const RenderOperation& operation
 
 	const D3D11VertexShader* vertexShaderD3D11 = static_cast_checked<const  D3D11VertexShader*>(&vertexShader);
 
+	// Todo: Vertex Layout may not match with shader input signatures
+
 	/**
 	 * May partial match
 	 */

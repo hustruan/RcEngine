@@ -771,6 +771,9 @@
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\ReconstructCSZ.hlsl">
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\Deferred.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -824,7 +827,7 @@
     <Xml Include="..\Media\Effect\LambertianOnly.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
-    <Xml Include="..\Media\Effect\DeepGBufferRadiosity.effect.xml">
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferRadiosity.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

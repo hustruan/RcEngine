@@ -34,6 +34,18 @@ private:
 		shared_ptr<Texture> mTextures[GBuffer::Count];
 	};
 
+	class MipmapGenerator
+	{
+	public:
+		MipmapGenerator(const shared_ptr<Texture>& buffer, int maxLevel);
+		void GenerateMipmap(const shared_ptr<FrameBuffer>& fb, const shared_ptr<Effect>& minifyTech, int techIndex);
+
+	private:
+		RenderDevice* mDevice;
+		uint32_t mMaxLevel;
+		vector<shared_ptr<ShaderResourceView> > mPrevLevelSRV;
+		vector<shared_ptr<RenderView> > mLevelRTV;
+	};
 
 public:
 	DeepGBufferRadiosity(void);
@@ -54,10 +66,12 @@ private:
 	void RenderGBuffers();
 	void RenderLambertianOnly();
 	void RenderIndirectIllumination();
+	void DeferredShade();
 
 	void ComputeMipmapedBuffers();
 	void ComputeRawII();
 	void TemporalFiltering();
+
 
 	const shared_ptr<Texture> GetRadiosityTexture() const;
 
@@ -68,6 +82,10 @@ private:
 
 	uint32_t mBufferWidth, mBufferHeight;
 
+	float4 mProjInfo;
+	float2 mClipInfo;
+	float mProjScale;
+
 	// GBuffers
 	GBuffer mGBuffer;
 	GBuffer mPeeledGBuffer;
@@ -76,13 +94,16 @@ private:
 	
 	shared_ptr<Texture> mCSZBuffer;
 	shared_ptr<RenderView> mCSZRTV;
+	shared_ptr<MipmapGenerator> mCSZMipmapGen;
 
 	shared_ptr<Texture> mPackedNormalBuffer;
 	shared_ptr<RenderView> mPackedNormalRTV;
+	shared_ptr<MipmapGenerator> mPackedNormalMipmapGen;
 
 	// Initial Radiosity
 	shared_ptr<Texture> mLambertDirectBuffer;
 	shared_ptr<RenderView> mLambertDirectRTV;
+	shared_ptr<MipmapGenerator> mLambertMipmapGen;
 
 	shared_ptr<Texture> mPeeledLambertDirectBuffer;
 	shared_ptr<RenderView> mPeeledLambertDirectRTV;
@@ -96,11 +117,11 @@ private:
 
 	shared_ptr<Texture> mPreviousDepthBuffer;
 
-
 	// Effect
 	shared_ptr<Effect> mLambertianOnlyEffect;
 	shared_ptr<Effect> mRadiosityEffect;
     shared_ptr<Effect> mReconstrctCSZEffect;
+	shared_ptr<Effect> mMinifyEffect;
 	shared_ptr<Effect> mBlitEffect;
 
 	float4x4 mPrevViewMatrix;

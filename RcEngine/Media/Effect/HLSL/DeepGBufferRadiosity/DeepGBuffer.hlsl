@@ -3,7 +3,7 @@ struct VSInput
 	float3 Pos 		 	 : POSITION;
 	float3 Normal		 : NORMAL;
 
-#if defined(_DiffuseMap)
+#if defined(_DiffuseMap) || defined(_DummyMap)
 	float2 Tex			 : TEXCOORD0;
 #endif
 
@@ -24,7 +24,7 @@ struct VSOutput
 #ifdef _NormalMap
 	float3x3 TangentToWorld : TEXCOORD3;
 #else
-	float3 NormalWS 	    : TEXCOORD3;
+	float3 NormalCS 	    : TEXCOORD3;
 #endif 
 	
 	float4 Position : SV_POSITION;
@@ -48,17 +48,18 @@ VSOutput GBufferVS(VSInput input)
 {
 	VSOutput output;
 	
-	float3 normal = normalize( mul(input.Normal, (float3x3)World) );
+	float4x4 WorldView = mul(World, View);
+	float3 normal = normalize( mul(input.Normal, (float3x3)WorldView) );
 	
 	// calculate tangent and binormal.
 #ifdef _NormalMap
-	float3 tangent = normalize( mul(input.Tangent, (float3x3)World) );
-	float3 binormal = normalize( mul(input.Binormal, (float3x3)World) );
+	float3 tangent = normalize( mul(input.Tangent, (float3x3)WorldView) );
+	float3 binormal = normalize( mul(input.Binormal, (float3x3)WorldView) );
 
 	// actualy this is a world to tangent matrix, because we always use V * Mat.
-	output.TangentToWorld = float3x3( tangent, binormal, normal);
+	output.TangentToWorld = float3x3( tangent, binormal, normal );
 #else
-	output.NormalWS = normal;
+	output.NormalCS = normal;
 #endif
 	
 #ifndef _DiffuseMap
@@ -67,7 +68,7 @@ VSOutput GBufferVS(VSInput input)
 	output.Tex = input.Tex;
 #endif
 	
-	output.PosCS = mul( float4(input.Pos, 1.0), mul(World, View) );
+	output.PosCS = mul( float4(input.Pos, 1.0), WorldView );
 	output.PrevPosCS = mul( float4(input.Pos, 1.0), mul(World, PrevView) );
 	output.Position = mul( output.PosCS, Projection );
 	
@@ -111,7 +112,7 @@ void GBufferPS(in VSOutput input,
 	//normal = normalize( mul(normal, input.TangentToWorld) );
 	normal = normalize( input.TangentToWorld[2] );
 #else
-	float3 normal = normalize(input.NormalWS);
+	float3 normal = normalize(input.NormalCS);
 #endif	
 	
 	float4 accurateHomogeneousFragCoord = mul( input.PosCS, ProjectionToScreenMatrix );

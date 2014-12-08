@@ -119,7 +119,8 @@ struct DeepGBufferRadiositySettings
 		  DepthPeelSeparationHint(0.5f),
 		  PropagationDamping(0.1f),
 		  UnsaturatedBoost(1.0f),
-		  SaturatedBoost(1.0f)
+		  SaturatedBoost(1.0f),
+		  UseOct16(true)
 	{
 	}
 };

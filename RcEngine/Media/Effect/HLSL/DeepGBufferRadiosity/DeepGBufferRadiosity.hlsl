@@ -19,6 +19,8 @@
 
 #define PI 3.141592653589
 
+//#define USE_MIPMAPS 0
+
 Texture2D CSZBuffer;
 Texture2D NormalBuffer;
 Texture2D BounceBuffer;
@@ -44,8 +46,13 @@ float3 reconstructCameraSpacePosition(float2 S, float z)
 	return float3((S.xy * ProjInfo.xy + ProjInfo.zw) * z, z);
 }
 
-float3 sampleNormal(Texture2D normalBuffer, int2 ssC, int mipLevel) {
-	return normalBuffer.Load(int3(ssC, mipLevel)).xyz * 2.0 - 1.0;
+float3 sampleNormal(Texture2D normalBuffer, int2 ssC, int mipLevel)
+{
+#if USE_OCT16
+    return decode16(normalBuffer.Load(int3(ssC, mipLevel)).xy * 2.0 - 1.0);
+#else
+    return normalBuffer.Load(int3(ssC, mipLevel)).xyz * 2.0 - 1.0;
+#endif
 }
 
 float3 getPosition(int2 ssp, int2 texel, int mipLevel)
@@ -216,8 +223,6 @@ void DeepGBufferRadiosity(in float2 iTex	   : TEXCOORD0,
 
 	float numSamplesUsed = 0.0;
     float3 irradianceSum = 0.0;
-    float3 ii_peeled = 0.0;
-    float peeledSum = 0.0;
     for (int i = 0; i < NUM_SAMPLES; ++i)
         sampleIndirectLight(ssC, C, n_C, ssDiskRadius, i, randomPatternRotationAngle, radialJitter, irradianceSum, numSamplesUsed);
 
@@ -228,6 +233,7 @@ void DeepGBufferRadiosity(in float2 iTex	   : TEXCOORD0,
     float visibility = 1 - numSamplesUsed / float(NUM_SAMPLES);
 	
 	visibility += E_X.x;
-
+	//E_X = BounceBuffer.Load(int3(ssC, 0)).rgb;
+	//E_X = n_C * 0.5 + 0.5;
 	oFragColor = float4(E_X, visibility);
 }

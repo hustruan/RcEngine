@@ -1,4 +1,5 @@
 #include "DeepGBufferRadiosity.h"
+#include <MainApp/Application.h>
 #include <Graphics/RenderDevice.h>
 #include <Graphics/RenderFactory.h>
 #include <Graphics/GraphicsResource.h>
@@ -13,6 +14,7 @@
 #include <MainApp/Application.h>
 #include <MainApp/Window.h>
 #include <Core/Environment.h>
+#include <Input/InputSystem.h>
 
 /** Floating point bits per pixel for CSZ: 16 or 32. */
 #define ZBITS (32)
@@ -106,6 +108,50 @@ const shared_ptr<ShaderResourceView>& DeepGBufferRadiosity::GBuffer::GetTextureS
 }
 
 //////////////////////////////////////////////////////////////////////////
+DeepGBufferRadiosity::MipmapGenerator::MipmapGenerator(const shared_ptr<Texture>& buffer, int maxLevel)
+	: mMaxLevel(maxLevel)
+{
+	mDevice = Environment::GetSingleton().GetRenderDevice();
+
+	if (Environment::GetSingleton().GetApplication()->GetAppSettings().RHDeviceType == RD_Direct3D11)
+	{
+		for (int i = 1; i < maxLevel; ++i)
+		{
+			mLevelRTV.push_back( mDevice->GetRenderFactory()->CreateRenderTargetView2D(buffer, 0, i) );
+			mPrevLevelSRV.push_back( mDevice->GetRenderFactory()->CreateTexture2DSRV(buffer, 0, i, 0, 1) );
+		}
+	}
+}
+
+void DeepGBufferRadiosity::MipmapGenerator::GenerateMipmap(const shared_ptr<FrameBuffer>& frameBuffer, const shared_ptr<Effect>& minifyEffect, int techIndex)
+{
+	uint32_t baseWidth = frameBuffer->GetWidth();
+	uint32_t baseHeight = frameBuffer->GetHeight();
+
+	uint32_t width = frameBuffer->GetWidth();
+	uint32_t height = frameBuffer->GetHeight();
+
+	for (uint32_t i = 1; i < MAX_MIP_LEVEL; ++i)
+	{
+		minifyEffect->GetParameterByName("SourceMap")->SetValue( mPrevLevelSRV[i-1] ); 
+
+		// last level size
+		minifyEffect->GetParameterByName("PreviousMIP")->SetValue( int3(i-1, width, height) );
+
+		// curr level size
+		width = std::max(1U, width >> 1);
+		height = std::max(1U, height >> 1);
+		frameBuffer->Resize(width, height);
+
+		frameBuffer->AttachRTV(ATT_Color0, mLevelRTV[i-1]);
+		mDevice->BindFrameBuffer(frameBuffer);
+		mDevice->DrawFSTriangle(minifyEffect->GetTechniqueByIndex(techIndex));
+	}
+
+	frameBuffer->Resize(baseWidth, baseHeight);
+}
+
+//////////////////////////////////////////////////////////////////////////
 DeepGBufferRadiosity::DeepGBufferRadiosity(void)
 {
 }
@@ -130,6 +176,18 @@ PixelFormat DeepGBufferRadiosity::GetNormalFormat(bool useOct16) const
 	return useOct16 ? PF_RGBA8_UNORM : PF_RGB10A2;
 }
 
+const shared_ptr<Texture> DeepGBufferRadiosity::GetRadiosityTexture() const
+{
+	if (mSettings.BlurRadius != 0) 
+	{
+		return mResultBuffer;
+	} 
+	else
+	{ // No blur passes, so pull out the raw buffer!
+		return mTempFiltedResultBuffer;
+	}
+}
+
 void DeepGBufferRadiosity::OnGraphicsInit(const shared_ptr<Camera>& camera)
 {
 	RenderPath::OnGraphicsInit(camera);
@@ -143,6 +201,7 @@ void DeepGBufferRadiosity::OnGraphicsInit(const shared_ptr<Camera>& camera)
 	mLambertianOnlyEffect = resMan.GetResourceByName<Effect>(RT_Effect, "LambertianOnly.effect.xml", "General");
 	mRadiosityEffect = resMan.GetResourceByName<Effect>(RT_Effect, "DeepGBufferRadiosity/DeepGBufferRadiosity.effect.xml", "General");
 	mReconstrctCSZEffect = resMan.GetResourceByName<Effect>(RT_Effect, "DeepGBufferRadiosity/Reconstruct.effect.xml", "General");
+	mMinifyEffect = resMan.GetResourceByName<Effect>(RT_Effect, "MipmapGen.effect.xml", "General");
 	CreateBuffers(windowWidth, windowHeight);
 }
 
@@ -177,11 +236,15 @@ void DeepGBufferRadiosity::CreateBuffers( uint32_t width, uint32_t height )
 		mFrameBuffer->Resize(width, height);
 	}
 
+	mSettings.UseHalfPrecisionColors = false;
 	PixelFormat colorFormat = mSettings.UseHalfPrecisionColors ? PF_RGBA16F : PF_RGBA32F;
 	const uint32_t texCreateFlags = TexCreate_RenderTarget | TexCreate_ShaderResource;
 
-	mLambertDirectBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, 1, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
+	uint32_t numLevel = (mSettings.Enabled && mSettings.UseMipMaps) ? MAX_MIP_LEVEL : 1;
+
+	mLambertDirectBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, numLevel, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 	mLambertDirectRTV = factory->CreateRenderTargetView2D(mLambertDirectBuffer, 0, 0);
+	mLambertMipmapGen = std::make_shared<MipmapGenerator>(mLambertDirectBuffer, MAX_MIP_LEVEL);
 
 	mPeeledLambertDirectBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, 1, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 	mPeeledLambertDirectRTV = factory->CreateRenderTargetView2D(mPeeledLambertDirectBuffer, 0, 0);
@@ -192,8 +255,9 @@ void DeepGBufferRadiosity::CreateBuffers( uint32_t width, uint32_t height )
 	mResultBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, 1, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 	mTempFiltedResultBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, 1, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 
-	mCSZBuffer = factory->CreateTexture2D(width, height, GetCSZBufferFormat(mSettings.UseDepthPeelBuffer), 1, 1, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
+	mCSZBuffer = factory->CreateTexture2D(width, height, GetCSZBufferFormat(mSettings.UseDepthPeelBuffer), 1, numLevel, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 	mCSZRTV = factory->CreateRenderTargetView2D(mCSZBuffer, 0, 0);
+	mCSZMipmapGen = std::make_shared<MipmapGenerator>(mCSZBuffer, MAX_MIP_LEVEL);
 
 	// Bind shader parameter for SRV
 	mReconstrctCSZEffect->GetParameterByName("DepthBuffer")->SetValue(mGBuffer.GetTextureSRV(GBuffer::DepthStencil));
@@ -214,19 +278,44 @@ void DeepGBufferRadiosity::OnWindowResize(uint32_t width, uint32_t height)
 
 void DeepGBufferRadiosity::RenderScene()
 {
+	// Compute proj information
+	const float4x4& proj = mCamera->GetProjMatrix();
+	mProjInfo = float4(2.0f/(mBufferWidth*proj.M11), -2.0f/(mBufferHeight*proj.M22), -1.0f/proj.M11, 1.0f/proj.M22);
+	mClipInfo = float2(proj.M33, proj.M43);
+	mProjScale = 0.5f * proj.M22 * mBufferHeight;
+
 	RenderGBuffers();
 	RenderLambertianOnly();
-	RenderIndirectIllumination();
-
-	if (mSettings.Enabled && mSettings.PropagationDamping < 1.0f)
-		mGBuffer.GetTexture(GBuffer::DepthStencil)->CopyToTexture(*mPreviousDepthBuffer);
+	//RenderIndirectIllumination();
+	
+	/*if (mSettings.Enabled && mSettings.PropagationDamping < 1.0f)
+		mGBuffer.GetTexture(GBuffer::DepthStencil)->CopyToTexture(*mPreviousDepthBuffer);*/
 
 	mDevice->BindFrameBuffer(mDevice->GetScreenFrameBuffer());
 
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mGBuffer.GetTextureSRV(GBuffer::Lambertain));
-	mBlitEffect->GetParameterByName("SourceMap")->SetValue(mRawIIBuffer->GetShaderResourceView());
+	mBlitEffect->GetParameterByName("SourceMap")->SetValue(mLambertDirectBuffer->GetShaderResourceView());
+	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mRawIIBuffer->GetShaderResourceView());
 	mDevice->DrawFSTriangle(mBlitEffect->GetTechniqueByName("BlitColor"));
 
+	/*mMinifyEffect->GetParameterByName("SourceMap")->SetValue(mLambertDirectBuffer->GetShaderResourceView());
+	
+	static int level = 0;
+	if (InputSystem::GetSingleton().KeyPress(KC_0))
+		level = 0;
+	else if (InputSystem::GetSingleton().KeyPress(KC_1))
+		level = 1;
+	else if (InputSystem::GetSingleton().KeyPress(KC_2))
+		level = 2;
+	else if (InputSystem::GetSingleton().KeyPress(KC_3))
+		level = 3;
+	else if (InputSystem::GetSingleton().KeyPress(KC_4))
+		level = 4;
+	else if (InputSystem::GetSingleton().KeyPress(KC_5))
+		level = 5;
+
+	mMinifyEffect->GetParameterByName("MipLevel")->SetValue(level);
+	mDevice->DrawFSTriangle(mMinifyEffect->GetTechniqueByIndex(0));*/
 
 	mPrevViewMatrix = mCamera->GetViewMatrix();
 }
@@ -247,7 +336,7 @@ void DeepGBufferRadiosity::RenderGBuffers()
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
 		shared_ptr<Effect> effect = renderItem.Renderable->GetMaterial()->GetEffect();
-
+		
 		effect->SetCurrentTechnique("DeepGBuffer");
 		effect->GetParameterByName("PrevView")->SetValue(mPrevViewMatrix);
 		effect->GetParameterByName("ProjectionToScreenMatrix")->SetValue(projToScreenMatrix);
@@ -272,7 +361,7 @@ void DeepGBufferRadiosity::RenderGBuffers()
 	//RenderFactory* factory = mDevice->GetRenderFactory();
 	//factory->SaveTextureToFile("E:/DeepGBuffer_Lambertain.tga", mGBuffer.GetTexture(GBuffer::Lambertain));
 	//factory->SaveTextureToFile("E:/DeepGBuffer_Glossy.tga", mGBuffer.GetTexture(GBuffer::Glossy));
-	//factory->SaveTextureToFile("E:DeepGBuffer_Lambertain.pfm", mGBuffer.GetTexture(GBuffer::Lambertain));
+	//factory->SaveTextureToFile("E:/DeepGBuffer_Normal.pfm", mGBuffer.GetTexture(GBuffer::Normal));
 }
 
 void DeepGBufferRadiosity::RenderLambertianOnly()
@@ -284,14 +373,14 @@ void DeepGBufferRadiosity::RenderLambertianOnly()
 	assert(mainDirLight->GetLightType() == LT_DirectionalLight);
 
 	float3 lightColor = mainDirLight->GetLightColor() * mainDirLight->GetLightIntensity();
-	const float3& lightDirection = mainDirLight->GetDerivedDirection();
-
-	float4x4 InvViewProj = mCamera->GetViewMatrix() * mCamera->GetProjMatrix();
-	InvViewProj = MatrixInverse(InvViewProj);
 	
-	mLambertianOnlyEffect->GetParameterByName("InvViewProj")->SetValue(InvViewProj);
-	mLambertianOnlyEffect->GetParameterByName("CameraPosition")->SetValue(mCamera->GetPosition());
-	mLambertianOnlyEffect->GetParameterByName("LightDirection")->SetValue(lightDirection);
+	const float4x4& View = mCamera->GetViewMatrix();
+	const float3& lightDirection = mainDirLight->GetDerivedDirection();
+	float4 lightDirCS = float4(lightDirection.X(), lightDirection.Y(), lightDirection.Z(), 0.0) * View;
+	
+	mLambertianOnlyEffect->GetParameterByName("ProjInfo")->SetValue(mProjInfo);
+	mLambertianOnlyEffect->GetParameterByName("ClipInfo")->SetValue(mClipInfo);
+	mLambertianOnlyEffect->GetParameterByName("LightDirection")->SetValue(float3(lightDirCS.X(), lightDirCS.Y(), lightDirCS.Z()));
 	mLambertianOnlyEffect->GetParameterByName("LightColor")->SetValue(lightColor);
 	mLambertianOnlyEffect->GetParameterByName("PropagationDamping")->SetValue(mSettings.PropagationDamping);
 	mLambertianOnlyEffect->GetParameterByName("InvViewport")->SetValue(float2(1.0f / mBufferWidth, 1.0f / mBufferHeight));
@@ -362,54 +451,69 @@ void DeepGBufferRadiosity::RenderIndirectIllumination()
 	}
 }
 
+void DeepGBufferRadiosity::DeferredShade()
+{
+
+}
+
 void DeepGBufferRadiosity::ComputeMipmapedBuffers()
 {
 	EffectTechnique* reconstrctTech = mReconstrctCSZEffect->GetTechniqueByIndex(0);
 	
+	// Step 1, build camera space zbuffer, and pack normals using oct16 if enabled
 	mFrameBuffer->AttachRTV(ATT_Color0, mCSZRTV);
 	if (mSettings.UseDepthPeelBuffer)
 	{
-		if (!mSettings.UseOct16)
-		{
-			reconstrctTech = mReconstrctCSZEffect->GetTechniqueByIndex(1);
-		}
-		else
+		if (mSettings.UseOct16)
 		{
 			// lazy created if needed
 			if (!mPackedNormalBuffer || mPackedNormalBuffer->GetWidth() != mBufferWidth || mPackedNormalBuffer->GetHeight() != mBufferHeight)
 			{
 				RenderFactory* factory = Environment::GetSingleton().GetRenderFactory();
 
+				const uint32_t numLevel = (mSettings.Enabled && mSettings.UseMipMaps) ? MAX_MIP_LEVEL : 1;
 				const uint32_t texCreateFlags = TexCreate_RenderTarget | TexCreate_ShaderResource;
-				mPackedNormalBuffer = factory->CreateTexture2D(mBufferWidth, mBufferHeight, GetNormalFormat(mSettings.UseOct16), 1, 1, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
+
+				mPackedNormalBuffer = factory->CreateTexture2D(mBufferWidth, mBufferHeight, GetNormalFormat(mSettings.UseOct16), 1, numLevel, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 				mPackedNormalRTV = factory->CreateRenderTargetView2D(mPackedNormalBuffer, 0, 0);
-				
+				mPackedNormalMipmapGen = std::make_shared<MipmapGenerator>(mPackedNormalBuffer, MAX_MIP_LEVEL);
+
 				// Bind shader parameter for SRV
 				mReconstrctCSZEffect->GetParameterByName("PeeledNormalBuffer")->SetValue(mPeeledGBuffer.GetTextureSRV(GBuffer::Normal));
+				mRadiosityEffect->GetParameterByName("NormalBuffer")->SetValue(mPackedNormalBuffer->GetShaderResourceView());
 			}
-				
+
 			reconstrctTech = mReconstrctCSZEffect->GetTechniqueByIndex(2);
 			mFrameBuffer->AttachRTV(ATT_Color2, mPackedNormalRTV);
 		}
+		else
+		{
+			mRadiosityEffect->GetParameterByName("NormalBuffer")->SetValue(mGBuffer.GetTextureSRV(GBuffer::Normal));
+			reconstrctTech = mReconstrctCSZEffect->GetTechniqueByIndex(1);
+		}
 	}
 
-	const float4x4& proj = mCamera->GetProjMatrix();
-	mReconstrctCSZEffect->GetParameterByName("ClipInfo")->SetValue(float2(proj.M33, proj.M43));
-
+	mReconstrctCSZEffect->GetParameterByName("ClipInfo")->SetValue(mClipInfo);
 	mDevice->BindFrameBuffer(mFrameBuffer);
 	mDevice->DrawFSTriangle(reconstrctTech);
+
+	// Step2, Generate mipmap 
+	if (mSettings.UseMipMaps)
+	{
+		mFrameBuffer->DetachAll();
+		mCSZMipmapGen->GenerateMipmap(mFrameBuffer, mMinifyEffect, 1);
+		mLambertMipmapGen->GenerateMipmap(mFrameBuffer, mMinifyEffect, 1);
+		if (mSettings.Enabled && mSettings.UseOct16)
+			mPackedNormalMipmapGen->GenerateMipmap(mFrameBuffer, mMinifyEffect, 1);
+	}
 }
 
 void DeepGBufferRadiosity::ComputeRawII()
 {
-	const float4x4& proj = mCamera->GetProjMatrix();
-	float4 projInfo(2.0f/(mBufferWidth*proj.M11), -2.0f/(mBufferHeight*proj.M22), -1.0f/proj.M11, 1.0f/proj.M22);
-	float projScale = 0.5f * proj.M22 * mBufferHeight;
+	mSettings.Radius = 54.0f;
 
-	mSettings.Radius = 74.0f;
-
-	mRadiosityEffect->GetParameterByName("ProjInfo")->SetValue(projInfo);
-	mRadiosityEffect->GetParameterByName("ProjScale")->SetValue(projScale);
+	mRadiosityEffect->GetParameterByName("ProjInfo")->SetValue(mProjInfo);
+	mRadiosityEffect->GetParameterByName("ProjScale")->SetValue(mProjScale);
 	mRadiosityEffect->GetParameterByName("TextureBound")->SetValue(int4(0, 0, mBufferWidth-1, mBufferHeight-1));
 	mRadiosityEffect->GetParameterByName("Radius")->SetValue(mSettings.Radius);
 	mRadiosityEffect->GetParameterByName("Radius2")->SetValue(mSettings.Radius * mSettings.Radius);
@@ -424,7 +528,6 @@ void DeepGBufferRadiosity::ComputeRawII()
 		}
 		else
 		{
-
 			radiosityTech = mRadiosityEffect->GetTechniqueByIndex(2);
 		}
 	}
@@ -438,20 +541,6 @@ void DeepGBufferRadiosity::TemporalFiltering()
 {
 
 }
-
-const shared_ptr<Texture> DeepGBufferRadiosity::GetRadiosityTexture() const
-{
-	if (mSettings.BlurRadius != 0) 
-	{
-		return mResultBuffer;
-	} 
-	else
-	{ // No blur passes, so pull out the raw buffer!
-		return mTempFiltedResultBuffer;
-	}
-}
-
-
 
 
 

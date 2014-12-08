@@ -106,7 +106,6 @@ void Material::LoadImpl()
 
 	// material name 
 	mMaterialName = root->AttributeString("name", "");
-	mMaterialName = mResourceName;
 
 	// effect first
 	XMLNodePtr effectNode = root->FirstNode("Effect");

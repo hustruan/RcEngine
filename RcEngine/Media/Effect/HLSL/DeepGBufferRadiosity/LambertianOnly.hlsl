@@ -12,10 +12,10 @@ Texture2D GBufferDepth;
 	Texture2D PrevIndirectRadiosityBuffer;
 #endif 
 
-float4x4 InvViewProj;
-float3 CameraPosition; 
-float3 LightDirection;
+float4 ProjInfo;
+float2 ClipInfo;
 
+float3 LightDirection;
 float3 LightColor;
 float PropagationDamping;
 
@@ -23,47 +23,42 @@ float2 InvViewport;
 float2 LightBoost;
 
 //////////////////////////////////////////////////////////////////////////////////////
-float3 ReconstructWorldPosition(Texture2D depthBuffer, float2 fragCoord)
+float3 reconstructCameraSpacePosition(float2 S, float z)
 {
-	float z = depthBuffer.Load(int3(fragCoord, 0)).r; 
-	
-	float2 clipPos = (fragCoord * InvViewport);
-	clipPos = clipPos * float2(2.0f, -2.0f) + float2(-1.0f, 1.0f);
-	
-	float4 worldPosition = mul(float4(clipPos, z, 1.0), InvViewProj);
-	return float3(worldPosition.xyz / worldPosition.w); 
+	float csz = ClipInfo.y / ( z - ClipInfo.x);
+	return float3((S.xy * ProjInfo.xy + ProjInfo.zw) * csz, csz);
 }
 
 void LambertianOnly(in float2 iTex	      : TEXCOORD0,
 					in float4 iFragCoord  : SV_Position,
 					out float3 oFragColor : SV_Target0)
 {
-	int3 ssp = int3(iFragCoord.xy, 0);
+	int3 ssP = int3(iFragCoord.xy, 0);
 
-	float3 N = GBufferNormal.Load(ssp).xyz * 2.0 - 1.0;
-    if (dot(N, N) < 0.01) {
+	float3 csN = GBufferNormal.Load(ssP).xyz * 2.0 - 1.0;
+    if (dot(csN, csN) < 0.01) {
         // This is a background pixel, not part of an object
         discard;
     } 
 
-	float3 worldPosition = ReconstructWorldPosition(GBufferDepth, iFragCoord.xy);
-	float3 V = normalize(CameraPosition - worldPosition);
+	float3 csPosition = reconstructCameraSpacePosition(iFragCoord.xy, GBufferDepth.Load(ssP).r);
+	float3 V = normalize(-csPosition);
 	float3 L = normalize(-LightDirection);
 
 	// Lambertian coefficient in BSDF
-    float3 diffuseAlbedo  = (GBufferLambertain.Load(ssp).rgb); // / PI;
+    float3 diffuseAlbedo  = (GBufferLambertain.Load(ssP).rgb); // / PI;
 
 	// Direct light
-	float3 E_lambertian = LightColor * max(0.0f, dot(N, L));
+	float3 E_lambertian = LightColor * max(0.0f, dot(csN, L));
 
 #if USE_INDIRECT
 	
-    float2 prevFragCoord  = iFragCoord.xy - GBufferSSVelocity.Load(ssp).rg;
+    float2 prevFragCoord  = iFragCoord.xy - GBufferSSVelocity.Load(ssP).rg;
     float3 indirect = PrevIndirectRadiosityBuffer.Sample(RadiositySampler, prevFragCoord * InvViewport).rgb;
     
     float epsilon = 0.05;
-    float3 prevWorldPosition = ReconstructWorldPosition(PrevDepthBuffer, prevFragCoord);
-    float dist = length(worldPosition - prevWorldPosition);
+    float3 prevPosition = reconstructCameraSpacePosition(prevFragCoord, PrevDepthBuffer.Load(int3(prevFragCoord, 0)).r);
+    float dist = length(csPosition - prevPosition);
 
     float weight = 1.0 - smoothstep(epsilon * 0.8, epsilon * 1.2, dist);
     indirect *= weight;
