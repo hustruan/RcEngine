@@ -12,15 +12,18 @@ Texture2D GBufferDepth;
 	Texture2D PrevIndirectRadiosityBuffer;
 #endif 
 
+float4x4 InvView;
+float4x4 PrevoiusInvView;
+
 float4 ProjInfo;
 float2 ClipInfo;
-
+float2 InvViewport;
 float3 LightDirection;
 float3 LightColor;
 float PropagationDamping;
-
-float2 InvViewport;
 float2 LightBoost;
+
+#define PI 3.141592653589
 
 //////////////////////////////////////////////////////////////////////////////////////
 float3 reconstructCameraSpacePosition(float2 S, float z)
@@ -41,15 +44,16 @@ void LambertianOnly(in float2 iTex	      : TEXCOORD0,
         discard;
     } 
 
+	// Compute direct lighting in camera space
 	float3 csPosition = reconstructCameraSpacePosition(iFragCoord.xy, GBufferDepth.Load(ssP).r);
 	float3 V = normalize(-csPosition);
 	float3 L = normalize(-LightDirection);
 
 	// Lambertian coefficient in BSDF
-    float3 diffuseAlbedo  = (GBufferLambertain.Load(ssP).rgb); // / PI;
+    float3 diffuseAlbedo  = (GBufferLambertain.Load(ssP).rgb) / PI;
 
 	// Direct light
-	float3 E_lambertian = LightColor * max(0.0f, dot(csN, L));
+	float3 E_lambertian = LightColor * max(0.0, dot(csN, L));
 
 #if USE_INDIRECT
 	
@@ -57,8 +61,12 @@ void LambertianOnly(in float2 iTex	      : TEXCOORD0,
     float3 indirect = PrevIndirectRadiosityBuffer.Sample(RadiositySampler, prevFragCoord * InvViewport).rgb;
     
     float epsilon = 0.05;
-    float3 prevPosition = reconstructCameraSpacePosition(prevFragCoord, PrevDepthBuffer.Load(int3(prevFragCoord, 0)).r);
-    float dist = length(csPosition - prevPosition);
+    float3 csPrevPosition = reconstructCameraSpacePosition(prevFragCoord, PrevDepthBuffer.Load(int3(prevFragCoord, 0)).r);
+    
+	// Calculate motion in world space
+	float4 wsPosition = mul( float4(csPosition, 1.0), InvView );
+	float4 wsPrevPosition = mul( float4(csPrevPosition, 1.0), PrevoiusInvView );
+	float dist = length(wsPosition.xyz - wsPrevPosition.xyz);
 
     float weight = 1.0 - smoothstep(epsilon * 0.8, epsilon * 1.2, dist);
     indirect *= weight;

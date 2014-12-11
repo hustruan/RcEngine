@@ -762,9 +762,6 @@
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBuffer.hlsl">
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
-    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\LambertianOnly.hlsl">
-      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
-    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBufferRadiosity.hlsl">
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
@@ -772,6 +769,9 @@
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\Deferred.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\LambertianOnly.hlsl">
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
   </ItemGroup>
@@ -824,10 +824,22 @@
     <Xml Include="..\Media\Effect\AmbientOcclusion.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
-    <Xml Include="..\Media\Effect\LambertianOnly.effect.xml">
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferRadiosity.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
-    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferRadiosity.effect.xml">
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShade.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\LambertianOnly.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\MipmapGen.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\Reconstruct.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\TemporalFilter.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

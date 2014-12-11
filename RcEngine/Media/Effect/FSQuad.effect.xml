@@ -15,14 +15,6 @@
       <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>
-
-  <Technique name="Minify">
-    <Pass name="p0">
-      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
-      <PixelShader file="MipmapMinify" entry="Minify"/>
-      <State name="DepthEnable" value="false"/>
-    </Pass>
-  </Technique>
   
 </Effect>
 

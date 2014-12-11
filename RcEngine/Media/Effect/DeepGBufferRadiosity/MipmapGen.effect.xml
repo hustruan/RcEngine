@@ -9,7 +9,7 @@
   <Technique name="BlitColor">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
-      <PixelShader file="MipmapMinify" entry="BlitColor"/>
+      <PixelShader file="DeepGBufferRadiosity/MipmapMinify" entry="BlitColor"/>
       <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>
@@ -17,7 +17,7 @@
   <Technique name="Minify">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
-      <PixelShader file="MipmapMinify" entry="Minify"/>
+      <PixelShader file="DeepGBufferRadiosity/MipmapMinify" entry="Minify"/>
       <State name="DepthEnable" value="false"/>
     </Pass>
   </Technique>

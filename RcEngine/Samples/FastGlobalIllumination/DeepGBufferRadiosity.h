@@ -9,7 +9,7 @@ namespace RcEngine {
 class DeepGBufferRadiosity : public RenderPath
 {
 private:
-
+	
 	class GBuffer
 	{
 	public:
@@ -61,8 +61,11 @@ private:
 	PixelFormat GetNormalFormat(bool useOct16) const;
 	PixelFormat GetColorFormat(bool useHalfPrecisionColor) const;
 
+	uint32_t NumSpiralTurns() const;
+
 	void CreateBuffers(uint32_t width, uint32_t height);
 	
+	void Prepare();
 	void RenderGBuffers();
 	void RenderLambertianOnly();
 	void RenderIndirectIllumination();
@@ -70,12 +73,13 @@ private:
 
 	void ComputeMipmapedBuffers();
 	void ComputeRawII();
+	
 	void TemporalFiltering();
 
+	//void BlurHorizontal();
+	//void BlurVertical();
 
 	const shared_ptr<Texture> GetRadiosityTexture() const;
-
-
 
 private:
 	DeepGBufferRadiositySettings mSettings;
@@ -107,12 +111,16 @@ private:
 
 	shared_ptr<Texture> mPeeledLambertDirectBuffer;
 	shared_ptr<RenderView> mPeeledLambertDirectRTV;
+	shared_ptr<MipmapGenerator> mPeeledLambertMipmapGen;
 	
 	shared_ptr<Texture> mResultBuffer;
 	shared_ptr<Texture> mTempFiltedResultBuffer;
+	shared_ptr<RenderView> mTempFiltedResultRTV;
+	shared_ptr<RenderView> mResultRTV;
 
 	// Raw indirect irradiance buffer
 	shared_ptr<Texture> mRawIIBuffer;
+	shared_ptr<Texture> mPreviousRawIIBuffer;
 	shared_ptr<RenderView> mRawIIRTV;
 
 	shared_ptr<Texture> mPreviousDepthBuffer;
@@ -122,9 +130,13 @@ private:
 	shared_ptr<Effect> mRadiosityEffect;
     shared_ptr<Effect> mReconstrctCSZEffect;
 	shared_ptr<Effect> mMinifyEffect;
+	shared_ptr<Effect> mDeepGBufferShadeEffect;
+	shared_ptr<Effect> mTemporalFilterEffect;
 	shared_ptr<Effect> mBlitEffect;
 
+	float4x4 mInvViewMatrix;
 	float4x4 mPrevViewMatrix;
+	float4x4 mPrevInvViewMatrix;
 	float4x4 mViewportMatrix;
 };	
 

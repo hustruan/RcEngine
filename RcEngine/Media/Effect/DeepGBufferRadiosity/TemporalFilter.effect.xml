@@ -1,0 +1,11 @@
+<Effect name="ResconstructCSZ">
+
+  <Technique name="TemporalFilter">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/TemporalFilter" entry="TemporalFilter"/>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+
+</Effect>

@@ -456,7 +456,7 @@ void Image::SaveImageToFile( const String& filename, int layer, int level)
 
 		WritePfm(filename.c_str(), w, h, 1, &temp[0]);
 	}
-	else if (mFormat == PF_D32F || PF_R32F)
+	else if (mFormat == PF_D32F || mFormat == PF_R32F)
 	{
 		float* pixel = (float*)mSurfaces.at(index).pData;
 
@@ -498,8 +498,7 @@ void Image::SaveImageToFile( const String& filename, int layer, int level)
 				{
 					float r = pixel[((h-j-1) * w + i)*2 + 0];
 					float g = pixel[((h-j-1) * w + i)*2 + 1];
-					float b = pixel[((h-j-1) * w + i)*2 + 2];
-	
+					
 					*imageData++ = r;
 					*imageData++ = g;
 					*imageData++ = 0;
@@ -512,7 +511,6 @@ void Image::SaveImageToFile( const String& filename, int layer, int level)
 				{
 					float r = pixel[(j * w + i)*2 + 0];
 					float g = pixel[(j * w + i)*2 +1];
-					float b = pixel[(j * w + i)*2 +2];
 
 					*imageData++ = r;
 					*imageData++ = g;

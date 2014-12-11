@@ -253,8 +253,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\LambertianOnly.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\ReconstructCSZ.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -351,6 +351,11 @@
     <Xml Include="..\Media\Effect\Compute.effect.xml" />
     <Xml Include="..\Media\Effect\DebugView.effect.xml" />
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferRadiosity.effect.xml" />
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShade.effect.xml" />
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\LambertianOnly.effect.xml" />
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\MipmapGen.effect.xml" />
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\Reconstruct.effect.xml" />
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\TemporalFilter.effect.xml" />
     <Xml Include="..\Media\Effect\DeferredLighting.effect.xml">
       <SubType>Designer</SubType>
     </Xml>
@@ -358,7 +363,6 @@
       <SubType>Designer</SubType>
     </Xml>
     <Xml Include="..\Media\Effect\FontOutline.effect.xml" />
-    <Xml Include="..\Media\Effect\LambertianOnly.effect.xml" />
     <Xml Include="..\Media\Effect\ShadowMapBlur.effect.xml" />
     <Xml Include="..\Media\Effect\Sprite.effect.xml" />
     <Xml Include="..\Media\Effect\Tessellation.effect.xml">

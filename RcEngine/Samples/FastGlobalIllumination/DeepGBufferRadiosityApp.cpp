@@ -61,12 +61,12 @@ protected:
 		mRenderPath = std::make_shared<DeepGBufferRadiosity>();
 		mRenderPath->OnGraphicsInit(mMainCamera);
 
-		mMainCamera->CreateLookAt(float3(-18.415079, 5.102501, 0.825465), float3(-17.415262, 5.120544, 0.831733));
-		mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.5f, 100.0f );
+		mMainCamera->CreateLookAt(float3(-24.278074, 3.664948, -1.303544), float3(-23.288984, 3.664948, -1.303544));
+		mMainCamera->CreatePerspectiveFov(Mathf::ToRadian(77.49f), (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 150.0f );
 
 		mCameraControler = std::make_shared<Test::FPSCameraControler>(); 
 		mCameraControler->AttachCamera(*mMainCamera);
-		mCameraControler->SetMoveSpeed(10.0f);
+		mCameraControler->SetMoveSpeed(7.0f);
 		mCameraControler->SetMoveInertia(true);
 	}
 
@@ -76,9 +76,10 @@ protected:
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
 		Light* dirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
+		//dirLight->SetDirection(float3(0, -1.5, -0.5));
 		dirLight->SetDirection(float3(0, -0.5, -1));
 		dirLight->SetLightColor(float3(1.0, 1.0, 1.0));
-		dirLight->SetLightIntensity(1.0);
+		dirLight->SetLightIntensity(5.0);
 		dirLight->SetCastShadow(false);
 		dirLight->SetShadowCascades(4);
 		sceneMan->GetRootSceneNode()->AttachObject(dirLight);
@@ -96,7 +97,7 @@ protected:
 
 		const float lucyScale = 0.005f;
 		lucyNode->SetScale(float3(lucyScale, lucyScale, lucyScale));
-		lucyNode->SetPosition(float3(0, 2.95f, -3));
+		lucyNode->SetPosition(float3(-9.0f, 2.95f, -3));
 		lucyNode->SetRotation( QuaternionFromRotationAxis(float3(0, 1, 0), Mathf::ToRadian(90.0f)) );
 		lucyNode->AttachObject(lucyEnt);
 
@@ -109,6 +110,21 @@ protected:
 	void Update(float deltaTime)
 	{
 		mCameraControler->Update(deltaTime);
+
+		if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
+		{
+			auto target = mMainCamera->GetLookAt();
+			auto eye = mMainCamera->GetPosition();
+			auto up = mMainCamera->GetUp();
+
+			FILE* f = fopen("E:/camera.txt", "w");
+			fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
+				eye[0], eye[1], eye[2], 
+				target[0], target[1], target[2],
+				up[0], up[1], up[2]);
+			fclose(f);
+		}
+
 
 		//auto pos = mMainCamera->GetPosition();
  		//printf("Pos: %f, %f, %f\n", pos.X(), pos.Y(), pos.Z());
