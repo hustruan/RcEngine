@@ -75,14 +75,24 @@ protected:
 		ResourceManager& resMan = ResourceManager::GetSingleton();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
+		//Light* dirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
+		////dirLight->SetDirection(float3(0, -1.5, -0.5));
+		//dirLight->SetDirection(float3(0, -0.5, -1));
+		//dirLight->SetLightColor(float3(1.0, 1.0, 1.0));
+		//dirLight->SetLightIntensity(5.0);
+		//dirLight->SetCastShadow(false);
+		//dirLight->SetShadowCascades(4);
+		//sceneMan->GetRootSceneNode()->AttachObject(dirLight);
+
 		Light* dirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
-		//dirLight->SetDirection(float3(0, -1.5, -0.5));
-		dirLight->SetDirection(float3(0, -0.5, -1));
+		dirLight->SetDirection(float3(0, -2.0, -0.58));
+		//dirLight->SetDirection(float3(0, -0.5, -1));
 		dirLight->SetLightColor(float3(1.0, 1.0, 1.0));
-		dirLight->SetLightIntensity(5.0);
-		dirLight->SetCastShadow(false);
-		dirLight->SetShadowCascades(4);
+		dirLight->SetLightIntensity(10.0);
+		dirLight->SetCastShadow(true);
+		dirLight->SetShadowCascades(3);
 		sceneMan->GetRootSceneNode()->AttachObject(dirLight);
+
 
 		// Load Sponza
 		Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");
@@ -97,7 +107,7 @@ protected:
 
 		const float lucyScale = 0.005f;
 		lucyNode->SetScale(float3(lucyScale, lucyScale, lucyScale));
-		lucyNode->SetPosition(float3(-9.0f, 2.95f, -3));
+		lucyNode->SetPosition(float3(-14.0f, 2.95f, -3.0));
 		lucyNode->SetRotation( QuaternionFromRotationAxis(float3(0, 1, 0), Mathf::ToRadian(90.0f)) );
 		lucyNode->AttachObject(lucyEnt);
 

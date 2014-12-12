@@ -1,6 +1,6 @@
 <Effect name="DeepGBufferShade">
 
-  <Technique name="DeferredShade">
+  <Technique name="">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
       <PixelShader file="DeepGBufferRadiosity/Deferred" entry="Deferred">

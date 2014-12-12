@@ -1,5 +1,8 @@
 #include "ColorBoost.hlsl"
 
+#define PCF
+#include "PSSM.hlsl"
+
 Texture2D GBufferLambertain;
 Texture2D GBufferGossly;
 Texture2D GBufferNormal;
@@ -46,6 +49,8 @@ void LambertianOnly(in float2 iTex	      : TEXCOORD0,
 
 	// Compute direct lighting in camera space
 	float3 csPosition = reconstructCameraSpacePosition(iFragCoord.xy, GBufferDepth.Load(ssP).r);
+	float4 wsPosition = mul( float4(csPosition, 1.0), InvView );
+
 	float3 V = normalize(-csPosition);
 	float3 L = normalize(-LightDirection);
 
@@ -54,6 +59,10 @@ void LambertianOnly(in float2 iTex	      : TEXCOORD0,
 
 	// Direct light
 	float3 E_lambertian = LightColor * max(0.0, dot(csN, L));
+
+	int iCascadeSelected = 0;
+	float percentLit = EvalCascadeShadow(wsPosition, iCascadeSelected);
+	E_lambertian *= percentLit; 
 
 #if USE_INDIRECT
 	
@@ -64,7 +73,6 @@ void LambertianOnly(in float2 iTex	      : TEXCOORD0,
     float3 csPrevPosition = reconstructCameraSpacePosition(prevFragCoord, PrevDepthBuffer.Load(int3(prevFragCoord, 0)).r);
     
 	// Calculate motion in world space
-	float4 wsPosition = mul( float4(csPosition, 1.0), InvView );
 	float4 wsPrevPosition = mul( float4(csPrevPosition, 1.0), PrevoiusInvView );
 	float dist = length(wsPosition.xyz - wsPrevPosition.xyz);
 

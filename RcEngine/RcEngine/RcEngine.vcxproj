@@ -244,6 +244,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBufferBlur.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBufferRadiosity.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -259,6 +263,10 @@
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\ReconstructCSZ.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\TemporalFilter.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\DeferredLighting.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -348,10 +356,9 @@
   <ItemGroup>
     <Xml Include="..\Media\Effect\AlphaTest.effect.xml" />
     <Xml Include="..\Media\Effect\AmbientOcclusion.effect.xml" />
-    <Xml Include="..\Media\Effect\Compute.effect.xml" />
     <Xml Include="..\Media\Effect\DebugView.effect.xml" />
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferRadiosity.effect.xml" />
-    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShade.effect.xml" />
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShading.effect.xml" />
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\LambertianOnly.effect.xml" />
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\MipmapGen.effect.xml" />
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\Reconstruct.effect.xml" />

@@ -6,6 +6,8 @@
 
 namespace RcEngine {
 
+class CascadedShadowMap;
+
 class DeepGBufferRadiosity : public RenderPath
 {
 private:
@@ -64,23 +66,19 @@ private:
 	uint32_t NumSpiralTurns() const;
 
 	void CreateBuffers(uint32_t width, uint32_t height);
-	
+	const shared_ptr<Texture> GetRadiosityTexture() const;
+
 	void Prepare();
+	void ComputeShadows();
 	void RenderGBuffers();
 	void RenderLambertianOnly();
 	void RenderIndirectIllumination();
-	void DeferredShade();
-
+	void DeferredShading();
 	void ComputeMipmapedBuffers();
 	void ComputeRawII();
-	
 	void TemporalFiltering();
-
-	//void BlurHorizontal();
-	//void BlurVertical();
-
-	const shared_ptr<Texture> GetRadiosityTexture() const;
-
+	void RadiosityBlur();
+	
 private:
 	DeepGBufferRadiositySettings mSettings;
 
@@ -89,7 +87,9 @@ private:
 	float4 mProjInfo;
 	float2 mClipInfo;
 	float mProjScale;
-
+	
+	shared_ptr<CascadedShadowMap> mShadowMan;
+	
 	// GBuffers
 	GBuffer mGBuffer;
 	GBuffer mPeeledGBuffer;
@@ -113,9 +113,13 @@ private:
 	shared_ptr<RenderView> mPeeledLambertDirectRTV;
 	shared_ptr<MipmapGenerator> mPeeledLambertMipmapGen;
 	
-	shared_ptr<Texture> mResultBuffer;
 	shared_ptr<Texture> mTempFiltedResultBuffer;
 	shared_ptr<RenderView> mTempFiltedResultRTV;
+
+	shared_ptr<Texture> mTempBlurBuffer;
+	shared_ptr<RenderView> mTempBlurRTV;
+
+	shared_ptr<Texture> mResultBuffer;
 	shared_ptr<RenderView> mResultRTV;
 
 	// Raw indirect irradiance buffer
@@ -130,8 +134,9 @@ private:
 	shared_ptr<Effect> mRadiosityEffect;
     shared_ptr<Effect> mReconstrctCSZEffect;
 	shared_ptr<Effect> mMinifyEffect;
-	shared_ptr<Effect> mDeepGBufferShadeEffect;
+	shared_ptr<Effect> mDeepGBufferShadingEffect;
 	shared_ptr<Effect> mTemporalFilterEffect;
+	shared_ptr<Effect> mRadiosityBlurEffect;
 	shared_ptr<Effect> mBlitEffect;
 
 	float4x4 mInvViewMatrix;

@@ -3,6 +3,9 @@ Texture2D GBufferGossly;
 Texture2D GBufferNormal;
 Texture2D GBufferDepth;
 Texture2D IndirectRadiosity;
+Texture2D AmbientOcclusion;
+
+float4x4 InvView;
 
 float4 ProjInfo;
 float2 ClipInfo;
@@ -10,6 +13,7 @@ float2 LightBoost;
 
 float3 LightDirection;
 float3 LightColor;
+bool   EnableSSAO;
 
 #define pi (3.1415926)
 #define invPi (0.318309886)
@@ -17,6 +21,9 @@ float3 LightColor;
 #define inv8pi (0.0397887358)
 
 #include "colorBoost.hlsl"
+
+#define PCF
+#include "PSSM.hlsl"
 
 float3 reconstructCameraSpacePosition(float2 S, float z)
 {
@@ -45,14 +52,15 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
     } 
 
 	float3 csPosition = reconstructCameraSpacePosition(iFragCoord.xy, GBufferDepth.Load(ssC).r);
-	
+	float4 wsPosition = mul( float4(csPosition, 1.0), InvView );
+
 	// View vector	
 	float3 V = normalize(-csPosition);
 	float3 L = normalize(-LightDirection);
 	float3 H = normalize(V + L);
 	
 	// Lambertian coefficient in BSDF
-    float3 lambertianColor = GBufferLambertain.Load(ssC).rgb ;//* invPi;
+    float3 lambertianColor = GBufferLambertain.Load(ssC).rgb * invPi;
 
     // Glossy coefficient in BSDF (this code unpacks  G3D::UniversalBSDF's encoding)
     float4 F0 = GBufferGossly.Load(ssC);
@@ -62,7 +70,7 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
     float3 F = ComputeFresnel(F0.rgb, dot(V, H));
 
     // G = F * (s_X + 8) / (8 pi)
-    float3 glossyColor = F * (glossyExponent * (1.0 / (8.0 * pi)) + invPi);
+	float3 glossyColor = F * (glossyExponent * (1.0 / (8.0 * pi)) + invPi);
 
 	float3 E_lambertianAmbient = 0.0;
 	float3 E_glossyAmbient = 0.0;
@@ -70,14 +78,18 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
 	/*float3 E_lambertianAmbient = computeLambertianEnvironmentMapLighting(wsN);
     float3 E_glossyAmbient     = computeGlossyEnvironmentMapLighting(w_mi, (F0.a == 1.0), glossyExponent) 
         * (8.0 / (glossyExponent + 8.0));*/
-  
-    float3 E_lambertian = LightColor * max( 0.0, dot(N, L) ); 
+	
+	// Compute shadow
+	int iCascadeSelected = 0;
+	float percentLit = EvalCascadeShadow(wsPosition, iCascadeSelected);
+
+    float3 E_lambertian = LightColor * max( 0.0, dot(N, L) ) * percentLit; 
 	float3 E_glossy = E_lambertian * pow( max(0.0, dot(N, H)), glossyExponent );
 
-	//E_glossy = min((float3)0, E_glossy);
-	//E_lambertian = min((float3)0, E_lambertian);
-
 	float AO = 1.0;
+	if (EnableSSAO) {
+		AO = 0.95 * AmbientOcclusion.Load(ssC).r + 0.05;
+	}
 
 	// How much ambient occlusion to apply to direct illumination (sort of approximates area lights,
     // more importantly: NPR term that adds local contrast)
@@ -93,6 +105,8 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
 	float3 emissiveColor = 0.0;
 	float3 result = 0.0;
 
+	glossyColor = min((float3)0.0, glossyColor);
+
 #if USE_INDIRECT
     result =
             emissiveColor +
@@ -106,7 +120,6 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
            + (E_glossy     * directAO                               + E_glossyAmbient     * AO) * glossyColor;
 #endif
 
-	float a = result.r;
-	//result =  indirect;
-	oFragColor = float4(result, a);
+	//oFragColor = float4(E_lambertianIndirect, result.r);
+	oFragColor = float4(result, 1.0);
 }

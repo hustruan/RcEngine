@@ -774,6 +774,12 @@
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\LambertianOnly.hlsl">
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\DeepGBufferBlur.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\TemporalFilter.hlsl">
+      <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -795,9 +801,6 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\TiledDeferredShading.effect.xml">
-      <Filter>Asset\Effect</Filter>
-    </Xml>
-    <Xml Include="..\Media\Effect\Compute.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\TiledLightCull.effect.xml">
@@ -827,9 +830,6 @@
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferRadiosity.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
-    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShade.effect.xml">
-      <Filter>Asset\Effect</Filter>
-    </Xml>
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\LambertianOnly.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
@@ -840,6 +840,9 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\TemporalFilter.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShading.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

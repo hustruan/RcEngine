@@ -1,0 +1,14 @@
+<Effect name="DeepGBufferBlur">
+
+  <Technique name="Blur">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/DeepGBufferBlur" entry="DeepGBufferBlur">
+        <Macro name="USE_NORMAL" value="1"/>
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+	  
+    </Pass>
+  </Technique>
+
+</Effect>

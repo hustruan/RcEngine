@@ -1,4 +1,4 @@
-<Effect name="ResconstructCSZ">
+<Effect name="TemporalFilter">
 
   <Technique name="TemporalFilter">
     <Pass name="p0">

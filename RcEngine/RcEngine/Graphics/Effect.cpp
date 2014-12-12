@@ -558,6 +558,7 @@ EffectConstantBuffer* Effect::GetConstantBuffer( const String& name ) const
 			return cb;
 	}
 
+	ENGINE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "cbuffer: " + name + " not exits!", "Effect::GetConstantBuffer");
 	return NULL;
 }
 

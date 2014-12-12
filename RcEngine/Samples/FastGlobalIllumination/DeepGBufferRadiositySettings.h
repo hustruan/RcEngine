@@ -150,7 +150,8 @@ struct DeepGBufferRadiositySettings
 		  PropagationDamping(0.1f),
 		  UnsaturatedBoost(1.0f),
 		  SaturatedBoost(1.0f),
-		  UseOct16(true)
+		  UseOct16(true),
+		  BlurRadius(5)
 	{
 	}
 };
