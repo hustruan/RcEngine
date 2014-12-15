@@ -14,6 +14,7 @@ enum SceneObejctType
 {
 	SOT_Entity = 0,
 	SOT_Light,
+	SOT_Sky,
 	SOT_Camera,
 	SOT_Particle,
 	SOT_Count

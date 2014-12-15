@@ -84,6 +84,7 @@ protected:
 		castleNode->SetScale(float3(3, 3, 3));
 		castleNode->AttachObject(arena);
 
+		SkyBox* skybox = sceneMan->CreateSkyBox("noonclouds", "/CubeMap/noonclouds.dds", "General");
 
 
 		//const float CHAR_SCALE = 5.0f;

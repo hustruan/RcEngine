@@ -780,6 +780,9 @@
     <FxCompile Include="..\Media\Effect\HLSL\DeepGBufferRadiosity\TemporalFilter.hlsl">
       <Filter>Asset\HLSL\DeepGBufferRadiosity</Filter>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\Sky.hlsl">
+      <Filter>Asset\HLSL</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="..\Media\Effect\FSQuad.effect.xml">
@@ -843,6 +846,9 @@
       <Filter>Asset\Effect</Filter>
     </Xml>
     <Xml Include="..\Media\Effect\DeepGBufferRadiosity\DeepGBufferShading.effect.xml">
+      <Filter>Asset\Effect</Filter>
+    </Xml>
+    <Xml Include="..\Media\Effect\Sky.effect.xml">
       <Filter>Asset\Effect</Filter>
     </Xml>
   </ItemGroup>

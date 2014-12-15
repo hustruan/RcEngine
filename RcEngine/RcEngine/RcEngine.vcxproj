@@ -332,6 +332,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\Media\Effect\HLSL\Sky.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\Media\Effect\HLSL\VSM.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -371,6 +375,7 @@
     </Xml>
     <Xml Include="..\Media\Effect\FontOutline.effect.xml" />
     <Xml Include="..\Media\Effect\ShadowMapBlur.effect.xml" />
+    <Xml Include="..\Media\Effect\Sky.effect.xml" />
     <Xml Include="..\Media\Effect\Sprite.effect.xml" />
     <Xml Include="..\Media\Effect\Tessellation.effect.xml">
       <SubType>Designer</SubType>

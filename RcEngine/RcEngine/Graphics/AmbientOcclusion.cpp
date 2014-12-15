@@ -255,7 +255,7 @@ void AmbientOcclusionPanel::InitGUI(int2 position)
 	wchar_t sz[100];
 	int sliderPos;
 	swprintf(sz, 100, L"Radius %.2f", mAmbientOcclusion.mSettings.Radius);
-	sliderPos = (mAmbientOcclusion.mSettings.Radius - MIN_SAMPLE_RADIUS) / (MAX_SAMPLE_RADIUS - MIN_SAMPLE_RADIUS) * 100;
+	sliderPos = static_cast<int>( (mAmbientOcclusion.mSettings.Radius - MIN_SAMPLE_RADIUS) / (MAX_SAMPLE_RADIUS - MIN_SAMPLE_RADIUS) * 100 );
 
 	mRadiusLabel = new Label;
 	mRadiusLabel->InitGuiStyle(nullptr);
@@ -276,7 +276,7 @@ void AmbientOcclusionPanel::InitGUI(int2 position)
 
 	uiY += mRadiusLabel->GetSize().Y() + 5;
 	swprintf(sz, 100, L"Bias %.3f", mAmbientOcclusion.mSettings.Bias);
-	sliderPos = mAmbientOcclusion.mSettings.Bias * 100;
+	sliderPos = static_cast<int>( mAmbientOcclusion.mSettings.Bias * 100.0f );
 
 	mBiasLabel = new Label;
 	mBiasLabel->InitGuiStyle(nullptr);
@@ -298,7 +298,7 @@ void AmbientOcclusionPanel::InitGUI(int2 position)
 	//Detail AO
 	uiY += mBiasLabel->GetSize().Y() + 5;
 	swprintf(sz, 100, L"DetailAO %.2f", mAmbientOcclusion.mSettings.DetailAO);
-	sliderPos = mAmbientOcclusion.mSettings.DetailAO * 50;
+	sliderPos = static_cast<int>( mAmbientOcclusion.mSettings.DetailAO * 50.0f );
 
 	mDetailAOLabel = new Label;
 	mDetailAOLabel->InitGuiStyle(nullptr);
@@ -320,7 +320,7 @@ void AmbientOcclusionPanel::InitGUI(int2 position)
 	// Coarse AO
 	uiY += mDetailAOLabel->GetSize().Y() + 5;
 	swprintf(sz, 100, L"CoarseAO %.2f", mAmbientOcclusion.mSettings.CoarseAO);
-	sliderPos = mAmbientOcclusion.mSettings.CoarseAO * 50;
+	sliderPos = static_cast<int>( mAmbientOcclusion.mSettings.CoarseAO * 50.0f );
 
 	mCoarseAOLabel = new Label;
 	mCoarseAOLabel->InitGuiStyle(nullptr);
@@ -342,7 +342,7 @@ void AmbientOcclusionPanel::InitGUI(int2 position)
 	// Coarse AO
 	uiY += mCoarseAOLabel->GetSize().Y() + 5;
 	swprintf(sz, 100, L"Units %.1f", mAmbientOcclusion.mSettings.MetersToViewSpaceUnits);
-	sliderPos = mAmbientOcclusion.mSettings.MetersToViewSpaceUnits * 2;
+	sliderPos = static_cast<int>( mAmbientOcclusion.mSettings.MetersToViewSpaceUnits * 2.0f );
 
 	mSceneUnitsLabel = new Label;
 	mSceneUnitsLabel->InitGuiStyle(nullptr);

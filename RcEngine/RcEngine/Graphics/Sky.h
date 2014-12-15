@@ -2,72 +2,52 @@
 #define Sky_h__
 
 #include <Core/Prerequisites.h>
-#include <Graphics/Renderable.h>
+#include <Scene/SceneObject.h>
+#include <Graphics/Mesh.h>
 #include <Math/Matrix.h>
 
 namespace RcEngine {
 
-//class _ApiExport Sky : public Renderable
-//{
-//public:
-//	enum SkyBoxPlane
-//	{
-//		Left = 0,
-//		Right,
-//		Up,
-//		Down,
-//		Front,
-//		Back,
-//		MaxPlaneCount
-//	};
-//
-//public:
-//	Sky( float size,  bool cube = false );
-//	~Sky();
-//
-//	const shared_ptr<Material>& GetMaterial() const	{ return mMaterial; }
-//
-//	const shared_ptr<RenderOperation>& GetRenderOperation() const	{ return mRenderOperation; }
-//
-//	uint32_t GetWorldTransformsCount() const { return 0; }
-//	void GetWorldTransforms(float4x4* xform) const { }
-//	
-//	void SetMaterial( const shared_ptr<Material>& mat );
-//
-//private:
-//	void InitializeSkyBox(float size);
-//	void InitializeSkyCubeMap(float size);
-//
-//private:
-//	bool mCubeMapSky;
-//	
-//	shared_ptr<GraphicsBuffer> mVertexBuffer;
-//	shared_ptr<GraphicsBuffer> mIndexBuffer;
-//	shared_ptr<VertexDeclaration> mVertexDecl;
-//	shared_ptr<Material> mMaterial;
-//
-//	shared_ptr<RenderOperation> mRenderOperation;
-//};
-
-class _ApiExport SkyBox : public Renderable
+class _ApiExport SkyBox : public SceneObject
 {
 public:
-	SkyBox();
-	~SkyBox() {}
+	SkyBox( const String& name, const shared_ptr<Texture>& cubeSkyTexture );
+	~SkyBox();
 
-	void SetPosition(const float3& position);
+	void SetTexture(const shared_ptr<Texture>& texure);
 
-	const shared_ptr<Material>& GetMaterial() const					{ return mMaterial; }
-	const shared_ptr<RenderOperation>& GetRenderOperation() const	{ return mRenderOperation; }
-	uint32_t GetWorldTransformsCount() const						{ return 1; }
-	void GetWorldTransforms(float4x4* xform) const;
+	const BoundingBoxf& GetWorldBoundingBox() const;
+	void OnUpdateRenderQueue( RenderQueue* renderQueue, const Camera& camera, RenderOrder order, uint32_t buckterFilter, uint32_t filterIgnore );
 
-protected:
-	shared_ptr<RenderOperation> mRenderOperation;
-	shared_ptr<Material> mMaterial;
-	float4x4 mWorldTransform;
+public:
+	static SceneObject* FactoryFunc(const String& name, const NameValuePairList* params = 0);
+
+private:
+	class Renderable* mCubeBox;
 };
 
+//class _ApiExport SkyBox : public Renderable
+//{
+//public:
+//	SkyBox();
+//	~SkyBox() {}
+//
+//	bool IsActive() const { return mActive; }
+//	void SetActive(bool bActive);
+//	void SetTexture(const shared_ptr<Texture>& texture);
+//	void SetPosition(const float3& position);
+//
+//	const shared_ptr<Material>& GetMaterial() const					{ return mMaterial; }
+//	const shared_ptr<RenderOperation>& GetRenderOperation() const	{ return mRenderOperation; }
+//	uint32_t GetWorldTransformsCount() const						{ return 1; }
+//	void GetWorldTransforms(float4x4* xform) const;
+//
+//protected:
+//	shared_ptr<RenderOperation> mRenderOperation;
+//	shared_ptr<Material> mMaterial;
+//	float4x4 mWorldTransform;
+//	bool mActive;
+//};
 
 
 }

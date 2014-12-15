@@ -58,9 +58,6 @@ protected:
 		// Bind default camera
 		mDevice->GetScreenFrameBuffer()->SetCamera(mMainCamera);
 
-		mRenderPath = std::make_shared<DeepGBufferRadiosity>();
-		mRenderPath->OnGraphicsInit(mMainCamera);
-
 		mMainCamera->CreateLookAt(float3(-24.278074, 3.664948, -1.303544), float3(-23.288984, 3.664948, -1.303544));
 		mMainCamera->CreatePerspectiveFov(Mathf::ToRadian(77.49f), (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 150.0f );
 
@@ -68,6 +65,10 @@ protected:
 		mCameraControler->AttachCamera(*mMainCamera);
 		mCameraControler->SetMoveSpeed(7.0f);
 		mCameraControler->SetMoveInertia(true);
+
+		// Render Path
+		mRenderPath = std::make_shared<DeepGBufferRadiosity>();
+		mRenderPath->OnGraphicsInit(mMainCamera);
 	}
 
 	void LoadContent()
@@ -92,7 +93,6 @@ protected:
 		dirLight->SetCastShadow(true);
 		dirLight->SetShadowCascades(3);
 		sceneMan->GetRootSceneNode()->AttachObject(dirLight);
-
 
 		// Load Sponza
 		Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");

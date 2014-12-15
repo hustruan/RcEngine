@@ -46,6 +46,11 @@ public:
 	SceneNode* GetRootSceneNode();
 
 	/**
+	 * Get sky scene node, attach sky scene object to this node
+	 */
+	SceneNode* GetSkySceneNode(); 
+
+	/**
 	 * Create a new scene node, this will track the node in scene manager.
 	 */
 	SceneNode* CreateSceneNode( const String& name );
@@ -62,7 +67,7 @@ public:
 	Light* CreateLight( const String& name, uint32_t lightType);
 	const std::vector<Light*>& GetSceneLights() const  { return mAllSceneLights; }
 
-	void CreateSkyBox( const shared_ptr<Texture>& texture );
+	SkyBox* CreateSkyBox( const String& skyName, const String& resName, const String& groupName );
 
 	/**
 	 * Update all scene graph node and transform.
@@ -106,13 +111,12 @@ protected:
 	// Keep track of all scene node
     std::vector<SceneNode*> mAllSceneNodes;		// [0] is root node
 
+	SceneNode* mSkySceneNode;
+
 	// Keep track of all scene lights
 	std::vector<Light*> mAllSceneLights;
 
 	std::vector<SpriteBatch*> mSpriteBatchs;
-
-	// For sky box
-	SkyBox* mSkyBox;
 
 	AnimationController* mAnimationController;
 

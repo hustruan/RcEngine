@@ -43,7 +43,7 @@ public:
 	void SetSpecularColor(const float3& specular)	{ mSpecular = specular; }
 	void SetSpecularPower(float power)				{ mPower = power; }
 
-	void SetTexture(const String& name, const shared_ptr<ShaderResourceView>& textureSRV);
+	void SetTexture(const String& name, const shared_ptr<Texture>& texture);
 
 	// Apply shader parameter before rendering, called by renderable
 	void ApplyMaterial(const float4x4& world = float4x4::Identity());
@@ -71,9 +71,9 @@ protected:
 	float3 mEmissive;
 	float mPower;
 	
+	unordered_map<String, shared_ptr<Texture> > mMaterialTextures;
 	vector<shared_ptr<Texture> > mMaterialTextureCopys;
-	unordered_map<String, shared_ptr<ShaderResourceView> > mTextureSRVs;		
-
+	
 	vector<EffectParameter*> mAutoBindings;
 };
 

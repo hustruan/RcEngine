@@ -24,13 +24,14 @@
 namespace RcEngine {
 
 SceneManager::SceneManager()
-	: mSkyBox(nullptr) 
+	: mSkySceneNode(nullptr) 
 {
 	Environment::GetSingleton().mSceneManager = this;
 
 	// Register all known scene object types
 	RegisterType(SOT_Entity, "Entity Type", nullptr, nullptr, Entity::FactoryFunc);
 	RegisterType(SOT_Light, "Light Type", nullptr, nullptr, Light::FactoryFunc);
+	RegisterType(SOT_Sky, "Sky Type", nullptr, nullptr, SkyBox::FactoryFunc);
 
 	mAnimationController = new AnimationController;
 }
@@ -107,6 +108,17 @@ SceneNode* SceneManager::GetRootSceneNode()
 	return root;
 }
 
+SceneNode* SceneManager::GetSkySceneNode()
+{
+	if (!mSkySceneNode)
+	{
+		mSkySceneNode = GetRootSceneNode()->CreateChildSceneNode("SkyNode");
+	}
+
+	return mSkySceneNode;
+}
+
+
 AnimationController* SceneManager::GetAnimationController() const
 {
 	return mAnimationController;
@@ -170,6 +182,25 @@ Entity* SceneManager::CreateEntity( const String& entityName, const String& mesh
 	return entity;
 }
 
+SkyBox* SceneManager::CreateSkyBox(const String& skyName, const String& resName, const String& groupName)
+{
+	auto skyFactoryIter = mRegistry.find(SOT_Sky);
+	if (skyFactoryIter == mRegistry.end())
+	{
+		ENGINE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Sky type haven't Registed", "SceneManager::CreateEntity");
+	}
+
+	NameValuePairList params;
+	params["ResourceGroup"] = groupName;
+	params["Sky"] = resName;
+
+	SkyBox* entity = static_cast<SkyBox*>((skyFactoryIter->second.factoryFunc)(skyName, &params));
+	mSceneObjectCollections[SOT_Entity].push_back(entity);
+
+	return entity;
+}
+
+
 SceneNode* SceneManager::FindSceneNode( const String& name ) const
 {
 	for (SceneNode* sceneNode : mAllSceneNodes)
@@ -181,12 +212,6 @@ SceneNode* SceneManager::FindSceneNode( const String& name ) const
 	return nullptr;
 }
 
-void SceneManager::CreateSkyBox( const shared_ptr<Texture>& texture )
-{
-	SAFE_DELETE(mSkyBox);
-	mSkyBox = new SkyBox;
-	mSkyBox->GetMaterial()->SetTexture("EnvTex", texture->GetShaderResourceView());
-}
 
 void SceneManager::UpdateSceneGraph( float delta )
 {
@@ -207,18 +232,22 @@ void SceneManager::UpdateRenderQueue( shared_ptr<Camera> camera, RenderOrder ord
 			batch->OnUpdateRenderQueue( mRenderQueue );
 	}
 	
-	if (buckterFilter & RenderQueue::BucketBackground)
+	bool bUpdateSky = mSkySceneNode && (buckterFilter & RenderQueue::BucketBackground);
+
+	if (bUpdateSky)
 	{
 		// Update skynode same with camera positon, add sky box to render queue
-		if (mSkyBox)
-		{
-			mSkyBox->SetPosition( camera->GetPosition() );
-			mRenderQueue.AddToQueue( RenderQueueItem(mSkyBox, 0), RenderQueue::BucketBackground);
-		}
+		mSkySceneNode->SetPosition( camera->GetPosition() );
 	}
 
 	if (buckterFilter & (~(RenderQueue::BucketOverlay | RenderQueue::BucketBackground)))
+	{
 		GetRootSceneNode()->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);	
+	}
+	else if (bUpdateSky)
+	{
+		mSkySceneNode->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);	
+	}
 }
 
 void SceneManager::UpdateOverlayQueue()
@@ -280,6 +309,7 @@ void SceneManager::DestrySpriteBatch( SpriteBatch* batch )
 		mSpriteBatchs.erase(it);
 	}
 }
+
 
 
 }

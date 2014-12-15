@@ -69,8 +69,7 @@ shared_ptr<Resource> Material::Clone()
 	retVal->mPower = mPower;
 
 	retVal->mEffect = mEffect;
-	retVal->mMaterialTextureCopys = mMaterialTextureCopys;
-	retVal->mTextureSRVs = mTextureSRVs;
+	retVal->mMaterialTextures = mMaterialTextures;
 	retVal->mAutoBindings = mAutoBindings;
 
 	retVal->SetLoadState(Resource::Loaded);
@@ -78,18 +77,17 @@ shared_ptr<Resource> Material::Clone()
 	return retVal;
 }
 
-void Material::SetTexture( const String& name, const shared_ptr<ShaderResourceView>& textureSRV )
+void Material::SetTexture(const String& name, const shared_ptr<Texture>& texture)
 {
-	mTextureSRVs[name] = textureSRV;
-
 	EffectParameter* effectParam = mEffect->GetParameterByName(name);
-	if (effectParam == nullptr)
+	if (!effectParam)
 	{
 		String errMsg = "Texture " + name + " not exit in Effect" + mEffect->GetResourceName();
 		ENGINE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, errMsg, "Material::SetTexture");
 	}
 
-	effectParam->SetValue(textureSRV);
+	mMaterialTextures[name] = texture;
+	effectParam->SetValue(texture->GetShaderResourceView());
 }
 
 void Material::LoadImpl()
@@ -160,8 +158,7 @@ void Material::LoadImpl()
 						resGroup = "General";
 
 					shared_ptr<TextureResource> textureRes = resMan.GetResourceByName<TextureResource>(RT_Texture, texturePath, mGroup);
-					mMaterialTextureCopys.push_back(textureRes->GetTexture());
-					SetTexture(effectParam->GetName(), textureRes->GetTexture()->GetShaderResourceView());		
+					SetTexture(effectParam->GetName(), textureRes->GetTexture());		
 				}
 			}
 
@@ -279,7 +276,7 @@ void Material::ApplyMaterial( const float4x4& world )
 		case EPU_Material_Power:		  { effectParam->SetValue(mPower); } break;
 		case EPU_Material_DiffuseMap:
 		case EPU_Material_SpecularMap:
-		case EPU_Material_NormalMap:	  { effectParam->SetValue(mTextureSRVs[effectParam->GetName()]); } break;
+		case EPU_Material_NormalMap:	  { effectParam->SetValue(mMaterialTextures[effectParam->GetName()]->GetShaderResourceView()); } break;
 		default:
 			{ }
 		}
