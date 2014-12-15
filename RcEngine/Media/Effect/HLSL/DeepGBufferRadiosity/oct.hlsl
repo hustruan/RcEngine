@@ -15,16 +15,16 @@ float2 octEncode(in float3 v) {
     return result;
 }
 
-float2 encode16(in float3 v) {
-    return octEncode(v);  
-}
-
 float3 finalDecode(float x, float y) {
     float3 v = float3(x, y, 1.0 - abs(x) - abs(y));
     if (v.z < 0) {
         v.xy = (1.0 - abs(v.yx)) * signNotZero(v.xy);
     }
     return normalize(v);
+}
+
+float2 encode16(in float3 v) {
+    return octEncode(v);  
 }
 
 float3 decode16(in float2 p) {

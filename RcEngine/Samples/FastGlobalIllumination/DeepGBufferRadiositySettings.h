@@ -3,6 +3,34 @@
 
 namespace RcEngine {
 
+struct TemporalFilterSettings
+{
+		/** Between 0 and 1. If 0, no filtering occurs, if 1, 
+        use the previous value for texels that pass reverse-reprojection.
+
+        Default is 0.9.
+        */
+    float Alpha;
+
+    /** World-space distance between reverse-reprojection expected position and actual 
+        beyond which we start discounting the weight of the previous value.
+
+        Default is 0.05 meters.
+        */
+    float FalloffStartDistance;
+
+    /** World-space distance between reverse-reprojection expected position and actual 
+        beyond which we don't use the previous value at all. We smoothstep a discount value between
+        falloffStartDistance and falloffEndDistance.
+            
+        Default is 0.07 meters.
+        */
+    float FalloffEndDistance;
+
+	TemporalFilterSettings() : Alpha(0.9f), FalloffStartDistance(0.05f), FalloffEndDistance(0.07f) {}
+};
+
+
 struct DeepGBufferRadiositySettings
 {
 	bool                        Enabled;
@@ -110,16 +138,20 @@ struct DeepGBufferRadiositySettings
         1.0 gives full quality, 0.0 gives maximum performance. Default is 1.0. */
     float                       ComputeGuardBandFraction;
 
+	/** Temporal filtering occurs before spatial filtering. */
+	TemporalFilterSettings    TemporalFilterSettings;
 
 	DeepGBufferRadiositySettings()
 		: Enabled(true),
 		  Radius(1.0f),
 		  UseDepthPeelBuffer(true),
-		  UseHalfPrecisionColors(true),
+		  UseHalfPrecisionColors(false),
 		  DepthPeelSeparationHint(0.5f),
 		  PropagationDamping(0.1f),
 		  UnsaturatedBoost(1.0f),
-		  SaturatedBoost(1.0f)
+		  SaturatedBoost(1.0f),
+		  UseOct16(true),
+		  BlurRadius(5)
 	{
 	}
 };

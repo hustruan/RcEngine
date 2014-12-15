@@ -31,7 +31,7 @@ int main()
 
 	fbxProcesser.Initialize();
 
-	if (fbxProcesser.LoadScene("../../Media/Mesh/ShuangMaCheng/Castle.FBX"))
+	if (fbxProcesser.LoadScene("../../Media/Mesh/Lucy/Lucy.FBX"))
 	{
 		fbxProcesser.ProcessScene();
 		fbxProcesser.BuildAndSaveBinary();

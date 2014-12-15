@@ -1,0 +1,23 @@
+<Effect name="DeepGBufferShade">
+
+  <Technique name="">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/Deferred" entry="Deferred">
+        <Macro name="USE_INDIRECT" value="0"/>
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+  
+  <Technique name="DeferredShade">
+    <Pass name="p0">
+      <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
+      <PixelShader file="DeepGBufferRadiosity/Deferred" entry="Deferred">
+        <Macro name="USE_INDIRECT" value="1"/>
+      </PixelShader>
+      <State name="DepthEnable" value="false"/>
+    </Pass>
+  </Technique>
+ 
+</Effect>

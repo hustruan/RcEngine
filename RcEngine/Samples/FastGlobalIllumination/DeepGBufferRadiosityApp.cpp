@@ -58,16 +58,15 @@ protected:
 		// Bind default camera
 		mDevice->GetScreenFrameBuffer()->SetCamera(mMainCamera);
 
-
 		mRenderPath = std::make_shared<DeepGBufferRadiosity>();
 		mRenderPath->OnGraphicsInit(mMainCamera);
 
-		mMainCamera->CreateLookAt(float3(-18.415079, 5.102501, 0.825465), float3(-17.415262, 5.120544, 0.831733));
-		mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 0.5f, 300.0f );
+		mMainCamera->CreateLookAt(float3(-24.278074, 3.664948, -1.303544), float3(-23.288984, 3.664948, -1.303544));
+		mMainCamera->CreatePerspectiveFov(Mathf::ToRadian(77.49f), (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 150.0f );
 
 		mCameraControler = std::make_shared<Test::FPSCameraControler>(); 
 		mCameraControler->AttachCamera(*mMainCamera);
-		mCameraControler->SetMoveSpeed(30.0f);
+		mCameraControler->SetMoveSpeed(7.0f);
 		mCameraControler->SetMoveInertia(true);
 	}
 
@@ -76,26 +75,69 @@ protected:
 		ResourceManager& resMan = ResourceManager::GetSingleton();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
+		//Light* dirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
+		////dirLight->SetDirection(float3(0, -1.5, -0.5));
+		//dirLight->SetDirection(float3(0, -0.5, -1));
+		//dirLight->SetLightColor(float3(1.0, 1.0, 1.0));
+		//dirLight->SetLightIntensity(5.0);
+		//dirLight->SetCastShadow(false);
+		//dirLight->SetShadowCascades(4);
+		//sceneMan->GetRootSceneNode()->AttachObject(dirLight);
+
 		Light* dirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
-		dirLight->SetDirection(float3(0, -0.5, -1));
+		dirLight->SetDirection(float3(0, -2.0, -0.58));
+		//dirLight->SetDirection(float3(0, -0.5, -1));
 		dirLight->SetLightColor(float3(1.0, 1.0, 1.0));
-		dirLight->SetLightIntensity(1.0);
-		dirLight->SetCastShadow(false);
-		dirLight->SetShadowCascades(4);
+		dirLight->SetLightIntensity(10.0);
+		dirLight->SetCastShadow(true);
+		dirLight->SetShadowCascades(3);
 		sceneMan->GetRootSceneNode()->AttachObject(dirLight);
+
 
 		// Load Sponza
 		Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");
 		SceneNode* sponzaNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sponza");
 
-		sponzaNode->SetScale(float3(0.05, 0.05, 0.05));
+		const float SponzaScale = 0.02f;
+		sponzaNode->SetScale(float3(SponzaScale, SponzaScale, SponzaScale));
 		sponzaNode->AttachObject(sponzaEnt);
+
+		Entity* lucyEnt = sceneMan->CreateEntity("Sponza", "./Lucy/Lucy.mesh", "Custom");
+		SceneNode* lucyNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Lucy");
+
+		const float lucyScale = 0.005f;
+		lucyNode->SetScale(float3(lucyScale, lucyScale, lucyScale));
+		lucyNode->SetPosition(float3(-14.0f, 2.95f, -3.0));
+		lucyNode->SetRotation( QuaternionFromRotationAxis(float3(0, 1, 0), Mathf::ToRadian(90.0f)) );
+		lucyNode->AttachObject(lucyEnt);
+
+
+		//auto aabb = sceneMan->GetRootSceneNode()->GetWorldBoundingBox();
+		//auto extent = aabb.Max - aabb.Min;
 	}
 
 	void UnloadContent() {}
 	void Update(float deltaTime)
 	{
 		mCameraControler->Update(deltaTime);
+
+		if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
+		{
+			auto target = mMainCamera->GetLookAt();
+			auto eye = mMainCamera->GetPosition();
+			auto up = mMainCamera->GetUp();
+
+			FILE* f = fopen("E:/camera.txt", "w");
+			fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
+				eye[0], eye[1], eye[2], 
+				target[0], target[1], target[2],
+				up[0], up[1], up[2]);
+			fclose(f);
+		}
+
+
+		//auto pos = mMainCamera->GetPosition();
+ 		//printf("Pos: %f, %f, %f\n", pos.X(), pos.Y(), pos.Z());
 	}
 
 	void Render()

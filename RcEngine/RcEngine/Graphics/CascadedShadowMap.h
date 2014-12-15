@@ -27,14 +27,13 @@ public:
 public:
 	CascadedShadowMap(RenderDevice* device);
 	virtual ~CascadedShadowMap() {}
-
-	void UpdateShadowMatrix(const Camera& camera, const Light& directionLight);
+	
 	void MakeCascadedShadowMap(const Light& light);
 	void MakeSpotShadowMap(const Light& light);
 
 private:
 	void UpdateShadowMapStorage(const Light& light);
-
+	void UpdateShadowMatrix(const Camera& camera, const Light& directionLight);
 	void CreatePossionDiskSamples();
 
 private:	
