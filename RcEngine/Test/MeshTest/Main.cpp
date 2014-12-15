@@ -63,6 +63,9 @@ protected:
 		mRTBuffer = factory->CreateTexture2D(width, height, PF_RGBA32F, 1, MAX_MIP_LEVEL, 1, 0,
 			EAH_GPU_Read | EAH_GPU_Write, TexCreate_ShaderResource | TexCreate_RenderTarget , NULL);
 
+		for (int i = 0; i < MAX_MIP_LEVEL - 1; ++i)
+			mLevelSRVs.push_back(factory->CreateTexture2DSRV(mRTBuffer, 0, i+1, 0, 1));
+
 		for (int i = 0; i < MAX_MIP_LEVEL; ++i)
 			mRenderViews.push_back(factory->CreateRenderTargetView2D(mRTBuffer, 0, i));
 
@@ -121,7 +124,7 @@ protected:
 		uint32_t width = mMainWindow->GetWidth();
 		uint32_t height = mMainWindow->GetHeight();
 
-		mBlitEffect->GetParameterByName("SourceMap")->SetValue(mRTBuffer->GetShaderResourceView());
+		
 
 		for (int i = 1; i < MAX_MIP_LEVEL; ++i)
 		{
@@ -132,6 +135,7 @@ protected:
 			mFrameBuffer->AttachRTV(ATT_Color0, mRenderViews[i]);
 			device->BindFrameBuffer(mFrameBuffer);
 
+			mBlitEffect->GetParameterByName("SourceMap")->SetValue(mLevelSRVs[i-1]);
 			mBlitEffect->GetParameterByName("PreviousMIP")->SetValue(int3(i-1, width, height));
 			device->DrawFSTriangle(mBlitEffect->GetTechniqueByName("Minify"));
 
@@ -176,6 +180,7 @@ protected:
 	shared_ptr<FrameBuffer> mFrameBuffer;
 	shared_ptr<Texture> mRTBuffer;
 	vector<shared_ptr<RenderView> > mRenderViews;
+	vector<shared_ptr<ShaderResourceView> > mLevelSRVs;
 
 	int mMipLevel;
 	shared_ptr<Texture> mTexture;
