@@ -84,6 +84,7 @@ protected:
 		castleNode->SetScale(float3(3, 3, 3));
 		castleNode->AttachObject(arena);
 
+		auto textureRes = resMan.GetResourceByName<TextureResource>(RT_Texture, "MeadowTrail.dds", "General");
 
 
 		//const float CHAR_SCALE = 5.0f;

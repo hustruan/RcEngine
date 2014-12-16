@@ -34,8 +34,7 @@ void Image::Clear()
 
 uint32_t Image::GetRowPitch( uint32_t level )
 {
-	uint32_t index = (mType == TT_TextureCube) ? (level*6) : level;
-	return mSurfaces[index].RowPitch;
+	return mSurfaces[level].RowPitch;
 }
 
 uint32_t Image::GetSlicePitch( uint32_t level )

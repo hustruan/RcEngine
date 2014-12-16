@@ -233,12 +233,14 @@ shared_ptr<Texture> RenderFactory::LoadTextureFromFile( const String& filename )
 	case TT_TextureCube:
 		{
 			std::vector<ElementInitData> imageData(numLayers * numLevels * CMF_Count);
+			uint32_t subImageIndex = 0;
 			for (uint32_t layer = 0; layer < numLayers; ++layer)
 				for (uint32_t face = CMF_PositiveX; face < CMF_Count; ++face)
 					for (uint32_t level = 0; level < numLevels; ++level)
 					{
-						imageData[level].pData = image.GetLevel(level);
-						imageData[level].rowPitch = image.GetRowPitch(level);
+						imageData[subImageIndex].pData = image.GetLevel(level, layer, (CubeMapFace)face);
+						imageData[subImageIndex].rowPitch = image.GetRowPitch(level);
+						subImageIndex++;
 					}
 			
 			return CreateTextureCube(image.GetWidth(), image.GetHeight(), image.GetFormat(), numLayers, numLevels, 1, 0, EAH_GPU_Read, TexCreate_ShaderResource, &imageData[0]);
