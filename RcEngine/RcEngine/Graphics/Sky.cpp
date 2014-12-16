@@ -147,6 +147,8 @@ private:
 SkyBox::SkyBox(const String& name, const shared_ptr<Texture>& cubeSkyTexture)
 	: SceneObject(name, SOT_Sky, true)
 {
+	printf("Called Here!");
+
 	mCubeBox = new SkyBoxRenderable(*this);
 	SetTexture(cubeSkyTexture);
 }

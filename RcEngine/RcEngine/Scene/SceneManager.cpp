@@ -184,20 +184,20 @@ Entity* SceneManager::CreateEntity( const String& entityName, const String& mesh
 
 SkyBox* SceneManager::CreateSkyBox(const String& skyName, const String& resName, const String& groupName)
 {
-	auto skyFactoryIter = mRegistry.find(SOT_Sky);
-	if (skyFactoryIter == mRegistry.end())
+	if (mRegistry.find(SOT_Sky) == mRegistry.end())
 	{
 		ENGINE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "Sky type haven't Registed", "SceneManager::CreateEntity");
+		return nullptr;
 	}
 
 	NameValuePairList params;
 	params["ResourceGroup"] = groupName;
 	params["Sky"] = resName;
 
-	SkyBox* entity = static_cast<SkyBox*>((skyFactoryIter->second.factoryFunc)(skyName, &params));
-	mSceneObjectCollections[SOT_Entity].push_back(entity);
+	SkyBox* sky = static_cast<SkyBox*>((mRegistry[SOT_Sky].factoryFunc)(skyName, &params));
+	mSceneObjectCollections[SOT_Sky].push_back(sky);
 
-	return entity;
+	return sky;
 }
 
 

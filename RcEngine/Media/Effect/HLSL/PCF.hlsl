@@ -25,8 +25,7 @@ float EvalPossionPCF(Texture2D shadowMap, float3 shadowTexCoord, float filterRad
 
 float EvalPossionPCF(Texture2DArray CSM, float4 shadowTexCoord, float filterRadiusUV)
 {
-	//float shadowBias = 0.003f;
-	float shadowBias = 0.02f;
+	float shadowBias = 0.003f;
 
 	float sum = 0.0f;
     for(int i=0; i < NumPossionSamples; i++)
