@@ -15,6 +15,8 @@
 #include <Graphics/RenderPath.h>
 #include <Graphics/CameraController1.h>
 #include <Graphics/AmbientOcclusion.h>
+#include <Graphics/TextureResource.h>
+#include <Graphics/Sky.h>
 #include <Resource/ResourceManager.h>
 #include <Scene/SceneManager.h>
 #include <Scene/SceneNode.h>
@@ -111,6 +113,14 @@ protected:
 		lucyNode->SetRotation( QuaternionFromRotationAxis(float3(0, 1, 0), Mathf::ToRadian(90.0f)) );
 		lucyNode->AttachObject(lucyEnt);
 
+		// Environment lighting 
+		shared_ptr<TextureResource> envLightMapResource = resMan.GetResourceByName<TextureResource>(RT_Texture, "/CubeMap/cube.dds", "General");
+		(static_pointer_cast_checked<DeepGBufferRadiosity>(mRenderPath))->SetEnvironmentLightingProbe(envLightMapResource->GetTexture());
+
+		// SkyBox
+		SkyBox* skybox = sceneMan->CreateSkyBox("noonclouds", "/CubeMap/noonclouds.dds", "General");
+		//SkyBox* skybox = sceneMan->CreateSkyBox("noonclouds", "/CubeMap/cube.dds", "General");
+		sceneMan->GetSkySceneNode()->AttachObject(skybox);
 
 		//auto aabb = sceneMan->GetRootSceneNode()->GetWorldBoundingBox();
 		//auto extent = aabb.Max - aabb.Min;
@@ -121,12 +131,12 @@ protected:
 	{
 		mCameraControler->Update(deltaTime);
 
+		auto target = mMainCamera->GetLookAt();
+		auto eye = mMainCamera->GetPosition();
+		auto up = mMainCamera->GetUp();
+
 		if ( InputSystem::GetSingleton().KeyPress(KC_Q) )
 		{
-			auto target = mMainCamera->GetLookAt();
-			auto eye = mMainCamera->GetPosition();
-			auto up = mMainCamera->GetUp();
-
 			FILE* f = fopen("E:/camera.txt", "w");
 			fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
 				eye[0], eye[1], eye[2], 
@@ -135,7 +145,9 @@ protected:
 			fclose(f);
 		}
 
-
+		//char title[255];
+		//sprintf_s(title, 255, "Camera: %.1f, %.1f, %.1f", eye[0], eye[1], eye[2]);
+		//mMainWindow->SetTitle(title);
 		//auto pos = mMainCamera->GetPosition();
  		//printf("Pos: %f, %f, %f\n", pos.X(), pos.Y(), pos.Z());
 	}

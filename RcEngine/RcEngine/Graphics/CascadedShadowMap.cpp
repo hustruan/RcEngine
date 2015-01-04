@@ -395,7 +395,7 @@ void CascadedShadowMap::MakeCascadedShadowMap(const Light& light)
 		sceneMan->UpdateRenderQueue(mLightCamera[i], RO_None, 
 			RenderQueue::BucketOpaque | RenderQueue::BucketTransparent, SceneObject::NoCastShadow);
 
-		RenderBucket& opaqueBucket = sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
+		const RenderBucket& opaqueBucket = sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 		for (const RenderQueueItem& renderItem : opaqueBucket) 
 		{
 			renderItem.Renderable->GetMaterial()->SetCurrentTechnique(mShadowMapTech);
@@ -647,7 +647,7 @@ void CascadedShadowMap::MakeSpotShadowMap( const Light& light )
 	mDevice->BindFrameBuffer(mShadowFrameBuffer);
 	mShadowFrameBuffer->Clear(CF_Depth, ColorRGBA::Black, 1.0, 0);
 
-	RenderBucket& opaqueBucket = sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
+	const RenderBucket& opaqueBucket = sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
 		renderItem.Renderable->GetMaterial()->SetCurrentTechnique(shadowMapTech);

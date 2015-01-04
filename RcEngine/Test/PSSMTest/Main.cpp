@@ -18,6 +18,7 @@
 #include <Graphics/AnimationState.h>
 #include <Graphics/AnimationClip.h>
 #include <Graphics/Animation.h>
+#include <Graphics/Sky.h>
 #include <Graphics/DebugDrawManager.h>
 #include <Resource/ResourceManager.h>
 #include <Scene/SceneManager.h>
@@ -52,9 +53,9 @@ protected:
 	{
 		mCamera = std::make_shared<Camera>();
 		//mCamera->CreateLookAt(float3(165.303284, 195.397446, -139.612320), float3(164.771561, 194.696701, -139.136673), float3(-0.522273, 0.713417, 0.467192));
-		mCamera->CreateLookAt(float3(301.375397, 230.045181, 162.783783), float3(300.737335, 229.423859, 162.329010), float3(-0.505969, 0.783551, -0.360616));
+		mCamera->CreateLookAt(float3(-618.376099, 349.327698, 466.727600), float3(-617.696777, 348.934235, 466.108124), float3(0.290724, 0.919344, -0.265116));
 		//mCamera->CreateLookAt(float3(-18.394897, 196.775467, 244.656967), float3(-19.149876, 196.313293, 244.191772), float3(-0.393474, 0.886790, -0.242449));
-		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
+		mCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 2000.0f );
 
 		auto view = mCamera->GetViewMatrix();
 		auto proj = mCamera->GetProjMatrix();
@@ -84,9 +85,9 @@ protected:
 		castleNode->SetScale(float3(3, 3, 3));
 		castleNode->AttachObject(arena);
 
-		auto cubeMap = resMan.GetResourceByName<TextureResource>(RT_Texture, "/CubeMap/noonclouds.dds", "General");
-
-		//SkyBox* skybox = sceneMan->CreateSkyBox("noonclouds", "/CubeMap/noonclouds.dds", "General");
+		//auto cubeMap = resMan.GetResourceByName<TextureResource>(RT_Texture, "/CubeMap/noonclouds.dds", "General");
+		SkyBox* skybox = sceneMan->CreateSkyBox("noonclouds", "/CubeMap/noonclouds.dds", "General");
+		sceneMan->GetSkySceneNode()->AttachObject(skybox);
 
 
 		//const float CHAR_SCALE = 5.0f;
@@ -163,7 +164,7 @@ protected:
 		}
 
 		char buffer[255];
-		std::sprintf(buffer, "FPS: %d", mFramePerSecond);
+		std::sprintf(buffer, "PSSM+PCF FPS: %d", mFramePerSecond);
 		mMainWindow->SetTitle(buffer);
 	}
 

@@ -218,6 +218,11 @@ uint32_t DeepGBufferRadiosity::NumSpiralTurns() const
 #undef NUM_PRECOMPUTED
 }
 
+void DeepGBufferRadiosity::SetEnvironmentLightingProbe(const shared_ptr<Texture>& cubeEnvLightMap)
+{
+	mEnvLightProbeMap = cubeEnvLightMap;
+}
+
 void DeepGBufferRadiosity::OnGraphicsInit(const shared_ptr<Camera>& camera)
 {
 	RenderPath::OnGraphicsInit(camera);
@@ -306,6 +311,10 @@ void DeepGBufferRadiosity::CreateBuffers( uint32_t width, uint32_t height )
 	mTempBlurBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, 1, 1, 0, BufferAccessHint, texCreateFlags, NULL);
 	mTempBlurRTV = factory->CreateRenderTargetView2D(mTempBlurBuffer, 0, 0);
 
+	//------
+	mHDRBuffer = factory->CreateTexture2D(width, height, colorFormat, 1, 1, 1, 0, BufferAccessHint, texCreateFlags, NULL);
+	mHDRBufferRTV = factory->CreateRenderTargetView2D(mHDRBuffer, 0, 0);
+
 	mCSZBuffer = factory->CreateTexture2D(width, height, GetCSZBufferFormat(mSettings.UseDepthPeelBuffer), 1, numLevel, 1, 0,  BufferAccessHint, texCreateFlags, NULL);
 	mCSZRTV = factory->CreateRenderTargetView2D(mCSZBuffer, 0, 0);
 	mCSZMipmapGen = std::make_shared<MipmapGenerator>(mCSZBuffer, MAX_MIP_LEVEL);
@@ -335,8 +344,8 @@ void DeepGBufferRadiosity::OnWindowResize(uint32_t width, uint32_t height)
 void DeepGBufferRadiosity::RenderScene()
 {
 	Prepare();	
-	RenderGBuffers();
 	ComputeShadows();
+	RenderGBuffers();
 	RenderLambertianOnly();
 	RenderIndirectIllumination();
 	
@@ -346,24 +355,29 @@ void DeepGBufferRadiosity::RenderScene()
 	//mDevice->GetRenderFactory()->SaveTextureToFile("E:/DeepGBuffer/light.pfm", mLambertDirectBuffer);
 	//mDevice->GetRenderFactory()->SaveTextureToFile("E:/DeepGBuffer/rawII.pfm", mRawIIBuffer);
 	//mDevice->GetRenderFactory()->SaveTextureToFile("E:/DeepGBuffer/result.pfm", mResultBuffer);
-
-	mRawIIBuffer->CopyToTexture(*mPreviousRawIIBuffer);
-	if (mSettings.Enabled && mSettings.PropagationDamping < 1.0f)
-		mGBuffer.GetTexture(GBuffer::DepthStencil)->CopyToTexture(*mPreviousDepthBuffer);
 	
+	//mFrameBuffer->AttachRTV(ATT_Color0, mHDRBufferRTV);
+	//mDevice->BindFrameBuffer(mFrameBuffer);
+	//mFrameBuffer->Clear(CF_Color, ColorRGBA::Black, 1.0, 0);
+
 	// Final shading
 	shared_ptr<FrameBuffer> screenFrameBuffer = mDevice->GetScreenFrameBuffer();
 	mDevice->BindFrameBuffer(screenFrameBuffer);
 	screenFrameBuffer->Clear(CF_Color | CF_Depth, ColorRGBA::Black, 1.0f, 0);
-
-	DeferredShading();
-
+	
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mGBuffer.GetTextureSRV(GBuffer::Lambertain));
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mLambertDirectBuffer->GetShaderResourceView());
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mPeeledLambertDirectBuffer->GetShaderResourceView());
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(GetRadiosityTexture()->GetShaderResourceView());
+	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mHDRBuffer->GetShaderResourceView());
 	//mDevice->DrawFSTriangle(mBlitEffect->GetTechniqueByName("BlitColor"));
 
+	ForwardShading();
+	DeferredShading();
+
+	mRawIIBuffer->CopyToTexture(*mPreviousRawIIBuffer);
+	if (mSettings.Enabled && mSettings.PropagationDamping < 1.0f)
+		mGBuffer.GetTexture(GBuffer::DepthStencil)->CopyToTexture(*mPreviousDepthBuffer);
 
 	mPrevViewMatrix = mCamera->GetViewMatrix();
 	mPrevInvViewMatrix = mInvViewMatrix;
@@ -380,11 +394,20 @@ void DeepGBufferRadiosity::Prepare()
 	mInvViewMatrix = MatrixInverse(mCamera->GetViewMatrix());
 }
 
+void DeepGBufferRadiosity::ComputeShadows()
+{
+	mSceneMan->UpdateLightQueue(*mCamera);
+
+	Light* mainDirLight = mSceneMan->GetLightQueue().front();
+	assert(mainDirLight->GetLightType() == LT_DirectionalLight);
+	mShadowMan->MakeCascadedShadowMap(*mainDirLight);
+}
+
 void DeepGBufferRadiosity::RenderGBuffers()
 {
 	// Todo: update render queue with render bucket filter
 	mSceneMan->UpdateRenderQueue(mCamera, RO_None, RenderQueue::BucketAll, 0);   
-	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
+	const RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 
 	float4x4 projToScreenMatrix = mCamera->GetProjMatrix() * mViewportMatrix;
 
@@ -661,6 +684,14 @@ void DeepGBufferRadiosity::RadiosityBlur()
 	} // else the result is still in the rawAOBuffer 
 }
 
+void DeepGBufferRadiosity::ForwardShading()
+{
+	// Draw Sky box first
+	const RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
+	for (const RenderQueueItem& item : bkgBucket)
+		item.Renderable->Render();
+}
+
 void DeepGBufferRadiosity::DeferredShading()
 {
 	EffectTechnique* deferredTech = mDeepGBufferShadingEffect->GetTechniqueByIndex(1);
@@ -678,13 +709,13 @@ void DeepGBufferRadiosity::DeferredShading()
 
 	float3 lightColor = mainDirLight->GetLightColor() * mainDirLight->GetLightIntensity();
 
-	const float4x4& View = mCamera->GetViewMatrix();
-	const float3& lightDirection = mainDirLight->GetDerivedDirection();
-	float4 lightDirCS = float4(lightDirection.X(), lightDirection.Y(), lightDirection.Z(), 0.0) * View;
-
-	mDeepGBufferShadingEffect->GetParameterByName("LightDirection")->SetValue(float3(lightDirCS.X(), lightDirCS.Y(), lightDirCS.Z()));
+	mDeepGBufferShadingEffect->GetParameterByName("LightDirection")->SetValue(mainDirLight->GetDerivedDirection());
 	mDeepGBufferShadingEffect->GetParameterByName("LightColor")->SetValue(lightColor);
 	mDeepGBufferShadingEffect->GetParameterByName("EnableSSAO")->SetValue(false);
+
+	const float envGlossyMIPConstant = log2f(mEnvLightProbeMap->GetWidth() * sqrtf(3));
+	mDeepGBufferShadingEffect->GetParameterByName("EnvGlossyMIPConstant")->SetValue(envGlossyMIPConstant);
+	mDeepGBufferShadingEffect->GetParameterByName("EnvironmentMap")->SetValue(mEnvLightProbeMap->GetShaderResourceView());
 
 	// Setup shadow
 	mDeepGBufferShadingEffect->GetParameterByName("InvView")->SetValue(mInvViewMatrix);
@@ -697,16 +728,8 @@ void DeepGBufferRadiosity::DeferredShading()
 	mDeepGBufferShadingEffect->GetParameterByName("CascadeOffset")->SetValue(&mShadowMan->mShadowCascadeOffset[0], MAX_CASCADES); 
 	mDeepGBufferShadingEffect->GetParameterByName("InvShadowMapSize")->SetValue(1.0f / SHADOW_MAP_SIZE);
 
+
 	mDevice->DrawFSTriangle(deferredTech);
-}
-
-void DeepGBufferRadiosity::ComputeShadows()
-{
-	mSceneMan->UpdateLightQueue(*mCamera);
-
-	Light* mainDirLight = mSceneMan->GetLightQueue().front();
-	assert(mainDirLight->GetLightType() == LT_DirectionalLight);
-	mShadowMan->MakeCascadedShadowMap(*mainDirLight);
 }
 
 }

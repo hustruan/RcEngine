@@ -1,0 +1,23 @@
+<Effect name="Sky">
+
+  <AutoBinding name="WorldViewProj" semantic="WorldViewProjection" type="float4x4"/>
+  
+  <!-- SamplerState will used in this Effect -->
+  <Sampler name="EnvSampler">
+    <State name="Filter" value="Min_Mag_Mip_Linear"/>
+    <State name="AddressU" value="Wrap"/>
+    <State name="AddressV" value="Wrap"/>
+    <State name="AddressW" value="Wrap"/>
+  </Sampler>
+
+  
+  <Technique name="SkyTech">
+    <Pass name="p0">
+      <VertexShader file="Sky" entry="SkyVS"/>
+      <PixelShader file="Sky" entry="SkyPS"/>
+      <State name="DepthFunc" value="LessEqual"/>
+      <State name="CullMode" value="None"/>
+    </Pass>
+  </Technique>
+
+</Effect>

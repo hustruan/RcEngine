@@ -224,6 +224,5 @@ void DeepGBufferRadiosity(in float2 iTex	   : TEXCOORD0,
     // What is the ambient visibility of this location
     float visibility = 1 - numSamplesUsed / float(NUM_SAMPLES);
 
-	//oFragColor = float4(n_C* 0.5 + 0.5, E_X.x + visibility);
 	oFragColor = float4(E_X, visibility);
 }

@@ -1,6 +1,22 @@
 <Effect name="DeepGBufferShade">
 
-  <Technique name="">
+  <Sampler name="PCFSampler">
+    <State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+    <State name="AddressU" value="Border"/>
+    <State name="AddressV" value="Border"/>
+    <State name="AddressW" value="Border"/>
+    <State name="BorderColor" r="1" g="1" b="1" a="1"/>
+    <State name="ComparisonFunc" value="Less"/>
+  </Sampler>
+
+  <Sampler name="CubeMapSampler">
+    <State name="Filter" value="Min_Mag_Linear_Mip_Point"/>
+    <State name="AddressU" value="Clamp"/>
+    <State name="AddressV" value="Clamp"/>
+    <State name="AddressW" value="Clamp"/>
+  </Sampler>
+  
+  <Technique name="DeferredShadeDirect">
     <Pass name="p0">
       <VertexShader file="FullscreenTriangle" entry="FullscreenTriangleVS"/>
       <PixelShader file="DeepGBufferRadiosity/Deferred" entry="Deferred">

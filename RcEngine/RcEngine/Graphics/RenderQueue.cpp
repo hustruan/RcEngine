@@ -19,7 +19,7 @@ RenderQueue::~RenderQueue()
 		delete kv.second;
 }
 
-RenderBucket& RenderQueue::GetRenderBucket( Bucket bucket, bool sortBucket /*= true*/ )
+const RenderBucket& RenderQueue::GetRenderBucket(Bucket bucket, bool sortBucket /*= true*/)
 {
 	if (mRenderBuckets.find(bucket) == mRenderBuckets.end())
 	{
@@ -37,7 +37,7 @@ RenderBucket& RenderQueue::GetRenderBucket( Bucket bucket, bool sortBucket /*= t
 	return renderBucker;
 }
 
-std::map<RenderQueue::Bucket, RenderBucket*>& RenderQueue::GetAllRenderBuckets( bool sortBucket /*= true*/ )
+const std::map<RenderQueue::Bucket, RenderBucket*>& RenderQueue::GetAllRenderBuckets(bool sortBucket /*= true*/)
 {
 	if (sortBucket)
 	{

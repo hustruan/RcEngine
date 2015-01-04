@@ -183,9 +183,4 @@ void AlchemyAmbientObsurance(in float2 iTex			: TEXCOORD0,
     //A = mod(A, 1.0);
 
 	oVisibility = A;
-	//oVisibility = min(0, A) + ssDiskRadius;
-	
-	//int mipLevel = 1;
-	//float z = CameraSpaceZBuffer.Load(int3(ssC >> mipLevel, mipLevel)).r;
-	//oVisibility = min(A, 0) + z / 3000.0f;
 }

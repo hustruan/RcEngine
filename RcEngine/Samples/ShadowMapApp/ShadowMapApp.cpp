@@ -74,10 +74,10 @@ void ShadowMapApp::LoadContent()
 	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
 	Light* dirLight = sceneMan->CreateLight("Sun", LT_DirectionalLight);
-	dirLight->SetDirection(float3(0, -0.5, -1));
+	dirLight->SetDirection(float3(0, -1.5, -0.5));
 	dirLight->SetLightColor(float3(1.0, 1.0, 1.0));
 	dirLight->SetLightIntensity(1.0);
-	dirLight->SetCastShadow(false);
+	dirLight->SetCastShadow(true);
 	dirLight->SetShadowCascades(4);
 	sceneMan->GetRootSceneNode()->AttachObject(dirLight);
 
@@ -125,7 +125,7 @@ void ShadowMapApp::Render()
 	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 	sceneMan->UpdateOverlayQueue();
 
-	RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
+	const RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
 	for (const RenderQueueItem& renderItem : guiBucket) 
 		renderItem.Renderable->Render();
 

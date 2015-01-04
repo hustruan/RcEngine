@@ -91,8 +91,8 @@ void ForwardPath::RenderScene()
 	mSceneMan->UpdateRenderQueue(viewCamera, RO_None, RenderQueue::BucketAll, 0);
 
 	// Draw Sky box first
-	RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
-	for (RenderQueueItem& item : bkgBucket)
+	const RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
+	for (const RenderQueueItem& item : bkgBucket)
 		item.Renderable->Render();
 
 	// Update Light Queue
@@ -366,7 +366,7 @@ void DeferredPath::GenereateGBuffer()
 
 	auto aabb = mSceneMan->GetRootSceneNode()->GetWorldBoundingBox();
 
-	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
+	const RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
 		renderItem.Renderable->GetMaterial()->SetCurrentTechnique("GBuffer");
@@ -454,8 +454,8 @@ void DeferredPath::DeferredShading()
 	mHDRBufferRTV->ClearColor(ColorRGBA(0, 0, 0, 0));
 	
 	// Draw Sky box first
-	RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
-	for (RenderQueueItem& item : bkgBucket)
+	const RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
+	for (const RenderQueueItem& item : bkgBucket)
 		item.Renderable->Render();
 
 	mDevice->Draw(mShadingTech, mFullscreenTrangle);
@@ -710,7 +710,7 @@ void TiledDeferredPath::GenereateGBuffer()
 	shared_ptr<Camera> camera = mGBufferFB->GetCamera();
 	mSceneMan->UpdateRenderQueue(camera, RO_None, RenderQueue::BucketAll, 0);   
 
-	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
+	const RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
 		renderItem.Renderable->GetMaterial()->SetCurrentTechnique("GBuffer");
@@ -786,8 +786,8 @@ void TiledDeferredPath::DeferredShading()
 	mHDRBufferRTV->ClearColor(ColorRGBA(0, 0, 0, 0));
 	
 	// Draw Sky box first
-	RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
-	for (RenderQueueItem& item : bkgBucket)
+	const RenderBucket& bkgBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketBackground, false);
+	for (const RenderQueueItem& item : bkgBucket)
 		item.Renderable->Render();
 
 	mDevice->Draw(mShadingTech, mFullscreenTrangle);

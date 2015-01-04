@@ -26,30 +26,6 @@ private:
 	class Renderable* mCubeBox;
 };
 
-//class _ApiExport SkyBox : public Renderable
-//{
-//public:
-//	SkyBox();
-//	~SkyBox() {}
-//
-//	bool IsActive() const { return mActive; }
-//	void SetActive(bool bActive);
-//	void SetTexture(const shared_ptr<Texture>& texture);
-//	void SetPosition(const float3& position);
-//
-//	const shared_ptr<Material>& GetMaterial() const					{ return mMaterial; }
-//	const shared_ptr<RenderOperation>& GetRenderOperation() const	{ return mRenderOperation; }
-//	uint32_t GetWorldTransformsCount() const						{ return 1; }
-//	void GetWorldTransforms(float4x4* xform) const;
-//
-//protected:
-//	shared_ptr<RenderOperation> mRenderOperation;
-//	shared_ptr<Material> mMaterial;
-//	float4x4 mWorldTransform;
-//	bool mActive;
-//};
-
-
 }
 
 #endif // Sky_h__

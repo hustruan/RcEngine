@@ -22,12 +22,13 @@ public:
 	 */
 	const BoundingBoxf& GetWorldBoundingBox() const;
 
-	
 	void AttachObject( SceneObject* obj );
 	void DetachOject( SceneObject* obj );
 	void DetachAllObject(); 
 
-	uint32_t GetNumAttachedObjects() const;
+	uint32_t GetNumAttachedObjects() const	{ return mAttachedObjects.size(); }
+	
+	SceneObject* GetAttachedObject(uint32_t index) const { return mAttachedObjects[index];  }
 
 	/**
 	 * Get an attached object by given name.

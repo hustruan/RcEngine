@@ -44,6 +44,7 @@ public:
 	void SetSpecularPower(float power)				{ mPower = power; }
 
 	void SetTexture(const String& name, const shared_ptr<Texture>& texture);
+	const bool hasTexture() const { return mMaterialTextures.size() > 0; }
 
 	// Apply shader parameter before rendering, called by renderable
 	void ApplyMaterial(const float4x4& world = float4x4::Identity());
@@ -72,8 +73,6 @@ protected:
 	float mPower;
 	
 	unordered_map<String, shared_ptr<Texture> > mMaterialTextures;
-	vector<shared_ptr<Texture> > mMaterialTextureCopys;
-	
 	vector<EffectParameter*> mAutoBindings;
 };
 

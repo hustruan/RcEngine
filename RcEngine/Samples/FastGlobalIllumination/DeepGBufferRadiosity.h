@@ -53,6 +53,7 @@ public:
 	DeepGBufferRadiosity(void);
 	~DeepGBufferRadiosity(void);
 
+	void SetEnvironmentLightingProbe(const shared_ptr<Texture>& cubeEnvLightMap);
 	void OnGraphicsInit(const shared_ptr<Camera>& camera);
 	void OnWindowResize(uint32_t width, uint32_t height);
 	void RenderScene();
@@ -74,6 +75,7 @@ private:
 	void RenderLambertianOnly();
 	void RenderIndirectIllumination();
 	void DeferredShading();
+	void ForwardShading();
 	void ComputeMipmapedBuffers();
 	void ComputeRawII();
 	void TemporalFiltering();
@@ -88,6 +90,7 @@ private:
 	float2 mClipInfo;
 	float mProjScale;
 	
+	shared_ptr<Texture> mEnvLightProbeMap;
 	shared_ptr<CascadedShadowMap> mShadowMan;
 	
 	// GBuffers
@@ -124,10 +127,13 @@ private:
 
 	// Raw indirect irradiance buffer
 	shared_ptr<Texture> mRawIIBuffer;
-	shared_ptr<Texture> mPreviousRawIIBuffer;
 	shared_ptr<RenderView> mRawIIRTV;
 
+	shared_ptr<Texture> mPreviousRawIIBuffer;
 	shared_ptr<Texture> mPreviousDepthBuffer;
+
+	shared_ptr<Texture> mHDRBuffer;
+	shared_ptr<RenderView> mHDRBufferRTV;
 
 	// Effect
 	shared_ptr<Effect> mLambertianOnlyEffect;

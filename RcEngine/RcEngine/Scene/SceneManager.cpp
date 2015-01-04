@@ -47,8 +47,9 @@ void SceneManager::ClearScene()
 	// clear all scene node
 	for (SceneNode* node : mAllSceneNodes) 
 		delete node;
-
+	
 	mAllSceneNodes.clear();
+	SAFE_DELETE(mSkySceneNode);
 
 	// clear all sprite
 	for (SpriteBatch* batch : mSpriteBatchs)
@@ -111,9 +112,7 @@ SceneNode* SceneManager::GetRootSceneNode()
 SceneNode* SceneManager::GetSkySceneNode()
 {
 	if (!mSkySceneNode)
-	{
-		mSkySceneNode = GetRootSceneNode()->CreateChildSceneNode("SkyNode");
-	}
+		mSkySceneNode = CreateSceneNodeImpl("SkyNode");
 
 	return mSkySceneNode;
 }
@@ -128,21 +127,22 @@ void SceneManager::DestroySceneNode( SceneNode* node )
 {
 	auto found = std::find(mAllSceneNodes.begin(), mAllSceneNodes.end(), node);
 
-	if (found == mAllSceneNodes.end())
+	if (found != mAllSceneNodes.end())
 	{
-		ENGINE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND, "SceneNode '" + node->GetName() + "' not found.",
-			"SceneManager::DestroySceneNode");
-	}
+		// detach from parent (don't do this in destructor since bulk destruction behaves differently)
+		Node* parentNode = (*found)->GetParent();
+		if (parentNode)
+		{
+			parentNode->DetachChild((*found));
+		}
 
-	// detach from parent (don't do this in destructor since bulk destruction behaves differently)
-	Node* parentNode = (*found)->GetParent();
-	if (parentNode)
+		delete (*found);
+		mAllSceneNodes.erase(found);
+	}
+	else if (node == mSkySceneNode)
 	{
-		parentNode->DetachChild((*found));
+		SAFE_DELETE(mSkySceneNode);
 	}
-
-	delete (*found);
-	mAllSceneNodes.erase(found);
 }
 
 Light* SceneManager::CreateLight( const String& name, uint32_t type )
@@ -231,22 +231,22 @@ void SceneManager::UpdateRenderQueue( shared_ptr<Camera> camera, RenderOrder ord
 		for (SpriteBatch* batch : mSpriteBatchs)
 			batch->OnUpdateRenderQueue( mRenderQueue );
 	}
-	
-	bool bUpdateSky = mSkySceneNode && (buckterFilter & RenderQueue::BucketBackground);
 
+	bool bUpdateSky = mSkySceneNode && (buckterFilter & RenderQueue::BucketBackground);
 	if (bUpdateSky)
 	{
 		// Update skynode same with camera positon, add sky box to render queue
 		mSkySceneNode->SetPosition( camera->GetPosition() );
+		for (uint32_t i = 0; i < mSkySceneNode->GetNumAttachedObjects(); ++i)
+		{
+			SceneObject* skySceneObject = mSkySceneNode->GetAttachedObject(i);
+			skySceneObject->OnUpdateRenderQueue(&mRenderQueue, *camera, order, buckterFilter, filterIgnore);
+		}
 	}
 
 	if (buckterFilter & (~(RenderQueue::BucketOverlay | RenderQueue::BucketBackground)))
 	{
-		GetRootSceneNode()->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);	
-	}
-	else if (bUpdateSky)
-	{
-		mSkySceneNode->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);	
+		GetRootSceneNode()->OnUpdateRenderQueues(*camera, order, buckterFilter, filterIgnore);
 	}
 }
 

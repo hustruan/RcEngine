@@ -215,6 +215,11 @@
     <None Include="..\Media\Effect\GLSL\TessQuad.glsl" />
     <None Include="..\Media\Effect\GLSL\TessTeapot.glsl" />
     <None Include="..\Media\Effect\GLSL\TiledDeferredShading.glsl" />
+    <None Include="ClassDiagram.cd" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram3.cd" />
+    <None Include="ClassDiagram4.cd" />
     <None Include="Math\BoundingBox.inl" />
     <None Include="Math\BoundingSphere.inl" />
     <None Include="Math\ColorRGBA.inl" />

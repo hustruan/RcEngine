@@ -127,7 +127,7 @@ void ForwardPlusPath::DepthPrePass()
 	// Todo: update render queue with render bucket filter
 	//mSceneMan->UpdateRenderQueue(mCamera, RO_None, );   
 
-	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
+	const RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
 		renderItem.Renderable->GetMaterial()->SetCurrentTechnique("DepthPre");
@@ -235,7 +235,7 @@ void ForwardPlusPath::ForwardShading()
 	mDevice->BindFrameBuffer(mForwardFB);
 	mHDRBufferRTV->ClearColor(ColorRGBA(0, 0, 0, 0)); 
 
-	RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);	
+	const RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 	for (const RenderQueueItem& renderItem : opaqueBucket) 
 	{
 		shared_ptr<Effect> finalShadingEffect = renderItem.Renderable->GetMaterial()->GetEffect();

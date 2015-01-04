@@ -1871,6 +1871,8 @@ void FbxProcesser::BuildAndSaveBinary( )
 	for (size_t mi = 0; mi < mSceneMeshes.size(); ++mi)
 	{
 		MeshData& mesh  = *(mSceneMeshes[mi]);
+		
+		mesh.Name = "GIRoom";
 
 		FileStream stream;
 		stream.Open(mOutputPath + mesh.Name + ".mesh", FILE_WRITE);

@@ -81,8 +81,8 @@ public:
 
 	void AddRenderBucket(Bucket bucket);
 
-	RenderBucket& GetRenderBucket(Bucket bucket, bool sort = true);
-	std::map<Bucket, RenderBucket*>& GetAllRenderBuckets(bool sort = true);
+	const RenderBucket& GetRenderBucket(Bucket bucket, bool sort = true);
+	const std::map<Bucket, RenderBucket*>& GetAllRenderBuckets(bool sort = true);
 
 	void AddToQueue(RenderQueueItem item, Bucket bucket);
 	void ClearAllQueue();

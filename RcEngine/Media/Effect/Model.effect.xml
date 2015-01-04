@@ -20,7 +20,7 @@
 
   <!-- SamplerState will used in this Effect -->
   <Sampler name="MaterialSampler">
-      <State name="Filter" value="Min_Mag_Mip_Linear"/>
+	 <State name="Filter" value="Min_Mag_Mip_Linear"/>
       <State name="AddressU" value="Wrap"/>
       <State name="AddressV" value="Wrap"/>
   </Sampler>
@@ -38,6 +38,7 @@
   <Technique name="PCF">
 	  <Pass name="p0">
       <VertexShader file="ShadowMapGen" entry="ShadowMapVS"/>
+      <State name="CullMode" value="None"/>
 	  </Pass>
   </Technique>
 
@@ -80,6 +81,7 @@
     <Pass name="p0">
       <VertexShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferVS"/>
       <PixelShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferPS"/>
+      <State name="CullMode" value="None"/>
     </Pass>
   </Technique>
 
@@ -89,6 +91,7 @@
       <PixelShader file="DeepGBufferRadiosity/DeepGBuffer" entry="GBufferPS">
         <Macro name="USE_DEPTH_PEEL"/>
       </PixelShader>
+      <State name="CullMode" value="None"/>
     </Pass>
   </Technique>
   
@@ -98,6 +101,7 @@
       <PixelShader file="ForwardLighting" entry="DirectionalLightingPS">
         <Macro name="PCF"/>
       </PixelShader>
+	   <State name="CullMode" value="None"/>
       <!--<State name="FillMode" value="WireFrame"/>-->
     </Pass>
   </Technique>

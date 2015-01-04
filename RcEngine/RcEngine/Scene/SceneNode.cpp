@@ -127,11 +127,6 @@ const BoundingBoxf& SceneNode::GetWorldBoundingBox() const
 	return mWorldBounds;
 }
 
-uint32_t SceneNode::GetNumAttachedObjects() const
-{
-	return mAttachedObjects.size();
-}
-
 void SceneNode::OnUpdateRenderQueues( const Camera& camera, RenderOrder order, uint32_t buckterFilter, uint32_t filterIgnore )
 {
 	const BoundingBoxf& worldBound = GetWorldBoundingBox();

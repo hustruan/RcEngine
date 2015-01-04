@@ -60,9 +60,17 @@ protected:
 		mRenderPath = std::make_shared<ForwardPath>();
 		mRenderPath->OnGraphicsInit(mMainCamera);
 
+<<<<<<< HEAD
+		for (int i = 0; i < MAX_MIP_LEVEL - 1; ++i)
+			mLevelSRVs.push_back(factory->CreateTexture2DSRV(mRTBuffer, 0, i+1, 0, 1));
+
+		for (int i = 0; i < MAX_MIP_LEVEL; ++i)
+			mRenderViews.push_back(factory->CreateRenderTargetView2D(mRTBuffer, 0, i));
+=======
 		//mMainCamera->CreateLookAt(float3(-24.278074, 3.664948, -1.303544), float3(-23.288984, 3.664948, -1.303544));
 		mMainCamera->CreateLookAt(float3(-24.278074, 3.664948, -1.303544), float3(-23.288984, 3.648995, -1.449993), float3(0.015781, 0.999873, -0.002337));
 		mMainCamera->CreatePerspectiveFov(Mathf::ToRadian(77.49f), (float)mAppSettings.Width / (float)mAppSettings.Height, 0.1f, 80.0f );
+>>>>>>> c2e2617678432ed132934d87b8ddf021ce2641df
 
 		mCameraControler = std::make_shared<Test::FPSCameraControler>(); 
 		mCameraControler->AttachCamera(*mMainCamera);
@@ -123,7 +131,45 @@ protected:
 		RenderDevice* device = Environment::GetSingleton().GetRenderDevice();
 		SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
 
+<<<<<<< HEAD
+		mFrameBuffer->AttachRTV(ATT_Color0, mRenderViews.front());
+		device->BindFrameBuffer(mFrameBuffer);
+
+		mBlitEffect->GetParameterByName("MipLevel")->SetValue(0);
+		mBlitEffect->GetParameterByName("SourceMap")->SetValue(mTexture->GetShaderResourceView());
+		device->DrawFSTriangle(mBlitEffect->GetTechniqueByName("BlitColor"));
+		//mRTBuffer->BuildMipMap();
+
+		////////////////////////////////////////////////////
+#if 1
+		uint32_t width = mMainWindow->GetWidth();
+		uint32_t height = mMainWindow->GetHeight();
+
+		
+
+		for (int i = 1; i < MAX_MIP_LEVEL; ++i)
+		{
+			uint32_t levelWidth = std::max(1U,width >> 1);
+			uint32_t levelHeight = std::max(1U, height >> 1);
+
+			mFrameBuffer->Resize(levelWidth, levelHeight);
+			mFrameBuffer->AttachRTV(ATT_Color0, mRenderViews[i]);
+			device->BindFrameBuffer(mFrameBuffer);
+
+			mBlitEffect->GetParameterByName("SourceMap")->SetValue(mLevelSRVs[i-1]);
+			mBlitEffect->GetParameterByName("PreviousMIP")->SetValue(int3(i-1, width, height));
+			device->DrawFSTriangle(mBlitEffect->GetTechniqueByName("Minify"));
+
+			width = levelWidth;
+			height = levelHeight;
+		}
+#endif
+
+		////////////////////////////////////////////////////
+		auto screenFB = device->GetScreenFrameBuffer();
+=======
 		shared_ptr<FrameBuffer> screenFB = device->GetScreenFrameBuffer();
+>>>>>>> c2e2617678432ed132934d87b8ddf021ce2641df
 		device->BindFrameBuffer(screenFB);
 		screenFB->Clear(CF_Color | CF_Depth, ColorRGBA::White, 1.0, 0);
 
@@ -154,10 +200,21 @@ protected:
 
 protected:
 	int mFramePerSecond;
+<<<<<<< HEAD
+	shared_ptr<FrameBuffer> mFrameBuffer;
+	shared_ptr<Texture> mRTBuffer;
+	vector<shared_ptr<RenderView> > mRenderViews;
+	vector<shared_ptr<ShaderResourceView> > mLevelSRVs;
+
+	int mMipLevel;
+	shared_ptr<Texture> mTexture;
+	shared_ptr<Effect> mBlitEffect;
+=======
 	RenderDevice* mDevice;
 	shared_ptr<Camera> mMainCamera;
 	shared_ptr<RenderPath> mRenderPath;
 	shared_ptr<Test::FPSCameraControler> mCameraControler;
+>>>>>>> c2e2617678432ed132934d87b8ddf021ce2641df
 };
 
 

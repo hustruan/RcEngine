@@ -124,9 +124,10 @@ void Mesh::LoadImpl()
 			vertexElement.Usage =  static_cast<VertexElementUsage>(source.ReadUInt());
 			vertexElement.UsageIndex = source.ReadUShort();
 		}
-
+	
 		mVertexBuffers[i].VertexDecl = factory->CreateVertexDeclaration(&elements[0], elements.size());
-		
+		printf("%s, size=%d, count=%d\n", meshName.c_str(), veCount, mVertexBuffers[i].VertexDecl->GetVertexSize());
+
 		// Read vertex buffer
 		uint32_t vertexSize = mVertexBuffers[i].VertexDecl->GetVertexSize();
 		uint32_t vertexBufferSize = vertexSize * vertexCount;

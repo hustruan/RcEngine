@@ -79,7 +79,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(FBX_SDK)\lib\vs2012\x86\release;../../Release</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(FBX_SDK)\lib\vs2013\x86\release;../../Release</AdditionalLibraryDirectories>
       <AdditionalDependencies>libfbxsdk-md.lib;RcEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
