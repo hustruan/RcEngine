@@ -169,7 +169,7 @@ protected:
 		//	//animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./Arthas/FightingStandby.anim", "Custom"));
 
 		//	AnimationState* takeClip = animPlayer->GetClip("Walk");
-		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	takeClip->WrapMode = AnimationState::Wrap_Loop;
 		//	takeClip->Play();
 
 		//	arthasSceneNode->SetScale(float3(2, 2, 2));
@@ -184,63 +184,63 @@ protected:
 		//	citySceneNode->AttachObject(arthasEntity);
 		//}
 
-		//SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
-		//{
-		//	Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh",  "Custom");
+		SceneNode* arthasSceneNode = sceneMan->GetRootSceneNode()->CreateChildSceneNode("Sinbad");
+		{
+			Entity* arthasEntity = sceneMan->CreateEntity("Sinbad", "./Sinbad/Sinbad.mesh", "Custom");
 
-		//	
-		//	Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
-		//	Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh",  "Custom");
 
-		//	BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
-		//	BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
-		//	sword1Node->AttachObject(sword1);
-		//	sword2Node->AttachObject(sword2);
+			Entity* sword1 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh", "Custom");
+			Entity* sword2 = sceneMan->CreateEntity("Swoard", "./Sinbad/Sword.mesh", "Custom");
 
-		//	AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
+			BoneSceneNode* sword1Node = arthasEntity->CreateBoneSceneNode("WeaponL", "Sheath.L");
+			BoneSceneNode* sword2Node = arthasEntity->CreateBoneSceneNode("WeaponR", "Sheath.R");
+			sword1Node->AttachObject(sword1);
+			sword2Node->AttachObject(sword2);
 
-		//	const String AnimClips[] = { 
-		//		"./Sinbad/Dance.anim", 
-		//	    "./Sinbad/DrawSwords.anim",
-		//		"./Sinbad/JumpStart.anim",
-		//		"./Sinbad/JumpLoop.anim",
-		//		"./Sinbad/JumpEnd.anim",
-		//		"./Sinbad/HandsClosed.anim",
-		//		"./Sinbad/HandsRelaxed.anim",
-		//		"./Sinbad/IdleBase.anim",
-		//		"./Sinbad/IdleTop.anim",
-		//		"./Sinbad/RunBase.anim",
-		//		"./Sinbad/RunTop.anim",
-		//		"./Sinbad/SliceHorizontal.anim",
-		//		"./Sinbad/SliceVertical.anim",
-		//	};
+			AnimationPlayer* animPlayer = arthasEntity->GetAnimationPlayer();
 
-		//	for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
-		//	{
-		//		AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
-		//		animState->WrapMode = AnimationState::Wrap_Loop;
-		//	}
-		//	
-		//	AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
-		//	SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
+			const String AnimClips[] = {
+				"./Sinbad/Dance.anim",
+				"./Sinbad/DrawSwords.anim",
+				"./Sinbad/JumpStart.anim",
+				"./Sinbad/JumpLoop.anim",
+				"./Sinbad/JumpEnd.anim",
+				"./Sinbad/HandsClosed.anim",
+				"./Sinbad/HandsRelaxed.anim",
+				"./Sinbad/IdleBase.anim",
+				"./Sinbad/IdleTop.anim",
+				"./Sinbad/RunBase.anim",
+				"./Sinbad/RunTop.anim",
+				"./Sinbad/SliceHorizontal.anim",
+				"./Sinbad/SliceVertical.anim",
+			};
 
-		//	SliceHorizontal->Play();
-		//	animPlayer->PlayClip("IdleBase");
+			for (size_t i = 0; i < ARRAY_SIZE(AnimClips); ++i)
+			{
+				AnimationState* animState = animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, AnimClips[i], "Custom"));
+				animState->WrapMode = AnimationState::Wrap_Loop;
+			}
+			
+			AnimationState* SliceHorizontal = animPlayer->GetClip("SliceHorizontal");
+			SliceHorizontal->WrapMode = (AnimationState::Wrap_Once);
 
-		//	/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
-		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-		//	takeClip->Play();
+			SliceHorizontal->Play();
+			animPlayer->PlayClip("IdleBase");
 
-		//	AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
-		//	runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
-		//	runBaseClip->Play();*/
+			/*AnimationState* takeClip = animPlayer->GetClip("DrawSwords");
+			takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+			takeClip->Play();
 
-		//	arthasSceneNode->SetScale(float3(5, 5, 5));
-		//	arthasSceneNode->SetPosition(float3(0, 50, 0));
-		//	arthasSceneNode->AttachObject(arthasEntity);
+			AnimationState* runBaseClip = animPlayer->GetClip("RunBase");
+			runBaseClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+			runBaseClip->Play();*/
 
-		//	mDudeEntity = arthasEntity;
-		//}
+			arthasSceneNode->SetScale(float3(5, 5, 5));
+			arthasSceneNode->SetPosition(float3(0, 50, 0));
+			arthasSceneNode->AttachObject(arthasEntity);
+
+			mDudeEntity = arthasEntity;
+		}
 
 
 		//String modelName = "./LOL/blitzcrank/blitzcrank.mesh";
@@ -267,7 +267,7 @@ protected:
 		//	animPlayer->AddClip(resMan.GetResourceByName<AnimationClip>(RT_Animation, "./LOL/blitzcrank/Take 001.anim", "Custom"));
 
 		//	AnimationState* takeClip = animPlayer->GetClip("Take 001");
-		//	takeClip->SetAnimationWrapMode(AnimationState::Wrap_Loop);
+		//	takeClip->WrapMode = AnimationState::Wrap_Loop;
 		//	takeClip->Play();
 
 		//	blitzcrankSceneNode->SetScale(float3(0.3, 0.3, 0.3));
@@ -276,8 +276,8 @@ protected:
 		//	mDudeEntity = blitzcrankEntity;
 		//}
 
-		Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");
-		sceneMan->GetRootSceneNode()->AttachObject(sponzaEnt);
+		//Entity* sponzaEnt = sceneMan->CreateEntity("Sponza", "./Sponza/Sponza.mesh", "Custom");
+		//sceneMan->GetRootSceneNode()->AttachObject(sponzaEnt);
 	}
 	
 	void UnloadContent()
@@ -344,7 +344,7 @@ protected:
 		mRenderPath->RenderScene();
 
 		auto center = mCamera->GetPosition() + mCamera->GetForward() * 200.0f;
-		DebugDrawManager::GetSingleton().DrawSphere(center, 10.0f, ColorRGBA::Red, true);
+		//DebugDrawManager::GetSingleton().DrawSphere(center, 10.0f, ColorRGBA::Red, true);
 
 
 		//const float3 Points[] = {
@@ -378,10 +378,10 @@ protected:
 		//	}
 		//}
 
-		DebugDrawManager::GetSingleton().DrawSphere(float3(-1320, 160, 40), 150, ColorRGBA::Red, true);
+		//DebugDrawManager::GetSingleton().DrawSphere(float3(-1320, 160, 40), 150, ColorRGBA::Red, true);
 
 		sceneMan->UpdateOverlayQueue();
-		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
+		const RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
 		for (const RenderQueueItem& renderItem : guiBucket) 
 			renderItem.Renderable->Render();
 

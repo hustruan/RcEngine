@@ -86,7 +86,7 @@ void ForwardPath::RenderScene()
 	shared_ptr<Camera> viewCamera = screenFB->GetCamera();
 
 	mDevice->BindFrameBuffer(screenFB);
-	screenFB->Clear(CF_Color | CF_Depth, ColorRGBA(0, 0, 0, 0), 1.0f, 0);
+	screenFB->Clear(CF_Color | CF_Depth, ColorRGBA::ColorRGBA(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
 	mSceneMan->UpdateRenderQueue(viewCamera, RO_None, RenderQueue::BucketAll, 0);
 
@@ -195,14 +195,14 @@ void DeferredPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	
 	// Build light volume
 	BuildConeOperation(mSpotLightShape, 1.0f, 1.0f, 30);
-	BuildShpereOperation(mPointLightShape, 1.0f, 10, 10);
+	BuildShpereOperation(mPointLightShape, 1.0f, 30, 30);
 
 	mGBufferFB->SetCamera(camera);
 	mLightAccumulateFB->SetCamera(camera);
 	mHDRFB->SetCamera(camera);
 
 	//-------------------------
-	mAmbientOcclusion = new AmbientOcclusion(mDevice, SSAO_Alchemy, windowWidth, windowHeight);
+	//mAmbientOcclusion = new AmbientOcclusion(mDevice, SSAO_HBAO, windowWidth, windowHeight);
 	mShadowMan = new CascadedShadowMap(mDevice);
 }
 
@@ -305,7 +305,12 @@ void DeferredPath::RenderScene()
 {
 	GenereateGBuffer();
 
-	return;
+	/*if (mAmbientOcclusion)
+	{
+		mAmbientOcclusion->Apply(*mCamera, mDepthStencilBuffer);
+		mAmbientOcclusion->Visualize(mAmbientOcclusion->GetAmbientOcclusionSRV());
+		return;
+	}*/
 
 	DeferredLighting();
 	DeferredShading();
@@ -372,9 +377,6 @@ void DeferredPath::GenereateGBuffer()
 		renderItem.Renderable->GetMaterial()->SetCurrentTechnique("GBuffer");
 		renderItem.Renderable->Render();
 	}
-
-	if (mAmbientOcclusion)
-		mAmbientOcclusion->Apply(*mCamera, mDepthStencilBuffer);
 
 	//if ( InputSystem::GetSingleton().MouseButtonPress(MS_MiddleButton) )
 	//{

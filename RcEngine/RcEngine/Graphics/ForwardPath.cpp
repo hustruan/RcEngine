@@ -68,7 +68,7 @@ void ForwardPlusPath::OnGraphicsInit( const shared_ptr<Camera>& camera )
 	mPointLightsColorFalloff = factory->CreateTextureBuffer(PF_RGB32F, MaxNumLights*2, EAH_CPU_Write, bufferCreateFlag, NULL);
 
 	mPointLightsPosRangeSRV = factory->CreateTextureBufferSRV(mPointLightsPosRange, 0, MaxNumLights,  PF_RGBA32F);
-	mPointLightsColorSRV = factory->CreateTextureBufferSRV(mPointLightsColorFalloff, 0, MaxNumLights,  PF_RGB32F);
+	mPointLightsColorSRV = factory->CreateTextureBufferSRV(mPointLightsColorFalloff, 0, MaxNumLights, PF_RGB32F);
 	mPointLightsFalloffSRV = factory->CreateTextureBufferSRV(mPointLightsColorFalloff, MaxNumLights, MaxNumLights,  PF_RGB32F);
 
 	mNumTileX= (windowWidth + TileGroupSize - 1) / TileGroupSize;
@@ -116,7 +116,7 @@ void ForwardPlusPath::RenderScene()
 	EffectTechnique* toneMapTech = mToneMapEffect->GetTechniqueByName("CopyColor");
 	mDevice->Draw(toneMapTech, mFullscreenTrangle);
 
-	screenFB->SwapBuffers();
+	//screenFB->SwapBuffers();
 }
 
 void ForwardPlusPath::DepthPrePass()
@@ -125,7 +125,7 @@ void ForwardPlusPath::DepthPrePass()
 	mDepthStencilView->ClearDepthStencil(1.0f, 0);
 
 	// Todo: update render queue with render bucket filter
-	//mSceneMan->UpdateRenderQueue(mCamera, RO_None, );   
+	mSceneMan->UpdateRenderQueue(mCamera, RO_None, RenderQueue::BucketAll, 0);
 
 	const RenderBucket& opaqueBucket = mSceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOpaque);
 	for (const RenderQueueItem& renderItem : opaqueBucket) 

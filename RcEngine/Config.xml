@@ -1,7 +1,7 @@
 <Application Title = "DeepGbufferRadiosity Demo">
 	<Graphics Left="300" Top="100" Width="1280" Height="720" ColorForamt="R8G8B8A8" DepthStencilFormat="Depth24Stencil8" FullScreen="0">
 		<Sample Count="1" Quality="0"/>
-		<SyncInterval Interval="1"/>
+		<SyncInterval Interval="0"/>
 	</Graphics>
 	
 	<RenderSystem System="Direct3D11"/>

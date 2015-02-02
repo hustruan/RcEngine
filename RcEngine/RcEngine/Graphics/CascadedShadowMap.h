@@ -8,7 +8,7 @@
 namespace RcEngine {
 
 #define MAX_CASCADES 4
-#define SHADOW_MAP_SIZE 1024
+#define SHADOW_MAP_SIZE 2048
 #define SHADOW_MAP_BLUR_KERNEL_SIZE 5
 #define MAX_POSSION_SAMPLES 24
 

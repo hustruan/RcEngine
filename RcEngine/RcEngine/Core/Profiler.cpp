@@ -108,8 +108,6 @@ void ProfilerManager::ResetAll()
 
 void ProfilerManager::Output()
 {
-
-
 	for (uint32_t i = 0; i < mCurrNumSamples; ++i)
 	{
 

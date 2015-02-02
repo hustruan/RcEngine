@@ -179,6 +179,8 @@ void sampleIndirectLight(int2 ssC, float3 C, float3 n_C, float ssDiskRadius, int
         weight = (adjustedWeight0 > adjustedWeight1) ? weight0 : weight1;
         E = (adjustedWeight0 > adjustedWeight1) ? ii_tap0 : ii_tap1;
 
+		//weight = weight0 + min(0, weight1);
+		//E = ii_tap0 + min((float3)0, ii_tap1);
         numSamplesUsed += weight;
 
 #   else
@@ -224,5 +226,6 @@ void DeepGBufferRadiosity(in float2 iTex	   : TEXCOORD0,
     // What is the ambient visibility of this location
     float visibility = 1 - numSamplesUsed / float(NUM_SAMPLES);
 
-	oFragColor = float4(E_X, visibility);
+	//oFragColor = float4(E_X, visibility);
+	oFragColor = float4(E_X.rg, visibility, visibility);
 }

@@ -330,6 +330,9 @@
     <ClInclude Include="GUI\UIAll.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\RenderDevice.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Exception.cpp">

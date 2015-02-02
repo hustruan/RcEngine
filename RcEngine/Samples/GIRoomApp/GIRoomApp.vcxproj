@@ -11,19 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7F1B1907-F2D6-48C4-A58C-5F6FF66F6B4D}</ProjectGuid>
+    <ProjectGuid>{7A11FE55-7BE4-42A7-89E4-5BF52A32A532}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>OpenGLRenderSystem</RootNamespace>
+    <RootNamespace>GIRoomApp</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -41,7 +41,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -52,16 +51,15 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OPENGLENGINEDLL_EXPORTS;RcWindows;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../RcEngine;../3rdParty</AdditionalIncludeDirectories>
-      <MinimalRebuild>false</MinimalRebuild>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../RcEngine;../../3rdParty</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../3rdParty/nvImage/lib;../Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;RcEngine_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RcEngine_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -72,59 +70,24 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENGLENGINEDLL_EXPORTS;RcWindows;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../RcEngine;../3rdParty</AdditionalIncludeDirectories>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../RcEngine;../../3rdParty</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>../3rdParty/nvImage/lib;../Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32.lib;RcEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>RcEngine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DllMain.cpp" />
-    <ClCompile Include="OpenGLBuffer.cpp" />
-    <ClCompile Include="OpenGLDepthStencilView.cpp" />
-    <ClCompile Include="OpenGLFrameBuffer.cpp" />
-    <ClCompile Include="OpenGLGraphicCommon.cpp" />
-    <ClCompile Include="OpenGLDevice.cpp" />
-    <ClCompile Include="OpenGLFactory.cpp" />
-    <ClCompile Include="OpenGLHBAO.cpp" />
-    <ClCompile Include="OpenGLModule.cpp" />
-    <ClCompile Include="OpenGLRenderTargetView.cpp" />
-    <ClCompile Include="OpenGLRenderWindow.cpp" />
-    <ClCompile Include="OpenGLSampleStater.cpp" />
-    <ClCompile Include="OpenGLShader.cpp" />
-    <ClCompile Include="OpenGLShaderPipeline.cpp" />
-    <ClCompile Include="OpenGLVertexDeclaration.cpp" />
-    <ClCompile Include="OpenGLView.cpp" />
-    <ClCompile Include="OpenGLTexture.cpp" />
-    <ClCompile Include="OpenGLTexture1D.cpp" />
-    <ClCompile Include="OpenGLTexture2D.cpp" />
-    <ClCompile Include="OpenGLTexture3D.cpp" />
-    <ClCompile Include="OpenGLTextureCube.cpp" />
-    <ClCompile Include="pfm.cpp" />
+    <ClCompile Include="GIRoomApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="OpenGLBuffer.h" />
-    <ClInclude Include="OpenGLFrameBuffer.h" />
-    <ClInclude Include="OpenGLGraphicCommon.h" />
-    <ClInclude Include="OpenGLHBAO.h" />
-    <ClInclude Include="OpenGLPrerequisites.h" />
-    <ClInclude Include="OpenGLDevice.h" />
-    <ClInclude Include="OpenGLFactory.h" />
-    <ClInclude Include="OpenGLModule.h" />
-    <ClInclude Include="OpenGLRenderWindow.h" />
-    <ClInclude Include="OpenGLSamplerState.h" />
-    <ClInclude Include="OpenGLShader.h" />
-    <ClInclude Include="OpenGLVertexDeclaration.h" />
-    <ClInclude Include="OpenGLView.h" />
-    <ClInclude Include="OpenGLTexture.h" />
-    <ClInclude Include="pfm.h" />
+    <ClInclude Include="GIRoomApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

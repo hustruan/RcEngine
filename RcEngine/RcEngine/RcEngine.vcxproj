@@ -45,6 +45,7 @@
     <ClInclude Include="Graphics\Mesh.h" />
     <ClInclude Include="Graphics\PixelFormat.h" />
     <ClInclude Include="Graphics\Renderable.h" />
+    <ClInclude Include="Graphics\RenderDevice.h" />
     <ClInclude Include="Graphics\RenderFactory.h" />
     <ClInclude Include="Graphics\RenderOperation.h" />
     <ClInclude Include="Graphics\RenderPath.h" />

@@ -51,9 +51,12 @@ protected:
 
 		// Create render path
 		mRenderPath = std::make_shared<TiledDeferredPath>();
+		//mRenderPath = std::make_shared<ForwardPlusPath>();
+		//mRenderPath = std::make_shared<DeferredPath>();
 		mRenderPath->OnGraphicsInit(mMainCamera);
 
-		mMainCamera->CreateLookAt(float3(0, 20, 0), float3(1, 20, 0));
+		//mMainCamera->CreateLookAt(float3(0, 20, 0), float3(1, 20, 0));
+		mMainCamera->CreateLookAt(float3(-887.878601, 1276.092896, 5.480794), float3(-887.154724, 1275.402954, 5.476086), float3(0.689913, 0.723878, -0.004488));
 		mMainCamera->CreatePerspectiveFov(Mathf::PI/4, (float)mAppSettings.Width / (float)mAppSettings.Height, 1.0f, 3000.0f );
 
 		mCameraControler = new RcEngine::Test::FPSCameraControler;
@@ -76,7 +79,7 @@ protected:
 		mUIWindow->InitGuiStyle(nullptr);
 		mUIWindow->SetName("TBDR");
 		mUIWindow->SetTitle(L"TBDR");
-		mUIWindow->SetPosition(int2(810, 640));
+		mUIWindow->SetPosition(int2(1070, 590));
 		mUIWindow->SetSize(int2(200, 120));
 		rootElem->AddChild( mUIWindow );
 
@@ -140,6 +143,20 @@ protected:
 		if (mAnimateLights)
 			mLightAnimation.Move(deltaTime);
 
+		auto target = mMainCamera->GetLookAt();
+		auto eye = mMainCamera->GetPosition();
+		auto up = mMainCamera->GetUp();
+
+		if (InputSystem::GetSingleton().KeyPress(KC_Q))
+		{
+			FILE* f = fopen("E:/camera.txt", "w");
+			fprintf(f, "float3(%f, %f, %f), float3(%f, %f, %f), float3(%f, %f, %f)",
+				eye[0], eye[1], eye[2],
+				target[0], target[1], target[2],
+				up[0], up[1], up[2]);
+			fclose(f);
+		}
+
 		/*	wchar_t buffer[128];
 		std::swprintf(buffer, L"FPS: %d", mFramePerSecond);
 		mFPSLabel->SetText(buffer);*/
@@ -157,7 +174,7 @@ protected:
 
 		sceneMan->UpdateOverlayQueue();
 
-		RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
+		const RenderBucket& guiBucket =sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);   
 		for (const RenderQueueItem& renderItem : guiBucket) 
 			renderItem.Renderable->Render();
 

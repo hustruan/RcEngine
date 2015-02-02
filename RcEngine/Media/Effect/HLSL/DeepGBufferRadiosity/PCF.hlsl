@@ -23,10 +23,13 @@ float EvalPossionPCF(Texture2D shadowMap, float3 shadowTexCoord, float filterRad
     return sum /NumPossionSamples;
 }
 
+// GIRoom
+static const float gShadowBias[4] = { 0.005f, 0.006f, 0.0009f, 0.0009f };
+
 float EvalPossionPCF(Texture2DArray CSM, float4 shadowTexCoord, float filterRadiusUV)
 {
 	//float shadowBias = 0.003f;
-	float shadowBias = 0.02f;
+	float shadowBias = gShadowBias[(int)shadowTexCoord.w];
 
 	float sum = 0.0f;
     for(int i=0; i < NumPossionSamples; i++)

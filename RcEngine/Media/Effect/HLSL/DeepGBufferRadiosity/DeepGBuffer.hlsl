@@ -138,5 +138,6 @@ void GBufferPS(in VSOutput input,
 	//oLambertain = float4(input.PosCS.rgb, material.DiffuseAlbedo.r);
 	oLambertain = float4(material.DiffuseAlbedo, 1.0);
 	oGlossy = float4(material.SpecularAlbedo, material.Shininess / 255.0);
+	//oNormal = float4(normal, 0.0);
 	oNormal = float4(normal * 0.5 + 0.5, 0.0); 
 }

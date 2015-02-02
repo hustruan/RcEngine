@@ -31,6 +31,14 @@ bool   EnableSSAO;
 #define PCF
 #include "PSSM.hlsl"
 
+static const float3 vCascadeColorsMultiplier[4] = {
+
+	float3 (1.5, 0.0, 0.0),
+	float3 (0.0, 1.5, 0.0),
+	float3 (0.0, 0.0, 1.5),
+	float3 (1.5, 1.5, 0.0)
+};
+
 float3 reconstructCameraSpacePosition(float2 S, float z)
 {
 	float csz = ClipInfo.y / ( z - ClipInfo.x);
@@ -111,6 +119,7 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
 	float AO = 1.0;
 	if (EnableSSAO) {
 		AO = 0.95 * AmbientOcclusion.Load(ssC).r + 0.05;
+		//AO = AmbientOcclusion.Load(ssC).r;
 	}
 
 	// How much ambient occlusion to apply to direct illumination (sort of approximates area lights,
@@ -130,13 +139,18 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
 	//E_lambertian = min((float3)0.0, E_lambertian);
 	//E_glossy = min((float3)0.0, E_glossy);
 	//E_lambertianIndirect = min((float3)0.0, E_lambertianIndirect);
-	//E_lambertianAmbient = min((float3)0.0, E_lambertianAmbient);
-	//E_glossyAmbient = min((float3)0.0, E_glossyAmbient);
+	E_lambertianAmbient = min((float3)0.0, E_lambertianAmbient);
+	E_glossyAmbient = min((float3)0.0, E_glossyAmbient);
+
+	E_lambertianAmbient += float3(1.1, 1.1, 1.1);
+
+	E_lambertian *= 0.5;
+	E_glossy *= 0.5;
 
 #if USE_INDIRECT
     result =
             emissiveColor +
-           + (E_lambertian * directAO + E_lambertianIndirect * AO   + E_lambertianAmbient * AO * lerp(0.7, 0.3, radiosityConfidence)) * lambertianColor
+           + (E_lambertian * directAO + E_lambertianIndirect * AO   + E_lambertianAmbient * AO * lerp(1.0, 0.3, radiosityConfidence)) * lambertianColor
            + (E_glossy     * directAO                               + E_glossyAmbient     * AO) * glossyColor;
 
 #else
@@ -146,6 +160,8 @@ void Deferred(in float2 iTex	   : TEXCOORD0,
            + (E_glossy     * directAO                               + E_glossyAmbient     * AO) * glossyColor;
 #endif
 
-	//oFragColor = float4(E_lambertian, result.r);
+	//result = result * vCascadeColorsMultiplier[iCascadeSelected];
+
+	//oFragColor = float4(N, result.r);
 	oFragColor = float4(result, 1.0);
 }

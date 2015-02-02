@@ -89,7 +89,6 @@ protected:
 	void DeferredShading();  // Shading pass
 	void PostProcess();
 
-
 	void DrawDirectionalLightShape(Light* light);
 	void DrawSpotLightShape(Light* light);
 	void DrawPointLightShape(Light* light);
@@ -249,6 +248,7 @@ private:
 
 	shared_ptr<GraphicsBuffer> mPointLightsPosRange;
 	shared_ptr<GraphicsBuffer> mPointLightsColorFalloff;
+
 	shared_ptr<GraphicsBuffer> mTilePointLightsRange;
 	shared_ptr<GraphicsBuffer> mTilePointLightsIndexList;
 	shared_ptr<GraphicsBuffer> mPointLightsIndexCounter;

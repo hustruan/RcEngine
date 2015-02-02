@@ -9,6 +9,8 @@ namespace RcEngine {
 
 OpenGLTextureBufferSRV::OpenGLTextureBufferSRV( const shared_ptr<GraphicsBuffer>& buffer, uint32_t elementOffset, uint32_t elementWidth, PixelFormat format )
 {
+	OGL_ERROR_CHECK();
+
 	OpenGLBuffer* pTBO = static_cast<OpenGLBuffer*>(buffer.get());
 	assert(pTBO->GetBufferTarget() == GL_TEXTURE_BUFFER);
 
@@ -22,9 +24,13 @@ OpenGLTextureBufferSRV::OpenGLTextureBufferSRV( const shared_ptr<GraphicsBuffer>
 	GLintptr bufferOffset = elementStride * elementOffset;
 	GLsizeiptr bufferSize = elementStride * elementWidth ;
 
+	//GLint align;
+	//glGetIntegerv(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &align);
 	glGenTextures(1, &mResourceOGL);
 	glBindTexture(GL_TEXTURE_BUFFER, mResourceOGL);
 	glTexBufferRange(GL_TEXTURE_BUFFER, internalFormat, pTBO->GetBufferOGL(), bufferOffset, bufferSize);
+
+	OGL_ERROR_CHECK();
 }
 
 OpenGLTextureBufferSRV::~OpenGLTextureBufferSRV()

@@ -216,8 +216,6 @@ void AmbientOcclusion::Apply(const Camera& viewCamera, const shared_ptr<Texture>
 	{
 		RenderHBAO(viewCamera, zBuffer);
 	}
-
-	Visualize(mAmbientOcclusionBuffer->GetShaderResourceView());
 }
 
 void AmbientOcclusion::Visualize(const shared_ptr<ShaderResourceView>& aoSRV)

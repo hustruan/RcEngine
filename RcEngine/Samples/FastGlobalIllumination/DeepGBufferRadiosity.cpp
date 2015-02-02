@@ -9,6 +9,8 @@
 #include <Graphics/Camera.h>
 #include <Graphics/Effect.h>
 #include <Graphics/CascadedShadowMap.h>
+#include <Graphics/AmbientOcclusion.h>
+#include <GUI/UIManager.h>
 #include <Resource/ResourceManager.h>
 #include <Scene/SceneManager.h>
 #include <Scene/SceneNode.h>
@@ -227,10 +229,10 @@ void DeepGBufferRadiosity::OnGraphicsInit(const shared_ptr<Camera>& camera)
 {
 	RenderPath::OnGraphicsInit(camera);
 
-	mSettings.Radius = 7.4f;
+	/*mSettings.Radius = 7.4f;
 	mSettings.DepthPeelSeparationHint = 1.6f;
 	mSettings.SaturatedBoost = 2.0f;
-	mSettings.UnsaturatedBoost = 1.0f;
+	mSettings.UnsaturatedBoost = 1.0f;*/
 
 	Window* appWindow = Application::msApp->GetMainWindow();
 	const uint32_t windowWidth = appWindow->GetWidth();
@@ -251,6 +253,7 @@ void DeepGBufferRadiosity::OnGraphicsInit(const shared_ptr<Camera>& camera)
 	CreateBuffers(windowWidth, windowHeight);
 
 	mShadowMan = std::make_shared<CascadedShadowMap>(mDevice);
+	mAmbientOcclusion = std::make_shared<AmbientOcclusion>(mDevice, SSAO_HBAO, windowWidth, windowHeight);
 }
 
 void DeepGBufferRadiosity::CreateBuffers( uint32_t width, uint32_t height )
@@ -346,10 +349,24 @@ void DeepGBufferRadiosity::RenderScene()
 	Prepare();	
 	ComputeShadows();
 	RenderGBuffers();
+
+	if (mAmbientOcclusion)
+	{
+		mAmbientOcclusion->Apply(*mCamera, mGBuffer.GetTexture(GBuffer::DepthStencil));
+		//mAmbientOcclusion->Visualize(mAmbientOcclusion->GetAmbientOcclusionSRV());
+		//return;
+	}
+
 	RenderLambertianOnly();
 	RenderIndirectIllumination();
 	
-	//static int i = 0;
+	static int i = 0;
+	static int j = 0;
+	//String filename = "E:/DeepGBuffer/LambertDirect" + std::to_string(i++) + "_.pfm";
+//	mDevice->GetRenderFactory()->SaveTextureToFile(filename, mLambertDirectBuffer);
+	//filename = "E:/DeepGBuffer/rawII" + std::to_string(j++) + "_.pfm";
+	//mDevice->GetRenderFactory()->SaveTextureToFile(filename, mRawIIBuffer);
+
 	//String filename = "E:/DeepGBuffer/tempRawII" + std::to_string(i++) + ".pfm";
 	//mDevice->GetRenderFactory()->SaveTextureToFile(filename, mTempFiltedResultBuffer);
 	//mDevice->GetRenderFactory()->SaveTextureToFile("E:/DeepGBuffer/light.pfm", mLambertDirectBuffer);
@@ -368,7 +385,7 @@ void DeepGBufferRadiosity::RenderScene()
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mGBuffer.GetTextureSRV(GBuffer::Lambertain));
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mLambertDirectBuffer->GetShaderResourceView());
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mPeeledLambertDirectBuffer->GetShaderResourceView());
-	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(GetRadiosityTexture()->GetShaderResourceView());
+	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(/*GetRadiosityTexture()*/mRawIIBuffer->GetShaderResourceView());
 	//mBlitEffect->GetParameterByName("SourceMap")->SetValue(mHDRBuffer->GetShaderResourceView());
 	//mDevice->DrawFSTriangle(mBlitEffect->GetTechniqueByName("BlitColor"));
 
@@ -381,6 +398,19 @@ void DeepGBufferRadiosity::RenderScene()
 
 	mPrevViewMatrix = mCamera->GetViewMatrix();
 	mPrevInvViewMatrix = mInvViewMatrix;
+
+
+
+	// Update overlays
+	UIManager& uiMan = UIManager::GetSingleton();
+	uiMan.Render();
+
+	SceneManager* sceneMan = Environment::GetSingleton().GetSceneManager();
+	sceneMan->UpdateOverlayQueue();
+
+	const RenderBucket& guiBucket = sceneMan->GetRenderQueue().GetRenderBucket(RenderQueue::BucketOverlay, false);
+	for (const RenderQueueItem& renderItem : guiBucket)
+		renderItem.Renderable->Render();
 }
 
 void DeepGBufferRadiosity::Prepare()
@@ -439,7 +469,7 @@ void DeepGBufferRadiosity::RenderGBuffers()
 	}
 
 	RenderFactory* factory = mDevice->GetRenderFactory();
-	//factory->SaveTextureToFile("E:/DeepGBuffer_Lambertain.pfm", mPeeledGBuffer.GetTexture(GBuffer::Lambertain));
+	//factory->SaveTextureToFile("E:/DeepGBuffer_Lambertain.tga", mGBuffer.GetTexture(GBuffer::Lambertain));
 	//factory->SaveTextureToFile("E:/DeepGBuffer_SSVelocity.pfm", mGBuffer.GetTexture(GBuffer::ScreenSpaceVelocity));
 	//factory->SaveTextureToFile("E:/DeepGBuffer_Normal.pfm", mGBuffer.GetTexture(GBuffer::Normal));
 }
@@ -711,7 +741,8 @@ void DeepGBufferRadiosity::DeferredShading()
 
 	mDeepGBufferShadingEffect->GetParameterByName("LightDirection")->SetValue(mainDirLight->GetDerivedDirection());
 	mDeepGBufferShadingEffect->GetParameterByName("LightColor")->SetValue(lightColor);
-	mDeepGBufferShadingEffect->GetParameterByName("EnableSSAO")->SetValue(false);
+	mDeepGBufferShadingEffect->GetParameterByName("EnableSSAO")->SetValue(true);
+	mDeepGBufferShadingEffect->GetParameterByName("AmbientOcclusion")->SetValue(mAmbientOcclusion->GetAmbientOcclusionSRV());
 
 	const float envGlossyMIPConstant = log2f(mEnvLightProbeMap->GetWidth() * sqrtf(3));
 	mDeepGBufferShadingEffect->GetParameterByName("EnvGlossyMIPConstant")->SetValue(envGlossyMIPConstant);
@@ -727,7 +758,7 @@ void DeepGBufferRadiosity::DeferredShading()
 	mDeepGBufferShadingEffect->GetParameterByName("CascadeScale")->SetValue(&mShadowMan->mShadowCascadeScale[0], MAX_CASCADES);
 	mDeepGBufferShadingEffect->GetParameterByName("CascadeOffset")->SetValue(&mShadowMan->mShadowCascadeOffset[0], MAX_CASCADES); 
 	mDeepGBufferShadingEffect->GetParameterByName("InvShadowMapSize")->SetValue(1.0f / SHADOW_MAP_SIZE);
-
+	
 
 	mDevice->DrawFSTriangle(deferredTech);
 }

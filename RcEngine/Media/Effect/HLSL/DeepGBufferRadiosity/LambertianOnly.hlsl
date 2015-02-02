@@ -78,6 +78,8 @@ void LambertianOnly(in float2 iTex	      : TEXCOORD0,
 
     float weight = 1.0 - smoothstep(epsilon * 0.8, epsilon * 1.2, dist);
     indirect *= weight;
+
+	//indirect = min((float3)0, indirect);
     E_lambertian += indirect * (1.0 - PropagationDamping) * colorBoost(indirect, LightBoost.x, LightBoost.y);
 
 #endif

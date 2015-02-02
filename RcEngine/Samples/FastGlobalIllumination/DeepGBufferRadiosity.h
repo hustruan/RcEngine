@@ -7,6 +7,7 @@
 namespace RcEngine {
 
 class CascadedShadowMap;
+class AmbientOcclusion;
 
 class DeepGBufferRadiosity : public RenderPath
 {
@@ -79,11 +80,12 @@ private:
 	void ComputeMipmapedBuffers();
 	void ComputeRawII();
 	void TemporalFiltering();
-	void RadiosityBlur();
-	
-private:
+	void RadiosityBlur();	
+
+public:
 	DeepGBufferRadiositySettings mSettings;
 
+private:
 	uint32_t mBufferWidth, mBufferHeight;
 
 	float4 mProjInfo;
@@ -92,6 +94,7 @@ private:
 	
 	shared_ptr<Texture> mEnvLightProbeMap;
 	shared_ptr<CascadedShadowMap> mShadowMan;
+	shared_ptr<AmbientOcclusion> mAmbientOcclusion;
 	
 	// GBuffers
 	GBuffer mGBuffer;
